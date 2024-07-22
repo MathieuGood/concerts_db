@@ -14,5 +14,6 @@ class Concert(BaseModel):
     venue: Venue
     artists: List[Artist]
     price: Optional[float] = None
-    festival = Festival
+    festival: Festival = None
     attendees: List[Person] = []
+    comments : str = None
