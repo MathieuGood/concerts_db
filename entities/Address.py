@@ -5,3 +5,4 @@ class Address(BaseModel):
     street: str
     city: str
     zip: str
+    country: str
