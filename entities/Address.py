@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from entities import Base
-
+from entities.Base import Base
+from entities.User import User
 
 class Address(Base):
     __tablename__ = "address"
