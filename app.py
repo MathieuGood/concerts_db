@@ -5,9 +5,7 @@ from sqlalchemy import (
     create_engine,
     MetaData,
 )
-
 from entities.User import User
-from tutorial.metadata_table_objects import run_table_queries
 
 
 def main():
@@ -21,7 +19,6 @@ def main():
 
     sandy = User(name="Sandy", fullname="Sandy Cheeks")
     print(sandy)
-
 
 
 if __name__ == "__main__":
