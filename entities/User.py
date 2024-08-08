@@ -1,6 +1,8 @@
 from typing import List, Optional
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from entities.Base import Base
+from entities.Address import Address
 
 
 class User(Base):

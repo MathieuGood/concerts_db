@@ -14,6 +14,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
+from entities.User import User
+
 
 def create_table(engine: Engine) -> None:
     with engine.begin() as conn:
@@ -77,9 +79,11 @@ def main():
 
     # print_results(engine)
 
-    user_table = create_user_table(metadata_obj)
-    address_table = create_address_table(metadata_obj)
-    metadata_obj.create_all(engine)
+    # user_table = create_user_table(metadata_obj)
+    # address_table = create_address_table(metadata_obj)
+    # metadata_obj.create_all(engine)
+
+    sandy = User(name="Sandy", fullname="Sandy Cheeks")
 
 
 if __name__ == "__main__":
