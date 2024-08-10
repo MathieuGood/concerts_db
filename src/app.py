@@ -21,8 +21,10 @@ def main():
     # engine: Engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
 
     import os
-
-    os.remove("../database/concerts_db.sqlite")
+    try:
+        os.remove("../database/concerts_db.sqlite")
+    except FileNotFoundError:
+        pass
 
     engine: Engine = create_engine(
         "sqlite+pysqlite:///database/concerts_db.sqlite", echo=True
@@ -43,7 +45,7 @@ def main():
     red_rocks: Venue = venue_repository.get_by_id(2)
 
     print("")
-    print(fillmore.addresse)
+    print(fillmore.address)
     print("")
     print(red_rocks.address)
 
