@@ -1,5 +1,5 @@
-from src.entities.Address import Address
-from src.entities.Venue import Venue
+from entities.Address import Address
+from entities.Venue import Venue
 
 fillmore = Venue(name="The Fillmore")
 red_rocks = Venue(name="Red Rocks")

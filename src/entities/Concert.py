@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from sqlalchemy import Date, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from src.entities.Base import Base
+from entities.Base import Base
 
 
 @dataclass
@@ -26,7 +26,7 @@ class Concert(Base):
     )
 
 
-from src.entities.Venue import Venue
-from src.entities.Festival import Festival
-from src.entities.Artist import Artist
-from src.entities.Person import Person
+from entities.Venue import Venue
+from entities.Festival import Festival
+from entities.Artist import Artist
+from entities.Person import Person

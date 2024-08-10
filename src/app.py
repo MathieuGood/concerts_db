@@ -1,11 +1,14 @@
 from sqlalchemy import Engine, create_engine, MetaData, insert, text
 from entities.Base import Base
-from entities.User import User
+from entities.Person import Person
+from entities.Artist import Artist
+from entities.Concert import Concert
+from entities.Festival import Festival
 from entities.Address import Address
 from sqlalchemy.orm import Session
-
-from entities.repositories.PersonRepository import PersonRepository
-from mockup_data.characters import characters
+from entities.Venue import Venue
+from mockup_data.venues import venues
+from entities.repositories.VenueRepository import VenueRepository
 
 
 def delete_all_users(session: Session):
@@ -18,6 +21,7 @@ def main():
     # engine: Engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
 
     import os
+
     os.remove("../database/concerts_db.sqlite")
 
     engine: Engine = create_engine(
@@ -31,22 +35,17 @@ def main():
 
     # delete_all_users(session)
 
-    user_repository = PersonRepository(session)
+    venue_repository = VenueRepository(session)
 
-    user_repository.add_multiple(characters)
+    venue_repository.add_multiple(venues)
 
-    kenny: User = user_repository.get_by_id(4)
-    stan: User = user_repository.get_by_id(3)
-
-    kenny_address = Address(city="South Park", country="USA")
-    stan_address = Address(city="Tegridyville", country="USA")
-    kenny.addresses.append(kenny_address)
-    stan.addresses.append(stan_address)
+    fillmore: Venue = venue_repository.get_by_id(1)
+    red_rocks: Venue = venue_repository.get_by_id(2)
 
     print("")
-    print(kenny.addresses)
+    print(fillmore.addresse)
     print("")
-    print(stan.addresses)
+    print(red_rocks.address)
 
     session.commit()
 
