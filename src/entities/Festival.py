@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from sqlalchemy import Date, String
 from sqlalchemy.orm import Mapped, mapped_column
-from entities.Base import Base
+from src.entities.Base import Base
 
 
 @dataclass

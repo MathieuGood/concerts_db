@@ -1,7 +1,6 @@
-from abc import ABC, abstractmethod
 from typing import List
 from sqlalchemy.orm import Session
-from entities.Person import Person
+from src.entities.Person import Person
 
 
 class PersonRepository():
