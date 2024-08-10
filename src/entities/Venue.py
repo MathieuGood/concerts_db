@@ -12,7 +12,7 @@ class Venue(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
 
     address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"), nullable=False)
-    address: Mapped["Address"] = relationship("Address", back_populates="venues")
+    address: Mapped["Address"] = relationship(back_populates="venues")
 
 
 from entities.Address import Address

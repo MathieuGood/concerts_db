@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from entities.Base import Base
@@ -7,13 +8,13 @@ from entities.Base import Base
 @dataclass
 class Address(Base):
 
-    __tablename__ = "address"
+    __tablename__ = "addresses"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     city: Mapped[str] = mapped_column(String)
     country: Mapped[str] = mapped_column(String)
 
-    venue: Mapped["Venue"] = relationship("Venue", back_populates="address")
+    venues: Mapped[List["Venue"]] = relationship("Venue", back_populates="address")
 
 
 from entities.Venue import Venue

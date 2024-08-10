@@ -1,6 +1,6 @@
 from typing import List, Type
 from sqlalchemy.orm import Session
-from src.entities.Venue import Venue
+from entities.Venue import Venue
 
 
 class VenueRepository():
