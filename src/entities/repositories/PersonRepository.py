@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Type
 from sqlalchemy.orm import Session
 from src.entities.Person import Person
 
@@ -15,7 +15,7 @@ class PersonRepository():
         self.session.add_all(users)
         self.session.commit()
 
-    def get_by_id(self, id) -> Person:
+    def get_by_id(self, id) -> Type[Person] | None:
         return self.session.get(Person, id)
 
     def get_all(self) -> List[Person]:
