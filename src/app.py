@@ -18,7 +18,7 @@ def main():
     # engine: Engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
 
     import os
-    os.remove("database/concerts_db.sqlite")
+    os.remove("../database/concerts_db.sqlite")
 
     engine: Engine = create_engine(
         "sqlite+pysqlite:///database/concerts_db.sqlite", echo=True
