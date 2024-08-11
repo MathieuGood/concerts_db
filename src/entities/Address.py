@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from entities.Base import Base
+from src.entities.Base import Base
 
 
 @dataclass
@@ -17,4 +17,4 @@ class Address(Base):
     venues: Mapped[List["Venue"]] = relationship("Venue", back_populates="address")
 
 
-from entities.Venue import Venue
+from src.entities.Venue import Venue
