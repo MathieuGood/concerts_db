@@ -21,9 +21,13 @@ def main():
     # engine: Engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
 
     import os
+
     try:
-        os.remove("../database/concerts_db.sqlite")
-    except FileNotFoundError:
+        os.remove("database/concerts_db.sqlite")
+        print("*** Database file removed ***")
+    except FileNotFoundError as e:
+        print(e)
+
         pass
 
     engine: Engine = create_engine(

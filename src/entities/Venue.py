@@ -11,7 +11,7 @@ class Venue(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
-    address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"), nullable=False)
+    address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
     address: Mapped["Address"] = relationship(back_populates="venues")
 
 
