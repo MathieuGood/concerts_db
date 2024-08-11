@@ -30,6 +30,8 @@ chicago_theatre.address = chicago
 venues = [fillmore, red_rocks, hollywood_bowl, msg, wrigley, chicago_theatre, ewerk]
 
 
+
+
 nofx_show_artists = [
     Artist(name="Circle Jerks", country="USA"),
     Artist(name="Itchy", country="USA"),

@@ -12,8 +12,9 @@ class Show(Base):
     __tablename__ = "shows"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    event_date: Mapped[date] = mapped_column(Date, nullable=False)
-    comments: Mapped[str] = mapped_column(String, nullable=True)
+    name: Mapped[str] = mapped_column(nullable=True)
+    event_date: Mapped[date] = mapped_column(nullable=False)
+    comments: Mapped[str] = mapped_column(nullable=True)
 
     venue_id: Mapped[int] = mapped_column(ForeignKey("venues.id"), nullable=False)
     festival_id: Mapped[int] = mapped_column(ForeignKey("festivals.id"), nullable=True)

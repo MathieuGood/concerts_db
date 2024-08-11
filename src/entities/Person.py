@@ -11,8 +11,8 @@ class Person(Base):
     __tablename__ = "persons"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    firstname: Mapped[str] = mapped_column(String, nullable=False)
-    lastname: Mapped[str] = mapped_column(String, nullable=True)
+    firstname: Mapped[str] = mapped_column(nullable=False)
+    lastname: Mapped[str] = mapped_column(nullable=True)
 
     shows: Mapped[List["Show"]] = relationship(
         "Show", secondary="show_attendees", back_populates="attendees"
