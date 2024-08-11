@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Concert</title>
+</head>
+
+<body>
+<h1>Edit Concert</h1>
+
+<p>Concert ID: {{ concert.id }}</p>
+
+<p>Concert Artists:
+    <select id="concert_artists" name="artists">
+        <option value="new">Add new artist</option>
+        <option value="1">Artist 1</option>
+        <option value="2">Artist 2</option>
+        <option value="3">Artist 3</option>
+    </select>
+<p>Red Hot Chili Peppers, Foo Fighters, Green Day</p>
+</p>
+
+<p>Concert Date:
+    <input type="date" id="concert_date" name="date">
+</p>
+
+<p>Concert Venue:
+    <select id="concert_venue" name="venue">
+        <option value="new">Add new venue</option>
+        <option value="1">Venue 1</option>
+        <option value="2">Venue 2</option>
+        <option value="3">Venue 3</option>
+    </select>
+</p>
+
+<p>Concert Comments:
+    <input type="text" id="concert_comments" name="comments">
+</p>
+
+<p>Concert Images:
+    <select id="concert_images" name="images">
+        <option value="new">Add new image</option>
+        <option value="1">Image 1</option>
+        <option value="2">Image 2</option>
+        <option value="3">Image 3</option>
+    </select>
+</p>
+<p>Concert Videos:
+    <select id="concert_videos" name="videos">
+        <option value="new">Add new video</option>
+        <option value="1">Video 1</option>
+        <option value="2">Video 2</option>
+        <option value="3">Video 3</option>
+    </select>
+</p>
+
+
+<!--Save and Delete buttons to interact with the form-->
+<form action="/concerts/{{ concert.id }}" method="POST">
+    <button type="submit">Save</button>
+</form>
+
+<p></p><a href="/concerts">Back to Concerts</a></p>
+
+
+</body>
+
+</html>
