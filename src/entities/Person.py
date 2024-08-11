@@ -21,3 +21,4 @@ class Person(Base):
 
 from src.entities.Show import Show
 from src.entities.ShowPersonAssociation import show_person_association
+    
