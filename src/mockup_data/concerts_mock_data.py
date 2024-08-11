@@ -52,11 +52,12 @@ nofx_show = Show(
     comments="NOFX played The Decline, it was exceptional",
 )
 
-nofx_show.venue = ewerk
-nofx_show.attendees = nofx_show_attendees
+
 
 for artist in nofx_show_artists:
     concert = Concert()
     concert.artist = artist
     concert.show = nofx_show
     
+nofx_show.venue = ewerk
+nofx_show.attendees = nofx_show_attendees

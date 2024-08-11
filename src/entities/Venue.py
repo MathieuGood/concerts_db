@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import List
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.entities.Base import Base
 

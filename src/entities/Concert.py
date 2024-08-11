@@ -1,14 +1,12 @@
 from dataclasses import dataclass
 from typing import List
-from sqlalchemy import ForeignKey, String, Date
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import date
 from src.entities.Base import Base
 
 
 @dataclass
 class Concert(Base):
-
     __tablename__ = "concerts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
