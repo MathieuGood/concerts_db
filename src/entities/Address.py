@@ -11,8 +11,8 @@ class Address(Base):
     __tablename__ = "addresses"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    city: Mapped[str] = mapped_column(String)
-    country: Mapped[str] = mapped_column(String)
+    city: Mapped[str] = mapped_column(nullable=False)
+    country: Mapped[str] = mapped_column(nullable=False)
 
     venues: Mapped[List["Venue"]] = relationship("Venue", back_populates="address")
 
