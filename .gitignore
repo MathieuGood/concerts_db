@@ -1,5 +1,8 @@
 .DS_Store
 
+# SQlite database file
+database/concerts_db.sqlite
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
