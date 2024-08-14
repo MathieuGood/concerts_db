@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from src.entities.Base import Base
+from entities.Base import Base
 
 
 @dataclass
@@ -18,6 +18,6 @@ class Venue(Base):
     shows: Mapped[List["Show"]] = relationship("Show", back_populates="venue")
 
 
-from src.entities.Address import Address
-from src.entities.Concert import Concert
-from src.entities.Show import Show
+from entities.Address import Address
+from entities.Concert import Concert
+from entities.Show import Show

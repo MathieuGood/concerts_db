@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from src.entities.Address import Address
-from src.repositories.BaseRepository import BaseRepository
+from entities.Address import Address
+from repositories.BaseRepository import BaseRepository
 
 
 class AddressRepository(BaseRepository[Address]):

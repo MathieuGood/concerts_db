@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from src.entities.Concert import Concert
-from src.repositories.BaseRepository import BaseRepository
+from entities.Concert import Concert
+from repositories.BaseRepository import BaseRepository
 
 
 class ConcertRepository(BaseRepository[Concert]):

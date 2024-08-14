@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from src.entities.Base import Base
+from entities.Base import Base
 
 
 @dataclass
@@ -19,6 +19,6 @@ class Person(Base):
     )
 
 
-from src.entities.Show import Show
-from src.entities.ShowPersonAssociation import show_person_association
+from entities.Show import Show
+from entities.ShowPersonAssociation import show_person_association
     

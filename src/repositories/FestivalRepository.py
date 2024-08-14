@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from src.entities.Festival import Festival
-from src.repositories.BaseRepository import BaseRepository
+from entities.Festival import Festival
+from repositories.BaseRepository import BaseRepository
 
 
 class FestivalRepository(BaseRepository[Festival]):

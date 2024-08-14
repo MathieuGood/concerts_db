@@ -1,13 +1,13 @@
 from datetime import datetime
-from src.entities.Address import Address
-from src.entities.Venue import Venue
-from src.entities.Concert import Concert
-from src.entities.Artist import Artist
-from src.entities.Festival import Festival
-from src.entities.Person import Person
-from src.entities.Photo import Photo
-from src.entities.Video import Video
-from src.entities.Show import Show
+from entities.Address import Address
+from entities.Venue import Venue
+from entities.Concert import Concert
+from entities.Artist import Artist
+from entities.Festival import Festival
+from entities.Person import Person
+from entities.Photo import Photo
+from entities.Video import Video
+from entities.Show import Show
 
 
 fillmore = Venue(name="The Fillmore", address=None)

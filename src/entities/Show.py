@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import date
-from src.entities.Base import Base
+from entities.Base import Base
 
 
 @dataclass
@@ -27,10 +27,10 @@ class Show(Base):
     )
 
 
-from src.entities.Venue import Venue
-from src.entities.Festival import Festival
-from src.entities.Artist import Artist
-from src.entities.Person import Person
-from src.entities.Photo import Photo
-from src.entities.Video import Video
-from src.entities.Concert import Concert
+from entities.Venue import Venue
+from entities.Festival import Festival
+from entities.Artist import Artist
+from entities.Person import Person
+from entities.Photo import Photo
+from entities.Video import Video
+from entities.Concert import Concert

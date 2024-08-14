@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from src.entities.Base import Base
+from entities.Base import Base
 
 
 @dataclass
@@ -15,4 +15,4 @@ class Video(Base):
     concert: Mapped["Concert"] = relationship("Concert", back_populates="videos")
 
 
-from src.entities.Concert import Concert
+from entities.Concert import Concert
