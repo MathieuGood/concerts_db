@@ -30,6 +30,7 @@ def main():
     show_repository.add(nofx_show)
     session.commit()
 
+
     first_concert = session.get(Concert, 1)
     print(first_concert)
 
