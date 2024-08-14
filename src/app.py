@@ -20,7 +20,7 @@ from src.repositories.ShowRepository import ShowRepository
 def main():
     session = create_session()
 
-    app = Flask()
+    app = Flask(__name__)
 
     venue_repository = VenueRepository(session)
     show_repository = ShowRepository(session)
