@@ -8,8 +8,10 @@ from sqlalchemy import (
     ForeignKey,
 )
 
+metadata_obj = MetaData()
 
-def create_user_table(metadata_obj: MetaData) -> Table:
+
+def create_user_table(metadata_obj: MetaData = metadata_obj) -> Table:
     return Table(
         "user",
         metadata_obj,
@@ -19,7 +21,7 @@ def create_user_table(metadata_obj: MetaData) -> Table:
     )
 
 
-def create_address_table(metadata_obj: MetaData) -> Table:
+def create_address_table(metadata_obj: MetaData = metadata_obj) -> Table:
     return Table(
         "address",
         metadata_obj,
@@ -29,7 +31,7 @@ def create_address_table(metadata_obj: MetaData) -> Table:
     )
 
 
-def run_table_queries(engine: Engine, metadata_obj: MetaData):
+def run_table_queries(engine: Engine, metadata_obj: MetaData = metadata_obj):
     user_table = create_user_table(metadata_obj)
     address_table = create_address_table(metadata_obj)
     metadata_obj.create_all(engine)
