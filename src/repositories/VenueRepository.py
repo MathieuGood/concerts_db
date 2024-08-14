@@ -1,8 +1,8 @@
 from typing import List, Type
 from sqlalchemy.orm import Session
-from src.entities.Concert import Concert
-from src.repositories.BaseRepository import BaseRepository
-from src.entities.Venue import Venue
+from entities.Concert import Concert
+from repositories.BaseRepository import BaseRepository
+from entities.Venue import Venue
 
 
 class VenueRepository(BaseRepository[Venue]):

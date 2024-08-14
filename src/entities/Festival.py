@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import date
-from src.entities.Base import Base
+from entities.Base import Base
 
 
 @dataclass
@@ -19,4 +19,4 @@ class Festival(Base):
     shows: Mapped[List["Show"]] = relationship("Show", back_populates="festival")
 
 
-from src.entities.Show import Show
+from entities.Show import Show
