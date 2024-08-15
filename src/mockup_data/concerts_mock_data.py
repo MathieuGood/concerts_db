@@ -23,9 +23,12 @@ chicago_theatre = Venue(name="Chicago Theatre")
 chicago = Address(city="Chicago", country="USA")
 wrigley.address = chicago
 chicago_theatre.address = chicago
-ewerk = Venue(name="E-Wek")
+ewerk = Venue(name="E-Werk")
 ewerk.address = Address(city="Saarbrücken", country="Germany")
-venues = [fillmore, red_rocks, hollywood_bowl, msg, wrigley, chicago_theatre, ewerk]
+hob_boston = Venue(name="House of Blues Boston")
+hob_boston.address = Address(city="Boston", country="USA")
+
+venues = [fillmore, red_rocks, hollywood_bowl, msg, wrigley, chicago_theatre, ewerk, hob_boston]
 
 nofx_show_artists = [
     Artist(name="Circle Jerks", country="USA"),
@@ -53,3 +56,10 @@ for artist in nofx_show_artists:
 nofx_show.name = "NOFX Final Tour"
 nofx_show.venue = ewerk
 nofx_show.attendees = nofx_show_attendees
+
+
+nfg_show = Show(event_date=datetime(year=2009, month=4, day=30))
+nfg_show.venue = hob_boston
+nfg_concert = Concert()
+nfg_concert.artist = Artist(name="New Found Glory", country="USA")
+nfg_show.concerts.append(nfg_concert)

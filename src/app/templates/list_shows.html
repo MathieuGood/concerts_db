@@ -10,7 +10,7 @@
     <h1>Concerts List</h1>
     <ul>
         {% for show in shows %}
-            <li>{{ show.name }} - {{ show.event_date }} at {{ show.venue.name }} ({{ show.venue.city }}, {{ show.venue.country }})</li>
+            <li>{{ show.name }} - {{ show.event_date }} at {{ show.venue.name }} ({{ show.venue.address.city }}, {{ show.venue.address.country }})</li>
         {% endfor %}
     </ul>
 </body>
