@@ -1,4 +1,5 @@
 .DS_Store
+prompt.txt
 
 # SQlite database file
 database/
