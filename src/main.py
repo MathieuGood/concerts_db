@@ -1,8 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from mockup_data.concerts_mock_data import venues, nofx_show
-from db_session import create_session
+from mockup_data.concerts_mock_data import venues, nofx_show, nfg_show
 from entities.Base import Base
 from entities.Person import Person
 from entities.Artist import Artist
@@ -33,11 +32,11 @@ def delete_database() -> None:
     print("")
     print(os.getcwd())
     print("")
-    input("Press Enter to continue...")
+    # input("Press Enter to continue...")
 
 
 def create_app(db: SQLAlchemy) -> Flask:
-    app = Flask(__name__, template_folder="templates")
+    app = Flask(__name__, template_folder="app/templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = (
         "sqlite+pysqlite:///flask_concerts_db.sqlite"
     )
@@ -47,7 +46,7 @@ def create_app(db: SQLAlchemy) -> Flask:
 
 
 def main():
-
+    delete_database()
     db = SQLAlchemy(model_class=Base)
     app = create_app(db)
 
@@ -68,10 +67,8 @@ def main():
 
         venue_repository.add_multiple(venues)
         show_repository.add(nofx_show)
+        show_repository.add(nfg_show)
         session.commit()
-
-        first_concert = session.get(Concert, 1)
-        print(first_concert)
 
     return app
 
