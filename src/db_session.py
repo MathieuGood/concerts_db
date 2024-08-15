@@ -6,7 +6,7 @@ from entities.Base import Base
 
 def create_session() -> Session:
     try:
-        os.remove("../database/concerts_db.sqlite")
+        os.remove("database/concerts_db.sqlite")
         print("*** Database file removed ***")
     except FileNotFoundError as e:
         print(e)
@@ -19,7 +19,7 @@ def create_session() -> Session:
     input("Press Enter to continue...")
 
     engine: Engine = create_engine(
-        "sqlite+pysqlite:///../database/concerts_db.sqlite", echo=True
+        "sqlite+pysqlite:///database/concerts_db.sqlite", echo=True
     )
     # engine: Engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
 
