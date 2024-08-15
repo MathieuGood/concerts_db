@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from mockup_data.concerts_mock_data import venues, nofx_show
 from db_session import create_session
 from entities.Person import Person
@@ -17,13 +18,18 @@ from repositories.PhotoRepository import PhotoRepository
 from repositories.VideoRepository import VideoRepository
 from repositories.ShowRepository import ShowRepository
 
+
 db = SQLAlchemy()
 
 
 def create_app():
     app = Flask(__name__, template_folder="templates")
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite+pysqlite:///database/concerts_db.sqlite"
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        "sqlite+pysqlite:///database/concerts_db.sqlite"
+    )
     db.init_app(app)
+    migrate = Migrate(app, db)
+    return app
 
 
 def main():
