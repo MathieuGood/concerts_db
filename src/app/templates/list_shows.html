@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Concerts List</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
     <h1>Concerts List</h1>
     <ul>
-        {% for show in shows %}
-            <li>{{ show.name }} - {{ show.event_date }} at {{ show.venue.name }} ({{ show.venue.address.city }}, {{ show.venue.address.country }})</li>
-        {% endfor %}
+      {% for show in shows %}
+        <li>{{ show.name }} - {{ show.event_date }} at {{ show.venue.name }} ({{ show.venue.address.city }}, {{ show.venue.address.country }})</li>
+      {% endfor %}
     </ul>
-</body>
+  </body>
 </html>
