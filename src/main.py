@@ -22,19 +22,22 @@ from repositories.ShowRepository import ShowRepository
 db = SQLAlchemy()
 
 
-def create_app():
+def create_app() -> Flask:
     app = Flask(__name__, template_folder="templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = (
-        "sqlite+pysqlite:///database/concerts_db.sqlite"
+        "sqlite+pysqlite:///flask_concerts_db.sqlite"
     )
     db.init_app(app)
+
+    from app.routes.show_routes import register_routes
+    register_routes(app, db)
+
     migrate = Migrate(app, db)
     return app
 
 
 def main():
     session = create_session()
-    app = Flask(__name__)
 
     venue_repository = VenueRepository(session)
     show_repository = ShowRepository(session)
