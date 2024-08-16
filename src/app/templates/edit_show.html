@@ -1,70 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- This is just a sketch for a page to edit a show -->
+  <!-- This is just a sketch for a page to edit a show -->
 
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Edit Show</title>
-</head>
+  </head>
 
-<body>
-    <h1>Edit Show</h1>
+  <body>
+ {#
+    <p>Show ID: XXX</p>
 
-    <p>Show ID: {{ concert.id }}</p>
-
-    <p>Show Date:
-        <input type="date" id="concert_date" name="date">
+    <p>
+      Show Date:<input type="date" id="concert_date" name="date" />
     </p>
 
-    <p>Show Venue:
-        <select id="concert_venue" name="venue">
-            <option value="new">Add new venue</option>
-            <option value="1">Venue 1</option>
-            <option value="2">Venue 2</option>
-            <option value="3">Venue 3</option>
-        </select>
+    <p>
+      Show Venue:<select id="concert_venue" name="venue">
+        <option value="new">Add new venue</option>
+        <option value="1">Venue 1</option>
+        <option value="2">Venue 2</option>
+        <option value="3">Venue 3</option>
+      </select>
     </p>
 
-    <p>Show Comments:
-        <input type="text" id="concert_comments" name="comments">
+    <p>
+      Show Comments:<input type="text" id="concert_comments" name="comments" />
     </p>
 
-    <p>Show Concerts:
-        <select id="concert_artists" name="artists">
-            <option value="new">Add new concert</option>
-            <option value="1">Artist 1</option>
-            <option value="2">Artist 2</option>
-            <option value="3">Artist 3</option>
-        </select>
-    <p>Red Hot Chili Peppers, Foo Fighters, Green Day</p>
+    <p>
+      Show Concerts:<select id="concert_artists" name="artists">
+        <option value="new">Add new concert</option>
+        <option value="1">Artist 1</option>
+        <option value="2">Artist 2</option>
+        <option value="3">Artist 3</option>
+      </select>
+      <br />Red Hot Chili Peppers, Foo Fighters, Green Day
     </p>
 
-    <p>Concert Images:
-        <select id="concert_images" name="images">
-            <option value="new">Add new image</option>
-            <option value="1">Image 1</option>
-            <option value="2">Image 2</option>
-            <option value="3">Image 3</option>
-        </select>
+    <p>
+      Concert Images:<select id="concert_images" name="images">
+        <option value="new">Add new image</option>
+        <option value="1">Image 1</option>
+        <option value="2">Image 2</option>
+        <option value="3">Image 3</option>
+      </select>
     </p>
 
-    <p>Concert Videos:
-        <select id="concert_videos" name="videos">
-            <option value="new">Add new video</option>
-            <option value="1">Video 1</option>
-            <option value="2">Video 2</option>
-            <option value="3">Video 3</option>
-        </select>
+    <p>
+      Concert Videos:<select id="concert_videos" name="videos">
+        <option value="new">Add new video</option>
+        <option value="1">Video 1</option>
+        <option value="2">Video 2</option>
+        <option value="3">Video 3</option>
+      </select>
     </p>
 
-    <!--Save and Delete buttons to interact with the form-->
-    <form action="/concerts/{{ concert.id }}" method="POST">
-        <button type="submit">Save</button>
+    <button type="submit">Save</button>
+
+    #}
+
+    <h1>Edit show Flask Form</h1>
+
+    <form action="" method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <p>
+        {{ form.name.label }}<br />
+        {{ form.name() }}
+      </p>
+      <p>
+        {{ form.venue.label }}<br />
+        {{ form.venue() }}
+      </p>
+      <p>
+        {{ form.comments.label }}<br />
+        {{ form.comments() }}
+      </p>
+      <p>
+        {{ form.concerts.label }}<br />
+        {{ form.concerts() }}
+      </p>
+      <p>{{ form.submit() }}</p>
     </form>
-
-    <p></p><a href="/concerts">Back to Concerts</a></p>
-
-
-</body>
-
+  </body>
 </html>
