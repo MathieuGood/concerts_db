@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import List
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from entities.Base import Base
 
@@ -10,8 +10,8 @@ class Concert(Base):
     __tablename__ = "concerts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    comments: Mapped[str] = mapped_column(nullable=True)
-    setlist : Mapped[str] = mapped_column(nullable=True)
+    comments: Mapped[str] = mapped_column(default="", nullable=False)
+    setlist: Mapped[str] = mapped_column(nullable=True)
 
     show_id: Mapped[int] = mapped_column(ForeignKey("shows.id"), nullable=False)
     show: Mapped["Show"] = relationship("Show", back_populates="concerts")

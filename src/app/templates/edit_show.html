@@ -1,110 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-  <!-- This is just a sketch for a page to edit a show -->
-
   <head>
     <meta charset="UTF-8" />
     <title>Edit Show</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </head>
 
   <body>
-    {#
-<p>Show ID: XXX</p>
+    <div class="container-fluid">
+      <h1>Edit show Flask Form</h1>
 
-<p>
-    Show Date:<input type="date" id="concert_date" name="date"/>
-</p>
+      <form action="" method="POST" novalidate>
+        <table class="table">
+          <tr>
+            <td>Show ID</td>
+            <td>{{ show.id }}</td>
+          </tr>
+          <tr>
+            <td>Show Name</td>
+            <td>{{ show.name }}</td>
+          </tr>
+          <tr>
+            <td>Show Date</td>
+            <td>{{ show.event_date }}</td>
+          </tr>
+          <tr>
+            <td>Venue</td>
+            <td>{{ show.venue.name }}, {{ show.venue.address.city }}, {{ show.venue.address.country }}</td>
+          </tr>
+          <tr>
+            <td>Comments</td>
+            <td>{{ show.comments }}</td>
+          </tr>
+          <tr></tr>
+        </table>
 
-<p>
-    Show Venue:<select id="concert_venue" name="venue">
-    <option value="new">Add new venue</option>
-    <option value="1">Venue 1</option>
-    <option value="2">Venue 2</option>
-    <option value="3">Venue 3</option>
-</select>
-</p>
+        {{ form.hidden_tag() }}
+        <p>
+          {{ form.name.label }}<br />
+          {{ form.name() }}
+        </p>
+        <p>
+          {{ form.event_date.label }}<br />
+          {{ form.event_date() }}
+        </p>
+        <p>
+          {{ form.venue.label }}<br />
+          {{ form.venue() }}
+        </p>
+        <p>
+          {{ form.comments.label }}<br />
+          {{ form.comments() }}
+        </p>
 
-<p>
-    Show Comments:<input type="text" id="concert_comments" name="comments"/>
-</p>
+        <div class="container">
+          <table class="table table-striped table-light table-responsive border-1">
+            <tr>
+              <th>Artist</th>
+              <th>Comments</th>
+              <th>Image</th>
+              <th>Video</th>
+            </tr>
 
-<p>
-    Show Concerts:<select id="concert_artists" name="artists">
-    <option value="new">Add new concert</option>
-    <option value="1">Artist 1</option>
-    <option value="2">Artist 2</option>
-    <option value="3">Artist 3</option>
-</select>
-    <br/>Red Hot Chili Peppers, Foo Fighters, Green Day
-</p>
+            {% for concert in show.concerts %}
+              <tr>
+                <td>{{ concert.artist.name }}</td>
+                <td>{{ concert.comments }}</td>
+                <td>{{ concert.photos }}</td>
+                <td>{{ concert.videos }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
 
-<p>
-    Concert Images:<select id="concert_images" name="images">
-    <option value="new">Add new image</option>
-    <option value="1">Image 1</option>
-    <option value="2">Image 2</option>
-    <option value="3">Image 3</option>
-</select>
-</p>
-
-<p>
-    Concert Videos:<select id="concert_videos" name="videos">
-    <option value="new">Add new video</option>
-    <option value="1">Video 1</option>
-    <option value="2">Video 2</option>
-    <option value="3">Video 3</option>
-</select>
-</p>
-
-<button type="submit">Save</button>
-
-#}
-
-    <h1>Edit show Flask Form</h1>
-
-    <form action="" method="POST" novalidate>
-      {{ form.hidden_tag() }}
-      <p>
-        {{ form.name.label }}<br />
-        {{ form.name() }}
-      </p>
-      <p>
-        {{ form.event_date.label }}<br />
-        {{ form.event_date() }}
-      </p>
-      <p>
-        {{ form.venue.label }}<br />
-        {{ form.venue() }}
-      </p>
-      <p>
-        {{ form.comments.label }}<br />
-        {{ form.comments() }}
-      </p>
-      <p>
-        {{ form.concerts.label }}<br />
-        {{ form.concerts() }}
-      </p>
-    
-      <table>
-        <tr>
-          <th>Artist</th>
-          <th>Comments</th>
-          <th>Image</th>
-          <th>Video</th>
-        </tr>
-
-        {% for concert in form.concerts %}
-        <tr>
-          <td>{{ concert[0] }}</td>
-          <td>{{ concert.artist }}</td>
-          <td>{{ concert.comments }}</td>
-          <td>{{ concert.photos }}</td>
-          <td>{{ concert.videos }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-
-      <p>{{ form.submit() }}</p>
-    </form>
+        <p>{{ form.submit() }}</p>
+      </form>
+    </div>
   </body>
 </html>

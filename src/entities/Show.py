@@ -13,7 +13,7 @@ class Show(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=True)
     event_date: Mapped[date] = mapped_column(nullable=False)
-    comments: Mapped[str] = mapped_column(nullable=True)
+    comments: Mapped[str] = mapped_column(default="", nullable=False)
 
     venue_id: Mapped[int] = mapped_column(ForeignKey("venues.id"), nullable=False)
     festival_id: Mapped[int] = mapped_column(ForeignKey("festivals.id"), nullable=True)

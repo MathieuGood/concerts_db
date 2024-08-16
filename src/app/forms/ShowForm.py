@@ -14,9 +14,8 @@ from wtforms.validators import DataRequired
 
 class ShowForm(FlaskForm):
 
-    def __init__(self, concerts: list[str], venues: list[str]) -> None:
-        super(ShowForm, self).__init__()
-        self.concerts.choices = concerts
+    def __init__(self, venues: list[str]) -> None:
+        super().__init__()
         self.venue.choices = venues
 
     name = StringField("Name", description="Name of the show")
@@ -35,11 +34,7 @@ class ShowForm(FlaskForm):
         ],
     )
     comments = TextAreaField("Comments", description="Comments related to the show")
-    concerts = SelectMultipleField(
-        "Concerts",
-        description="All the concerts played at that specific show",
-        validators=[DataRequired()],
-    )
+
     submit = SubmitField(
         "Save show", description="Saves all the show details to the database"
     )
