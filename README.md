@@ -131,7 +131,7 @@ Show is the main entity of the model :
 </table>
 
 
-## Dependencies\
+## Dependencies
 
 You can install all the app dependencies using pip with the requirements.txt file.
 ```python
