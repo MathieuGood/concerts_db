@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from mockup_data.concerts_mock_data import venues, nofx_show, nfg_show
+from config import Config
 from entities.Base import Base
 from entities.Person import Person
 from entities.Artist import Artist
@@ -37,11 +38,9 @@ def delete_database() -> None:
 
 def create_app(db: SQLAlchemy) -> Flask:
     app = Flask(__name__, template_folder="app/templates")
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        "sqlite+pysqlite:///flask_concerts_db.sqlite"
-    )
-    db.init_app(app)
 
+    app.config.from_object(Config)
+    db.init_app(app)
     return app
 
 
