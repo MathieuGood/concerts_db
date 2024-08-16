@@ -31,6 +31,7 @@ def delete_database() -> None:
         pass
 
     print("")
+    print("Current diretory :")
     print(os.getcwd())
     print("")
     # input("Press Enter to continue...")
