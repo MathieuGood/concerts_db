@@ -23,8 +23,11 @@
     </tr>
     <tr>
       <td>Venue</td>
-      <td>{{ show.venue.name if show.venue else '' }}, {{ show.venue.address.city if show.venue else '' }}, {{
-        show.venue.address.country if show.venue else '' }}</td>
+      <td>
+        {% if show.venue %}
+          {{ show.venue.name }}, {{ show.venue.address.city }}, {{ show.venue.address.country }}
+        {% endif %}
+      </td>
     </tr>
     <tr>
       <td>Comments</td>
@@ -33,22 +36,22 @@
     <tr></tr>
   </table>
 
-  {{ form.hidden_tag() }}
+  {{ show_form.hidden_tag() }}
   <p>
-    {{ form.name.label }}<br />
-    {{ form.name(class="form-text") }}
+    {{ show_form.name.label }}<br />
+    {{ show_form.name(class="form-control") }}
   </p>
   <p>
-    {{ form.event_date.label }}<br />
-    {{ form.event_date(class="") }}
+    {{ show_form.event_date.label }}<br />
+    {{ show_form.event_date(class="form-select") }}
   </p>
   <p>
-    {{ form.venue.label }}<br />
-    {{ form.venue(class="form-select") }}
+    {{ show_form.venue.label }}<br />
+    {{ show_form.venue(class="form-select") }}
   </p>
   <p>
-    {{ form.comments.label }}<br />
-    {{ form.comments(class="form-text") }}
+    {{ show_form.comments.label }}<br />
+    {{ show_form.comments(class="form-control") }}
   </p>
 
   <div class="container">
@@ -73,7 +76,7 @@
     </table>
   </div>
 
-  <p>{{ form.submit() }}</p>
+  <p>{{ show_form.submit() }}</p>
 </form>
 </div>
 {% endblock %}
