@@ -33,6 +33,7 @@ class ShowForm(FlaskForm):
             )
         ],
     )
+
     comments = TextAreaField("Comments", description="Comments related to the show")
 
     submit = SubmitField(

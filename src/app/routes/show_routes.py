@@ -42,19 +42,19 @@ def register_routes(app, db):
             for venue in venue_repository.get_all()
         ]
 
-        form = ShowForm(venues=venues)
+        show_form = ShowForm(venues=venues)
 
-
-        form.name.data = show.name
-        form.event_date.data = show.event_date
-        form.venue.data = f"{show.venue.name}, {show.venue.address.city}, {show.venue.address.country}"
-        form.comments.data = show.comments
+        # Populating the form with the show data
+        show_form.name.data = show.name
+        show_form.event_date.data = show.event_date
+        show_form.venue.data = f"{show.venue.name}, {show.venue.address.city}, {show.venue.address.country}"
+        show_form.comments.data = show.comments
 
         return render_template(
             "edit_show.html",
             title="Create a new show right now",
             show=show,
-            form=form,
+            show_form=show_form,
         )
 
     def render_show_template(form, title):
