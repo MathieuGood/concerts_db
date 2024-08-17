@@ -19,3 +19,9 @@ li {
     padding: 10px;
     border-bottom: 1px solid #ccc;
 }
+
+.app-header {
+    background-color: #eff0e1;
+    padding: 10px;
+    margin-bottom: 5px;
+}

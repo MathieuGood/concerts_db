@@ -38,8 +38,7 @@ def delete_database() -> None:
 
 
 def create_app(db: SQLAlchemy) -> Flask:
-    app = Flask(__name__, template_folder="app/templates")
-
+    app = Flask(__name__, template_folder="app/templates", static_folder="app/static")
     app.config.from_object(Config)
     db.init_app(app)
     return app
