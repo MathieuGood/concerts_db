@@ -8,6 +8,49 @@ Right now, I am learning to build a Flask app based on a SQLAlchemy model. This 
 
 The goal is to have a web interface to visualize all the concerts I have been to and to be able to add new ones.
 
+## How to install and run the app
+
+Clone this git repository.
+```bash
+git clone https://github.com/MathieuGood/concerts_db.git
+```
+
+Navigate to the project folder, create a virtual environment and activate it.
+```bash
+cd concerts_db
+python -m venv venv
+source venv/bin/activate
+```
+
+Install all the dependencies.
+```python
+pip install -r requirements.txt
+```
+
+Run the app.
+```bash
+python run.py
+```
+
+## Dependencies
+
+- alembic 1.13.2
+- blinker 1.8.2
+- click 8.1.7
+- Flask 3.0.3
+- Flask-Migrate 4.0.7
+- Flask-SQLAlchemy 3.1.1
+- Flask-WTF 1.2.1
+- itsdangerous 2.2.0
+- Jinja2 3.1.4
+- Mako 1.3.5
+- MarkupSafe 2.1.5
+- python-dotenv 1.0.1
+- SQLAlchemy 2.0.31
+- typing_extensions 4.12.2
+-  Werkzeug 3.0.3
+- WTForms 3.1.2
+
 ## Data model
 
 Show is the main entity of the model :
@@ -129,32 +172,4 @@ Show is the main entity of the model :
             <td></td>
     </tbody>
 </table>
-
-
-## Dependencies
-
-You can install all the app dependencies using pip with the requirements.txt file.
-```python
-pip install -r requirements.txt
-```
-
-- alembic 1.13.2
-- blinker 1.8.2
-- click 8.1.7
-- Flask 3.0.3
-- Flask-Migrate 4.0.7
-- Flask-SQLAlchemy 3.1.1
-- Flask-WTF 1.2.1
-- itsdangerous 2.2.0
-- Jinja2 3.1.4
-- Mako 1.3.5
-- MarkupSafe 2.1.5
-- python-dotenv 1.0.1
-- SQLAlchemy 2.0.31
-- typing_extensions 4.12.2
--  Werkzeug 3.0.3
-- WTForms 3.1.2
-
-
-
 
