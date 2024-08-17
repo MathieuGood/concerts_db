@@ -14,15 +14,15 @@ from wtforms.validators import DataRequired
 
 class ShowForm(FlaskForm):
 
-    def __init__(self, venues: list[str]) -> None:
+    def __init__(self, venues: list[str], festivals: list[str]) -> None:
         super().__init__()
         self.venue.choices = venues
+        self.festival.choices = festivals
 
     name = StringField("Name", description="Name of the show")
     event_date = DateField(
         "Date", description="Date the event took place", validators=[DataRequired()]
     )
-
     venue = SelectField(
         "Venue",
         description="Venue where the show took place",
@@ -33,9 +33,10 @@ class ShowForm(FlaskForm):
             )
         ],
     )
-
+    festival = SelectField(
+        "Festival", description="Festival where the show took place", choices=[]
+    )
     comments = TextAreaField("Comments", description="Comments related to the show")
-
     submit = SubmitField(
         "Save show", description="Saves all the show details to the database"
     )

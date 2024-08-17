@@ -7,34 +7,37 @@
 {% block content %}
 <h2 class="pt-2">Edit show</h1>
 
+  <table class="table" hidden="">
+    <tr>
+      <td>Show ID</td>
+      <td>{{ show.id }}</td>
+    </tr>
+    <tr>
+      <td>Show Name</td>
+      <td>{{ show.name }}</td>
+    </tr>
+    <tr>
+      <td>Show Date</td>
+      <td>{{ show.event_date }}</td>
+    </tr>
+    <tr>
+      <td>Venue</td>
+      <td>
+        {% if show.venue %}
+        {{ show.venue.name }}, {{ show.venue.address.city }}, {{ show.venue.address.country }}
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>Comments</td>
+      <td>{{ show.comments }}</td>
+    </tr>
+    <tr></tr>
+  </table>
+
+
+
   <form action="" method="POST" novalidate>
-    <table class="table" hidden="">
-      <tr>
-        <td>Show ID</td>
-        <td>{{ show.id }}</td>
-      </tr>
-      <tr>
-        <td>Show Name</td>
-        <td>{{ show.name }}</td>
-      </tr>
-      <tr>
-        <td>Show Date</td>
-        <td>{{ show.event_date }}</td>
-      </tr>
-      <tr>
-        <td>Venue</td>
-        <td>
-          {% if show.venue %}
-          {{ show.venue.name }}, {{ show.venue.address.city }}, {{ show.venue.address.country }}
-          {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <td>Comments</td>
-        <td>{{ show.comments }}</td>
-      </tr>
-      <tr></tr>
-    </table>
 
     {{ show_form.hidden_tag() }}
     <p>
@@ -49,6 +52,9 @@
       {{ show_form.venue.label }}<br />
       {{ show_form.venue(class="form-select") }}
     </p>
+    <p>
+      {{ show_form.festival.label }}<br />
+      {{ show_form.festival(class="form-select") }}
     <p>
       {{ show_form.comments.label }}<br />
       {{ show_form.comments(class="form-control") }}
