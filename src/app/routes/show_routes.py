@@ -25,6 +25,7 @@ def register_routes(app, db):
             for venue in venue_repository.get_all()
         ]
         form = ShowForm(venues=venues)
+        new_show = Show()
         return render_template(
             "edit_show.html",
             title="Create a new show right now",
