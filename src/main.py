@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from mockup_data.concerts_mock_data import venues, nofx_show, nfg_show
+from mockup_data.concerts_mock_data import venues, nofx_show, nfg_show, festivals
 from config import Config
 from entities.Base import Base
 from entities.Person import Person
@@ -63,8 +63,10 @@ def main():
         venue_repository = VenueRepository(session)
         show_repository = ShowRepository(session)
         person_repository = PersonRepository(session)
+        festival_repository = FestivalRepository(session)
 
         venue_repository.add_multiple(venues)
+        festival_repository.add_multiple(festivals)
         show_repository.add(nofx_show)
         show_repository.add(nfg_show)
         session.commit()
