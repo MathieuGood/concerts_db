@@ -1,78 +1,79 @@
 <!-- Include base_template.html template -->
-
 {% extends 'base_template.html' %}
 {% block head %}
-  {{ super() }}
+{{ super() }}
 {% endblock %}
 
 {% block content %}
-  <div class="container-fluid">
-    <h1>Edit show</h1>
+<h1>Edit show</h1>
 
-    <form action="" method="POST" novalidate>
-      <table class="table">
-        <tr>
-          <td>Show ID</td>
-          <td>{{ show.id }}</td>
-        </tr>
-        <tr>
-          <td>Show Name</td>
-          <td>{{ show.name }}</td>
-        </tr>
-        <tr>
-          <td>Show Date</td>
-          <td>{{ show.event_date }}</td>
-        </tr>
-        <tr>
-          <td>Venue</td>
-          <td>{{ show.venue }}</td>
-        </tr>
-        <tr>
-          <td>Comments</td>
-          <td>{{ show.comments }}</td>
-        </tr>
-        <tr></tr>
-      </table>
+<form action="" method="POST" novalidate>
+  <table class="table">
+    <tr>
+      <td>Show ID</td>
+      <td>{{ show.id }}</td>
+    </tr>
+    <tr>
+      <td>Show Name</td>
+      <td>{{ show.name }}</td>
+    </tr>
+    <tr>
+      <td>Show Date</td>
+      <td>{{ show.event_date }}</td>
+    </tr>
+    <tr>
+      <td>Venue</td>
+      <td>{{ show.venue.name if show.venue else '' }}, {{ show.venue.address.city if show.venue else '' }}, {{
+        show.venue.address.country if show.venue else '' }}</td>
+    </tr>
+    <tr>
+      <td>Comments</td>
+      <td>{{ show.comments }}</td>
+    </tr>
+    <tr></tr>
+  </table>
 
-      {{ form.hidden_tag() }}
-      <p>
-        {{ form.name.label }}<br />
-        {{ form.name() }}
-      </p>
-      <p>
-        {{ form.event_date.label }}<br />
-        {{ form.event_date() }}
-      </p>
-      <p>
-        {{ form.venue.label }}<br />
-        {{ form.venue() }}
-      </p>
-      <p>
-        {{ form.comments.label }}<br />
-        {{ form.comments() }}
-      </p>
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.name.label }}<br />
+    {{ form.name(class="form-text") }}
+  </p>
+  <p>
+    {{ form.event_date.label }}<br />
+    {{ form.event_date(class="") }}
+  </p>
+  <p>
+    {{ form.venue.label }}<br />
+    {{ form.venue(class="form-select") }}
+  </p>
+  <p>
+    {{ form.comments.label }}<br />
+    {{ form.comments(class="form-text") }}
+  </p>
 
-      <div class="container">
-        <table class="table table-striped table-light table-responsive border-1">
-          <tr>
-            <th>Artist</th>
-            <th>Comments</th>
-            <th>Image</th>
-            <th>Video</th>
-          </tr>
+  <div class="container">
+    <table class="table table-striped table-light table-responsive border-1">
+      <tr>
+        <th>Artist</th>
+        <th>Setlist</th>
+        <th>Comments</th>
+        <th>Image</th>
+        <th>Video</th>
+      </tr>
 
-          {% for concert in show.concerts %}
-            <tr>
-              <td>{{ concert.artist.name }}</td>
-              <td>{{ concert.comments }}</td>
-              <td>{{ concert.photos }}</td>
-              <td>{{ concert.videos }}</td>
-            </tr>
-          {% endfor %}
-        </table>
-      </div>
-
-      <p>{{ form.submit() }}</p>
-    </form>
+      {% for concert in show.concerts %}
+      <tr>
+        <td>{{ concert.artist.name }}</td>
+        <td>{{ concert.setlist }}</td>
+        <td>{{ concert.comments }}</td>
+        <td>{{ concert.photos }}</td>
+        <td>{{ concert.videos }}</td>
+      </tr>
+      {% endfor %}
+    </table>
   </div>
+
+  <p>{{ form.submit() }}</p>
+</form>
+</div>
 {% endblock %}
