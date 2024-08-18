@@ -1,8 +1,6 @@
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from sqlalchemy import Engine, MetaData, create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 from mockup_data.concerts_mock_data import venues, nofx_show, nfg_show, festivals
 from config import Config
 from entities.Base import Base
@@ -40,22 +38,19 @@ def delete_database() -> None:
     # input("Press Enter to continue...")
 
 
-def get_db_session(db: SQLAlchemy) -> Session:
-    engine: Engine = create_engine(
-        # "sqlite+pysqlite:///flask_concerts_db.sqlite"
+def get_db_session() -> Session:
+    engine = create_engine(
         Config.SQLALCHEMY_DATABASE_URI,
         echo=True,
     )
-    metadata_obj = MetaData()
     Base.metadata.create_all(engine)
-
-    return Session(engine)
+    SessionLocal = sessionmaker(bind=engine)
+    return SessionLocal()
 
 
 def main():
     delete_database()
-    db = SQLAlchemy(model_class=Base)
-    session = get_db_session(db)
+    session = get_db_session()
 
     venue_repository = VenueRepository(session)
     show_repository = ShowRepository(session)
