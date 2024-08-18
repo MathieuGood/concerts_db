@@ -43,10 +43,15 @@ def create_app(db: SQLAlchemy) -> Flask:
     db.init_app(app)
     return app
 
+def instantiate_db(db: SQLAlchemy) -> None:
+    pass
+
 
 def main():
     delete_database()
     db = SQLAlchemy(model_class=Base)
+
+
     app = create_app(db)
 
     with app.app_context():
