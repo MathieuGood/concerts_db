@@ -2,7 +2,7 @@
 prompt.txt
 
 # SQlite database file
-database/
+flask_concerts_db.sqlite
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
