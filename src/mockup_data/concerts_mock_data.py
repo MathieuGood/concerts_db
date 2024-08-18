@@ -57,31 +57,15 @@ venues = [
 festivals = [
     Festival(
         name="Punk Rock Bowling",
-        year="2019",
-        country="USA",
-        start_date=datetime(year=2019, month=5, day=24),
-        end_date=datetime(year=2019, month=5, day=27),
     ),
     Festival(
         name="Hellfest",
-        year="2019",
-        country="France",
-        start_date=datetime(year=2019, month=6, day=21),
-        end_date=datetime(year=2019, month=6, day=23),
     ),
     Festival(
         name="Download",
-        year="2008",
-        country="England",
-        start_date=datetime(year=2008, month=6, day=13),
-        end_date=datetime(year=2008, month=6, day=15),
     ),
     Festival(
         name="Rock en Seine",
-        year="2022",
-        country="France",
-        start_date=datetime(year=2022, month=8, day=26),
-        end_date=datetime(year=2022, month=8, day=28),
     ),
 ]
 
