@@ -24,4 +24,30 @@ li {
     background-color: #eff0e1;
     padding: 10px;
     margin-bottom: 5px;
+    height: 60px;
+    /* Center content horizontally */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.app-logo {
+    height: 35px;
+    width: auto;
+}
+
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+}
+
+.name-container {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    width: auto;
 }
