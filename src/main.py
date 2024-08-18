@@ -1,8 +1,7 @@
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Engine, MetaData, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from mockup_data.concerts_mock_data import venues, nofx_show, nfg_show, festivals
-from config import Config
+from database.db_connector import delete_database, get_db_session
 from entities.Base import Base
 from entities.Person import Person
 from entities.Artist import Artist
@@ -18,34 +17,6 @@ from repositories.FestivalRepository import FestivalRepository
 from repositories.PhotoRepository import PhotoRepository
 from repositories.VideoRepository import VideoRepository
 from repositories.ShowRepository import ShowRepository
-
-
-def delete_database() -> None:
-    import os
-
-    try:
-        os.remove("flask_concerts_db.sqlite")
-        print("*** Database file removed ***")
-    except FileNotFoundError as e:
-        print(e)
-        pass
-
-    print("")
-    print("Current diretory :")
-    # input("Press Enter to continue...")
-    print(os.getcwd())
-    print("")
-    # input("Press Enter to continue...")
-
-
-def get_db_session() -> Session:
-    engine = create_engine(
-        Config.SQLALCHEMY_DATABASE_URI,
-        echo=True,
-    )
-    Base.metadata.create_all(engine)
-    SessionLocal = sessionmaker(bind=engine)
-    return SessionLocal()
 
 
 def main():
