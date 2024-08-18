@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template, request, flash
 from entities.Show import Show
 from repositories.ShowRepository import ShowRepository
 from repositories.VenueRepository import VenueRepository
@@ -38,8 +38,6 @@ def register_routes(app, db):
         )
 
     @app.route("/show/<int:show_id>")
-    # GET /show/1
-
     def edit_show(show_id):
         concerts = concert_repository.get_all()
         show = show_repository.get_by_id(show_id)
@@ -64,9 +62,7 @@ def register_routes(app, db):
             show_form=show_form,
         )
 
-    # Route to update the show
     @app.route("/show/<int:show_id>", methods=["POST"])
-    # POST /show/1
     def update_show(show_id):
         pass
 
