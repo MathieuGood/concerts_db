@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from sqlalchemy import Engine, MetaData, create_engine
+from sqlalchemy.orm import Session
 from mockup_data.concerts_mock_data import venues, nofx_show, nfg_show, festivals
 from config import Config
 from entities.Base import Base
@@ -24,7 +26,7 @@ def delete_database() -> None:
     import os
 
     try:
-        os.remove("src/instance/flask_concerts_db.sqlite")
+        os.remove("flask_concerts_db.sqlite")
         print("*** Database file removed ***")
     except FileNotFoundError as e:
         print(e)
@@ -32,51 +34,41 @@ def delete_database() -> None:
 
     print("")
     print("Current diretory :")
+    # input("Press Enter to continue...")
     print(os.getcwd())
     print("")
     # input("Press Enter to continue...")
 
 
-def create_app(db: SQLAlchemy) -> Flask:
-    app = Flask(__name__, template_folder="app/templates", static_folder="app/static")
-    app.config.from_object(Config)
-    db.init_app(app)
-    return app
+def get_db_session(db: SQLAlchemy) -> Session:
+    engine: Engine = create_engine(
+        # "sqlite+pysqlite:///flask_concerts_db.sqlite"
+        Config.SQLALCHEMY_DATABASE_URI,
+        echo=True,
+    )
+    metadata_obj = MetaData()
+    Base.metadata.create_all(engine)
 
-def instantiate_db(db: SQLAlchemy) -> None:
-    pass
+    return Session(engine)
 
 
 def main():
     delete_database()
     db = SQLAlchemy(model_class=Base)
+    session = get_db_session(db)
 
+    venue_repository = VenueRepository(session)
+    show_repository = ShowRepository(session)
+    person_repository = PersonRepository(session)
+    festival_repository = FestivalRepository(session)
 
-    app = create_app(db)
+    venue_repository.add_multiple(venues)
+    festival_repository.add_multiple(festivals)
+    show_repository.add(nofx_show)
+    show_repository.add(nfg_show)
+    session.commit()
 
-    with app.app_context():
-        db.create_all()
-
-        session = db.session
-
-        from app.routes.show_routes import register_routes
-
-        register_routes(app, db)
-
-        migrate = Migrate(app, db)
-
-        venue_repository = VenueRepository(session)
-        show_repository = ShowRepository(session)
-        person_repository = PersonRepository(session)
-        festival_repository = FestivalRepository(session)
-
-        venue_repository.add_multiple(venues)
-        festival_repository.add_multiple(festivals)
-        show_repository.add(nofx_show)
-        show_repository.add(nfg_show)
-        session.commit()
-
-    return app
+    print(venue_repository.get_all())
 
 
 if __name__ == "__main__":

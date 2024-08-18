@@ -11,10 +11,6 @@ class Festival(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
-    year: Mapped[int] = mapped_column(nullable=False)
-    country: Mapped[str] = mapped_column(nullable=False)
-    start_date: Mapped[date] = mapped_column(nullable=True)
-    end_date: Mapped[date] = mapped_column(nullable=True)
 
     shows: Mapped[List["Show"]] = relationship("Show", back_populates="festival")
 
