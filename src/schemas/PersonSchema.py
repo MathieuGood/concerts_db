@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
@@ -13,7 +13,7 @@ class PersonCreate(PersonBase):
 
 class PersonResponse(PersonBase):
     id: int
-    shows: Optional[List["ShowResponse"]] = []
+    shows: Optional[List["ShowResponse"]] = Field(None, exclude=True)
 
     class Config:
         from_attributes = True

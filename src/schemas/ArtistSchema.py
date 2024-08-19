@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
@@ -15,7 +15,7 @@ class ArtistResponse(ArtistBase):
     id: int
     name: str
     country: str
-    concerts: Optional[List[ConcertResponse]] = None
+    concerts: Optional[List["ConcertResponse"]] = Field(None, exclude=True)
 
     class Config:
         from_attributes = True

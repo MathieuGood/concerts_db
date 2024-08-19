@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
@@ -18,8 +18,8 @@ class ConcertResponse(ConcertBase):
     setlist: Optional[str] = None
     show_id: int
     artist_id: int
-    show: Optional[ShowResponse] = None
-    artist: Optional["ArtistResponse"] = None
+    show: Optional["ShowResponse"] = Field(None, exclude=True)
+    artist: Optional["ArtistResponse"] = Field(None, exclude=True)
 
     class Config:
         from_attributes = True

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
@@ -15,7 +15,7 @@ class AddressResponse(AddressBase):
     id: int
     city: str
     country: str
-    venues: Optional[List["VenueResponse"]] = None
+    venues: Optional[List["VenueResponse"]]  = Field(None, exclude=True) 
 
     class Config:
         from_attributes = True

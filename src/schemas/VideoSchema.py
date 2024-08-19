@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class VideoBase(BaseModel):
@@ -12,7 +12,7 @@ class VideoCreate(VideoBase):
 
 class VideoResponse(VideoBase):
     id: int
-    concert: Optional["ConcertResponse"] = None
+    concert: Optional["ConcertResponse"] = Field(None, exclude=True)
 
     class Config:
         from_attributes = True
