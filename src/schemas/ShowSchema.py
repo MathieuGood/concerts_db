@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import date
 
@@ -21,8 +21,8 @@ class ShowResponse(ShowBase):
     comments: Optional[str] = None
     venue_id: int
     festival_id: Optional[int] = None
-    venue: Optional[VenueResponse] = None
-    concerts: Optional[List["ConcertResponse"]] = None
+    venue: Optional["VenueResponse"] = Field(None, exclude=True)
+    concerts: Optional[List["ConcertResponse"]] = Field(None, exclude=True)
 
     class Config:
         from_attributes = True

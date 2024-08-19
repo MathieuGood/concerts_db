@@ -73,6 +73,7 @@ def read_addresses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db
 @app.get("/festivals/", response_model=list[ShowResponse])
 def read_festivals(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     festivals = crud.get_shows(db, skip=skip, limit=limit)
+    print(festivals)
     return festivals
 
 
