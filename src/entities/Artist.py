@@ -9,7 +9,7 @@ class Artist(Base):
     __tablename__ = "artists"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(unique=True, nullable=False)
     country: Mapped[str] = mapped_column(nullable=False)
 
     concerts: Mapped[List["Concert"]] = relationship("Concert", back_populates="artist")
