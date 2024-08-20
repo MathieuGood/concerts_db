@@ -100,6 +100,15 @@ def get_shows(db: Session, skip: int = 0, limit: int = 100):
     )
 
 
+def get_festivals(db: Session, skip: int = 0, limit: int = 100):
+    return (
+        db.query(Festival)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
 # Delete an address
 def delete_address(db: Session, address_id: int):
     db_address = get_address(db, address_id)
@@ -125,3 +134,11 @@ def delete_show(db: Session, show_id: int):
         db.delete(db_show)
         db.commit()
     return db_show
+
+
+def create_festival(db: Session, festival: FestivalCreate):
+    db_festival = Festival(**festival.dict())
+    db.add(db_festival)
+    db.commit()
+    db.refresh(db_festival)
+    return db_festival

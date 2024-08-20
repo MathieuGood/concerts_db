@@ -12,7 +12,7 @@ class PhotoCreate(PhotoBase):
 
 class PhotoResponse(PhotoBase):
     id: int
-    concert: Optional["ConcertResponse"] = Field(None, exclude=True)
+    concert: Optional["ConcertResponse"] = None
 
     class Config:
         from_attributes = True

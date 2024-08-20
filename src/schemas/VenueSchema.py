@@ -14,8 +14,8 @@ class VenueResponse(BaseModel):
     id: int
     name: str
     address_id: int
-    address: Optional["AddressResponse"] = Field(None, exclude=True)
-    shows: Optional[List["ShowResponse"]] = Field(None, exclude=True)
+    address: Optional["AddressResponse"] = None
+    shows: Optional[List["ShowResponse"]] = None
 
     class Config:
         from_attributes = True

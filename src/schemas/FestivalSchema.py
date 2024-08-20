@@ -12,7 +12,8 @@ class FestivalCreate(FestivalBase):
 
 class FestivalResponse(FestivalBase):
     id: int
-    shows: Optional[List["ShowResponse"]] = Field(None, exclude=True)
+    # shows: Optional[List["ShowResponse"]] = Field(None, exclude=True)
+    # shows: Optional[List["ShowResponse"]] = None
 
     class Config:
         from_attributes = True
