@@ -13,7 +13,7 @@ class PersonCreate(PersonBase):
 
 class PersonResponse(PersonBase):
     id: int
-    shows: Optional[List["ShowResponse"]] = Field(None, exclude=True)
+    shows: Optional[List["ShowResponse"]] = None
 
     class Config:
         from_attributes = True

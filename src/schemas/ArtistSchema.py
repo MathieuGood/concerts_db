@@ -15,7 +15,7 @@ class ArtistResponse(ArtistBase):
     id: int
     name: str
     country: str
-    concerts: Optional[List["ConcertResponse"]] = Field(None, exclude=True)
+    concerts: Optional[List["ConcertResponse"]] = None
 
     class Config:
         from_attributes = True

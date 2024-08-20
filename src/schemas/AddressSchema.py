@@ -15,7 +15,7 @@ class AddressResponse(AddressBase):
     id: int
     city: str
     country: str
-    venues: Optional[List["VenueResponse"]]  = Field(None, exclude=True) 
+    venues: Optional[List["VenueResponse"]]  = None
 
     class Config:
         from_attributes = True

@@ -12,7 +12,7 @@ class VideoCreate(VideoBase):
 
 class VideoResponse(VideoBase):
     id: int
-    concert: Optional["ConcertResponse"] = Field(None, exclude=True)
+    concert: Optional["ConcertResponse"] = None
 
     class Config:
         from_attributes = True

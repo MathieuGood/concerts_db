@@ -21,8 +21,8 @@ class ShowResponse(ShowBase):
     comments: Optional[str] = None
     venue_id: int
     festival_id: Optional[int] = None
-    venue: Optional["VenueResponse"] = Field(None, exclude=True)
-    concerts: Optional[List["ConcertResponse"]] = Field(None, exclude=True)
+    venue: Optional["VenueResponse"] = None
+    concerts: Optional[List["ConcertResponse"]] = None
 
     class Config:
         from_attributes = True
