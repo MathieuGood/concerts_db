@@ -1,7 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
-
 from entities.Festival import Festival
 from schemas.FestivalSchema import FestivalCreate
 
