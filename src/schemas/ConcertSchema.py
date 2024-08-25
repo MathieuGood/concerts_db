@@ -20,6 +20,8 @@ class ConcertResponse(ConcertBase):
     artist_id: int
     show: Optional["ShowResponse"] = None
     artist: Optional["ArtistResponse"] = None
+    photos: Optional[List["PhotoResponse"]] = None
+    videos: Optional[List["VideoResponse"]] = None
 
     class Config:
         from_attributes = True
