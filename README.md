@@ -1,5 +1,5 @@
 # Concerts I Have Been To (Concerts DB)
-![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white) ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
+![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
 
 
 A simple app to keep track of all the concerts you've been to. Made for my own personal use as a side project.
@@ -32,24 +32,6 @@ Run the app.
 python run.py
 ```
 
-## Dependencies
-
-- alembic 1.13.2
-- blinker 1.8.2
-- click 8.1.7
-- Flask 3.0.3
-- Flask-Migrate 4.0.7
-- Flask-SQLAlchemy 3.1.1
-- Flask-WTF 1.2.1
-- itsdangerous 2.2.0
-- Jinja2 3.1.4
-- Mako 1.3.5
-- MarkupSafe 2.1.5
-- python-dotenv 1.0.1
-- SQLAlchemy 2.0.31
-- typing_extensions 4.12.2
--  Werkzeug 3.0.3
-- WTForms 3.1.2
 
 ## Data model
 
