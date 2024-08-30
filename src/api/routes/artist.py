@@ -20,19 +20,16 @@ def get_all_artists(db: Session = session):
     return get_all(db)
 
 
-# Create artist
 @router.post("/artist/")
 def create_artist(artist: ArtistCreate, db: Session = session):
     return create(db, artist)
 
 
-# Update artist
 @router.put("/artist/{artist_id}")
 def update_artist(artist_id: int, artist: ArtistCreate, db: Session = session):
     return update(db, artist_id, artist)
 
 
-# Delete artist
 @router.delete("/artist/{artist_id}")
 def delete_artist(artist_id: int, db: Session = session):
     return delete(db, artist_id)
