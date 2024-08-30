@@ -1,11 +1,8 @@
-from dataclasses import dataclass
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import date
 from entities.Base import Base
 
 
-@dataclass
 class Festival(Base):
     __tablename__ = "festivals"
 

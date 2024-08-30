@@ -1,11 +1,9 @@
-from dataclasses import dataclass
 from typing import List
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from entities.Base import Base
 
 
-@dataclass
 class Venue(Base):
     __tablename__ = "venues"
 

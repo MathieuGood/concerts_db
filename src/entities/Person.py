@@ -1,11 +1,8 @@
-from dataclasses import dataclass
 from typing import List
-from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from entities.Base import Base
 
 
-@dataclass
 class Person(Base):
 
     __tablename__ = "persons"
@@ -21,4 +18,3 @@ class Person(Base):
 
 from entities.Show import Show
 from entities.ShowPersonAssociation import show_person_association
-    

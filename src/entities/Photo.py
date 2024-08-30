@@ -1,10 +1,8 @@
-from dataclasses import dataclass
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from entities.Base import Base
 
 
-@dataclass
 class Photo(Base):
     __tablename__ = "photos"
 
