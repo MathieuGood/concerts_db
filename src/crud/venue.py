@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 def get(db: Session, venue_id: int):
     venue = db.query(Venue).filter(Venue.id == venue_id).first()
+    venue.address
     if not venue:
         raise HTTPException(
             status_code=404, detail=f"Venue with ID {venue_id} not found."
@@ -20,7 +21,7 @@ def get_all(db: Session):
 
 def create(db: Session, venue: VenueCreate) -> Venue:
     try:
-        db_venue = Venue(name=venue.name)
+        db_venue = Venue(name=venue.name, address_id=venue.address_id)
         db.add(db_venue)
         db.commit()
         db.refresh(db_venue)
@@ -42,6 +43,7 @@ def update(db: Session, venue_id: int, venue: VenueCreate) -> Venue:
                 status_code=404, detail=f"Venue with ID {venue_id} not found."
             )
         db_venue.name = venue.name
+        db_venue.address_id = venue.address_id
         db.commit()
         db.refresh(db_venue)
         return db_venue
@@ -58,7 +60,6 @@ def delete(db: Session, venue_id: int):
     )
     if not db_venue:
         return {"message": f"Venue #{venue_id} does not exist."}
-    venue_name = db_venue.name
     db.delete(db_venue)
     db.commit()
-    return {"message": f"Venue #{venue_id} '{venue_name}' deleted."}
+    return {"message": f"Venue #{venue_id} '{db_venue.name}' deleted."}

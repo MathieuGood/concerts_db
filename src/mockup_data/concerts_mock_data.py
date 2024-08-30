@@ -37,6 +37,8 @@ zenith = Venue(name="Zenith de Nantes")
 zenith.address = Address(city="Nantes", country="France")
 achenheim = Venue(name="Le Cheval Blanc")
 achenheim.address = Address(city="Achenheim", country="France")
+grillen = Venue(name="Le Grillen")
+grillen.address = Address(city="Colmar", country="France")
 
 venues = [
     fillmore,
@@ -52,6 +54,7 @@ venues = [
     bataclan,
     zenith,
     achenheim,
+    grillen
 ]
 
 festivals = [
