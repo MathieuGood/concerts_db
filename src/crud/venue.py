@@ -16,7 +16,10 @@ def get(db: Session, venue_id: int):
 
 
 def get_all(db: Session):
-    return db.query(Venue).all()
+    venues = db.query(Venue).all()
+    for venue in venues:
+        venue.address
+    return venues
 
 
 def create(db: Session, venue: VenueCreate) -> Venue:
