@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from crud.address import get, get_all, create, update, delete
 from database.database import get_db
-from entities.Address import Address
 from schemas.AddressSchema import AddressCreate
 
 router = APIRouter()

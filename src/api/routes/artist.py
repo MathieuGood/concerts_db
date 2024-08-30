@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from crud.artist import get, get_all, create, update, delete
 from database.database import get_db
-from entities.Artist import Artist
 from schemas.ArtistSchema import ArtistCreate
 
 router = APIRouter()
