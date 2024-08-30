@@ -8,6 +8,7 @@ from repositories.VenueRepository import VenueRepository
 from repositories.PersonRepository import PersonRepository
 from repositories.FestivalRepository import FestivalRepository
 from repositories.ShowRepository import ShowRepository
+from repositories.ArtistRepository import ArtistRepository
 
 
 def delete_database() -> None:
@@ -32,6 +33,7 @@ def seed_data(session: Session) -> None:
     show_repository = ShowRepository(session)
     person_repository = PersonRepository(session)
     festival_repository = FestivalRepository(session)
+    artist_repository = ArtistRepository(session)
     venue_repository.add_multiple(venues)
     festival_repository.add_multiple(festivals)
     show_repository.add(nofx_show)
