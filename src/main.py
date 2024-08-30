@@ -7,6 +7,7 @@ from database.database import delete_database, get_db
 from api.routes.root import router as root_router
 from api.routes.festival import router as festival_router
 from api.routes.artist import router as artist_router
+from api.routes.address import router as address_router
 from entities.Base import Base
 from repositories.VenueRepository import VenueRepository
 from repositories.ConcertRepository import ConcertRepository
@@ -46,11 +47,12 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown: Perform any necessary cleanup operations
-    print("Application shutdown")
+    print("Application shutdown") 
 
 
 app = FastAPI()
 app.include_router(root_router)
 app.include_router(festival_router)
 app.include_router(artist_router)
+app.include_router(address_router)
 app.router.lifespan_context = lifespan

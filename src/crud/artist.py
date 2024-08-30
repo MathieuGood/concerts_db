@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from entities.Artist import Artist
 from schemas.ArtistSchema import ArtistCreate
 
@@ -28,13 +28,13 @@ def create(db: Session, artist: ArtistCreate) -> Artist:
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Artist '{db_artist.name}' already exists."
+            status_code=400, detail=f"Artist '{artist.name}' already exists."
         )
 
 
-def update(db: Session, artist_id: int, artist: ArtistCreate) -> Artist:
+def update(db: Session, artist_id: int, artist: ArtistCreate) -> Artist | HTTPException:
     try:
-        db_artist: Artist = db.query(Artist).filter(Artist.id == artist_id).first()
+        db_artist: Artist | None = db.query(Artist).filter(Artist.id == artist_id).first()
         if db_artist is None:
             raise HTTPException(
                 status_code=404, detail=f"Artist with ID {artist_id} not found."
@@ -50,8 +50,8 @@ def update(db: Session, artist_id: int, artist: ArtistCreate) -> Artist:
         )
 
 
-def delete(db: Session, artist_id: int):
-    db_artist: Artist = db.query(Artist).filter(Artist.id == artist_id).first()
+def delete(db: Session, artist_id: int) -> dict[str, str] | HTTPException:
+    db_artist: Artist |None = db.query(Artist).filter(Artist.id == artist_id).first()
     if not db_artist:
         return {"message": f"Artist #{artist_id} does not exist."}
     artist_name = db_artist.name

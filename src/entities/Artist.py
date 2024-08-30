@@ -1,10 +1,8 @@
-from dataclasses import dataclass
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from entities.Base import Base
 
 
-@dataclass
 class Artist(Base):
     __tablename__ = "artists"
 
