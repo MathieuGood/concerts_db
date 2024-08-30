@@ -20,45 +20,43 @@ def get_all(db: Session):
 
 def create(db: Session, photo: PhotoCreate) -> Photo:
     try:
-        db_photo = Photo(name=photo.name)
+        db_photo = Photo(path=photo.path, concert_id=photo.concert_id)
         db.add(db_photo)
         db.commit()
         db.refresh(db_photo)
         return db_photo
-    except IntegrityError:
+    except IntegrityError as e:
+        print("IntegrityError")
+        print(e)
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Photo '{db_photo.name}' already exists."
+            status_code=400, detail=f"Photo '{db_photo.path}' already exists."
         )
 
 
 def update(db: Session, photo_id: int, photo: PhotoCreate) -> Photo:
     try:
-        db_photo: Photo = (
-            db.query(Photo).filter(Photo.id == photo_id).first()
-        )
+        db_photo: Photo = db.query(Photo).filter(Photo.id == photo_id).first()
         if db_photo is None:
             raise HTTPException(
                 status_code=404, detail=f"Photo with ID {photo_id} not found."
             )
-        db_photo.name = photo.name
+        db_photo.path = photo.path
+        db_photo.concert_id = photo.concert_id
         db.commit()
         db.refresh(db_photo)
         return db_photo
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Photo '{photo.name}' already exists."
+            status_code=400, detail=f"Photo '{photo.path}' already exists."
         )
 
 
 def delete(db: Session, photo_id: int):
-    db_photo: Photo = (
-        db.query(Photo).filter(Photo.id == photo_id).first()
-    )
+    db_photo: Photo = db.query(Photo).filter(Photo.id == photo_id).first()
     if not db_photo:
         return {"message": f"Photo #{photo_id} does not exist."}
-    photo_name = db_photo.name
     db.delete(db_photo)
     db.commit()
-    return {"message": f"Photo #{photo_id} '{photo_name}' deleted."}
+    return {"message": f"Photo #{photo_id} '{db_photo.path}' deleted."}

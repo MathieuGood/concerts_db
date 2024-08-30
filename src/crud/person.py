@@ -20,7 +20,7 @@ def get_all(db: Session):
 
 def create(db: Session, person: PersonCreate) -> Person:
     try:
-        db_person = Person(name=person.name)
+        db_person = Person(firstname=person.firstname, lastname=person.lastname)
         db.add(db_person)
         db.commit()
         db.refresh(db_person)
@@ -28,37 +28,35 @@ def create(db: Session, person: PersonCreate) -> Person:
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Person '{db_person.name}' already exists."
+            status_code=400,
+            detail=f"Person '{db_person.firstname} {db_person.lastname}' already exists.",
         )
 
 
 def update(db: Session, person_id: int, person: PersonCreate) -> Person:
     try:
-        db_person: Person = (
-            db.query(Person).filter(Person.id == person_id).first()
-        )
+        db_person: Person = db.query(Person).filter(Person.id == person_id).first()
         if db_person is None:
             raise HTTPException(
                 status_code=404, detail=f"Person with ID {person_id} not found."
             )
-        db_person.name = person.name
+        db_person.firstname = person.firstname
+        db_person.lastname = person.lastname
         db.commit()
         db.refresh(db_person)
         return db_person
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Person '{person.name}' already exists."
+            status_code=400,
+            detail=f"Person '{person.firstname} {person.lastname}' already exists.",
         )
 
 
 def delete(db: Session, person_id: int):
-    db_person: Person = (
-        db.query(Person).filter(Person.id == person_id).first()
-    )
+    db_person: Person = db.query(Person).filter(Person.id == person_id).first()
     if not db_person:
         return {"message": f"Person #{person_id} does not exist."}
-    person_name = db_person.name
     db.delete(db_person)
     db.commit()
-    return {"message": f"Person #{person_id} '{person_name}' deleted."}
+    return {"message": f"Person #{person_id} '{db_person.firstname} {db_person.lastname}' deleted."}

@@ -20,7 +20,7 @@ def get_all(db: Session):
 
 def create(db: Session, artist: ArtistCreate) -> Artist:
     try:
-        db_artist = Artist(name=artist.name)
+        db_artist = Artist(name=artist.name, country=artist.country)
         db.add(db_artist)
         db.commit()
         db.refresh(db_artist)
