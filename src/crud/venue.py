@@ -24,32 +24,32 @@ def get_all(db: Session):
 
 def create(db: Session, venue: VenueCreate) -> Venue:
     try:
-        db_venue = Venue(name=venue.name, address_id=venue.address_id)
-        db.add(db_venue)
+        new_venue = Venue(name=venue.name, address_id=venue.address_id)
+        db.add(new_venue)
         db.commit()
-        db.refresh(db_venue)
-        return db_venue
+        db.refresh(new_venue)
+        return new_venue
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Venue '{db_venue.name}' already exists."
+            status_code=400, detail=f"Venue '{new_venue.name}' already exists."
         )
 
 
 def update(db: Session, venue_id: int, venue: VenueCreate) -> Venue:
     try:
-        db_venue: Venue = (
+        updated_venue: Venue = (
             db.query(Venue).filter(Venue.id == venue_id).first()
         )
-        if db_venue is None:
+        if updated_venue is None:
             raise HTTPException(
                 status_code=404, detail=f"Venue with ID {venue_id} not found."
             )
-        db_venue.name = venue.name
-        db_venue.address_id = venue.address_id
+        updated_venue.name = venue.name
+        updated_venue.address_id = venue.address_id
         db.commit()
-        db.refresh(db_venue)
-        return db_venue
+        db.refresh(updated_venue)
+        return updated_venue
     except IntegrityError:
         db.rollback()
         raise HTTPException(
@@ -58,11 +58,11 @@ def update(db: Session, venue_id: int, venue: VenueCreate) -> Venue:
 
 
 def delete(db: Session, venue_id: int):
-    db_venue: Venue = (
+    deleted_venue: Venue = (
         db.query(Venue).filter(Venue.id == venue_id).first()
     )
-    if not db_venue:
+    if not deleted_venue:
         return {"message": f"Venue #{venue_id} does not exist."}
-    db.delete(db_venue)
+    db.delete(deleted_venue)
     db.commit()
-    return {"message": f"Venue #{venue_id} '{db_venue.name}' deleted."}
+    return {"message": f"Venue #{venue_id} '{deleted_venue.name}' deleted."}

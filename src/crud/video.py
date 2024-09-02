@@ -20,32 +20,32 @@ def get_all(db: Session):
 
 def create(db: Session, video: VideoCreate) -> Video:
     try:
-        db_video = Video(path=video.path, concert_id=video.concert_id)
-        db.add(db_video)
+        new_video = Video(path=video.path, concert_id=video.concert_id)
+        db.add(new_video)
         db.commit()
-        db.refresh(db_video)
-        return db_video
+        db.refresh(new_video)
+        return new_video
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Video '{db_video.path}' already exists."
+            status_code=400, detail=f"Video '{new_video.path}' already exists."
         )
 
 
 def update(db: Session, video_id: int, video: VideoCreate) -> Video:
     try:
-        db_video: Video = (
+        updated_video: Video = (
             db.query(Video).filter(Video.id == video_id).first()
         )
-        if db_video is None:
+        if updated_video is None:
             raise HTTPException(
                 status_code=404, detail=f"Video with ID {video_id} not found."
             )
-        db_video.path = video.path
-        db_video.concert_id = video.concert_id
+        updated_video.path = video.path
+        updated_video.concert_id = video.concert_id
         db.commit()
-        db.refresh(db_video)
-        return db_video
+        db.refresh(updated_video)
+        return updated_video
     except IntegrityError:
         db.rollback()
         raise HTTPException(
@@ -54,11 +54,11 @@ def update(db: Session, video_id: int, video: VideoCreate) -> Video:
 
 
 def delete(db: Session, video_id: int):
-    db_video: Video = (
+    deleted_video: Video = (
         db.query(Video).filter(Video.id == video_id).first()
     )
-    if not db_video:
+    if not deleted_video:
         return {"message": f"Video #{video_id} does not exist."}
-    db.delete(db_video)
+    db.delete(deleted_video)
     db.commit()
-    return {"message": f"Video #{video_id} '{db_video.path}' deleted."}
+    return {"message": f"Video #{video_id} '{deleted_video.path}' deleted."}

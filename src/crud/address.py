@@ -20,11 +20,11 @@ def get_all(db: Session):
 
 def create(db: Session, address: AddressCreate) -> Address:
     try:
-        db_address = Address(city=address.city, country=address.country)
-        db.add(db_address)
+        new_address = Address(city=address.city, country=address.country)
+        db.add(new_address)
         db.commit()
-        db.refresh(db_address)
-        return db_address
+        db.refresh(new_address)
+        return new_address
     except IntegrityError:
         db.rollback()
         raise HTTPException(
@@ -37,18 +37,18 @@ def update(
     db: Session, address_id: int, address: AddressCreate
 ) -> Address | HTTPException:
     try:
-        db_address: Address | None = (
+        updated_address: Address | None = (
             db.query(Address).filter(Address.id == address_id).first()
         )
-        if db_address is None:
+        if updated_address is None:
             raise HTTPException(
                 status_code=404, detail=f"Address with ID {address_id} not found."
             )
-        db_address.city = address.city
-        db_address.country = address.country
+        updated_address.city = address.city
+        updated_address.country = address.country
         db.commit()
-        db.refresh(db_address)
-        return db_address
+        db.refresh(updated_address)
+        return updated_address
     except IntegrityError:
         db.rollback()
         raise HTTPException(
@@ -57,12 +57,12 @@ def update(
 
 
 def delete(db: Session, address_id: int) -> dict[str, str] | HTTPException:
-    db_address: Address | None = (
+    deleted_address: Address | None = (
         db.query(Address).filter(Address.id == address_id).first()
     )
-    if not db_address:
+    if not deleted_address:
         return {"message": f"Address #{address_id} does not exist."}
-    address = f"{db_address.city}, {db_address.country}"
-    db.delete(db_address)
+    address = f"{deleted_address.city}, {deleted_address.country}"
+    db.delete(deleted_address)
     db.commit()
     return {"message": f"Address #{address_id} '{address}' deleted."}
