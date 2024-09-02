@@ -40,8 +40,8 @@ python run.py
 
 - [x] Build SQLAlchemy model
 - [x] FastAPI routes
-- [] FastAPI CRUD operations
-    - [] Show
+- [ ] FastAPI CRUD operations
+    - [ ] Show
     - [x] Concert
     - [x] Artist
     - [x] Venue
