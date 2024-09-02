@@ -49,9 +49,9 @@ python run.py
     - [x] Photo
     - [x] Video
     - [x] Person
-- [] Test constraints
-- [] Add asynchronous behavior to requests
-- [] React Frontend interface
+- [ ] Test constraints
+- [ ] Add asynchronous behavior to requests
+- [ ] React Frontend interface
 
 ## Data model
 
