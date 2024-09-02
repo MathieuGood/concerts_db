@@ -38,20 +38,20 @@ python run.py
 
 ## TO DO list
 
-[x] Build SQLAlchemy model
-[x] FastAPI routes
-[] FastAPI CRUD operations
-    [] Show
-    [x] Concert
-    [x] Artist
-    [x] Venue
-    [x] Address
-    [x] Photo
-    [x] Video
-    [x] Person
-[] Test constraints
-[] Add asynchronous behavior to requests
-[] React Frontend interface
+- [x] Build SQLAlchemy model
+- [x] FastAPI routes
+- [] FastAPI CRUD operations
+    - [] Show
+    - [x] Concert
+    - [x] Artist
+    - [x] Venue
+    - [x] Address
+    - [x] Photo
+    - [x] Video
+    - [x] Person
+- [] Test constraints
+- [] Add asynchronous behavior to requests
+- [] React Frontend interface
 
 ## Data model
 
