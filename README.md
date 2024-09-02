@@ -33,7 +33,8 @@ pip install -r requirements.txt
 Run the app.
 
 ```bash
-python run.py
+cd src
+uvicorn main:app --reload
 ```
 
 ## TO DO list
@@ -49,6 +50,47 @@ python run.py
     - [x] Photo
     - [x] Video
     - [x] Person
+- [ ] Test CRUD
+    - [ ] Show
+        - [ ] Create
+        - [ ] Read
+        - [ ] Update
+        - [ ] Delete
+    - [ ] Concert
+        - [ ] Create
+        - [ ] Read
+        - [ ] Update
+        - [ ] Delete
+    - [ ] Artist
+        - [ ] Create
+        - [ ] Read
+        - [ ] Update
+        - [ ] Delete
+    - [ ] Venue
+        - [ ] Create
+        - [ ] Read
+        - [ ] Update
+        - [ ] Delete
+    - [ ] Address
+        - [ ] Create
+        - [ ] Read
+        - [ ] Update
+        - [ ] Delete
+    - [ ] Photo
+        - [ ] Create
+        - [ ] Read
+        - [ ] Update
+        - [ ] Delete
+    - [ ] Video
+        - [ ] Create
+        - [ ] Read
+        - [ ] Update
+        - [ ] Delete
+    - [ ] Person
+        - [ ] Create
+        - [ ] Read
+        - [ ] Update
+        - [ ] Delete
 - [ ] Test constraints
 - [ ] Add asynchronous behavior to requests
 - [ ] React Frontend interface

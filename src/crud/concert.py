@@ -28,37 +28,37 @@ def get_all(db: Session):
 
 def create(db: Session, concert: ConcertCreate) -> Concert:
     try:
-        db_concert = Concert(
+        new_concert = Concert(
             comments=concert.comments,
             setlist=concert.setlist,
             show_id=concert.show_id,
             artist_id=concert.artist_id,
         )
-        db.add(db_concert)
+        db.add(new_concert)
         db.commit()
-        db.refresh(db_concert)
-        return db_concert
+        db.refresh(new_concert)
+        return new_concert
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Concert '{db_concert.artist}' already exists."
+            status_code=400, detail=f"Concert '{new_concert.artist}' already exists."
         )
 
 
 def update(db: Session, concert_id: int, concert: ConcertCreate) -> Concert:
     try:
-        db_concert: Concert = db.query(Concert).filter(Concert.id == concert_id).first()
-        if db_concert is None:
+        updated_concert: Concert = db.query(Concert).filter(Concert.id == concert_id).first()
+        if updated_concert is None:
             raise HTTPException(
                 status_code=404, detail=f"Concert with ID {concert_id} not found."
             )
-        db_concert.comments = concert.comments
-        db_concert.setlist = concert.setlist
-        db_concert.show_id = concert.show_id
-        db_concert.artist_id = concert.artist_id
+        updated_concert.comments = concert.comments
+        updated_concert.setlist = concert.setlist
+        updated_concert.show_id = concert.show_id
+        updated_concert.artist_id = concert.artist_id
         db.commit()
-        db.refresh(db_concert)
-        return db_concert
+        db.refresh(updated_concert)
+        return updated_concert
     except IntegrityError:
         db.rollback()
         raise HTTPException(
@@ -67,9 +67,9 @@ def update(db: Session, concert_id: int, concert: ConcertCreate) -> Concert:
 
 
 def delete(db: Session, concert_id: int):
-    db_concert: Concert = db.query(Concert).filter(Concert.id == concert_id).first()
-    if not db_concert:
+    deleted_concert: Concert = db.query(Concert).filter(Concert.id == concert_id).first()
+    if not deleted_concert:
         return {"message": f"Concert #{concert_id} does not exist."}
-    db.delete(db_concert)
+    db.delete(deleted_concert)
     db.commit()
     return {"message": f"Concert #{concert_id} deleted."}

@@ -20,31 +20,31 @@ def get_all(db: Session):
 
 def create(db: Session, person: PersonCreate) -> Person:
     try:
-        db_person = Person(firstname=person.firstname, lastname=person.lastname)
-        db.add(db_person)
+        new_person = Person(firstname=person.firstname, lastname=person.lastname)
+        db.add(new_person)
         db.commit()
-        db.refresh(db_person)
-        return db_person
+        db.refresh(new_person)
+        return new_person
     except IntegrityError:
         db.rollback()
         raise HTTPException(
             status_code=400,
-            detail=f"Person '{db_person.firstname} {db_person.lastname}' already exists.",
+            detail=f"Person '{new_person.firstname} {new_person.lastname}' already exists.",
         )
 
 
 def update(db: Session, person_id: int, person: PersonCreate) -> Person:
     try:
-        db_person: Person = db.query(Person).filter(Person.id == person_id).first()
-        if db_person is None:
+        updated_person: Person = db.query(Person).filter(Person.id == person_id).first()
+        if updated_person is None:
             raise HTTPException(
                 status_code=404, detail=f"Person with ID {person_id} not found."
             )
-        db_person.firstname = person.firstname
-        db_person.lastname = person.lastname
+        updated_person.firstname = person.firstname
+        updated_person.lastname = person.lastname
         db.commit()
-        db.refresh(db_person)
-        return db_person
+        db.refresh(updated_person)
+        return updated_person
     except IntegrityError:
         db.rollback()
         raise HTTPException(
@@ -54,9 +54,9 @@ def update(db: Session, person_id: int, person: PersonCreate) -> Person:
 
 
 def delete(db: Session, person_id: int):
-    db_person: Person = db.query(Person).filter(Person.id == person_id).first()
-    if not db_person:
+    deleted_person: Person = db.query(Person).filter(Person.id == person_id).first()
+    if not deleted_person:
         return {"message": f"Person #{person_id} does not exist."}
-    db.delete(db_person)
+    db.delete(deleted_person)
     db.commit()
-    return {"message": f"Person #{person_id} '{db_person.firstname} {db_person.lastname}' deleted."}
+    return {"message": f"Person #{person_id} '{deleted_person.firstname} {deleted_person.lastname}' deleted."}
