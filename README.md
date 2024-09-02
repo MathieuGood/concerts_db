@@ -1,6 +1,6 @@
 # Concerts I Have Been To (Concerts DB)
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white) ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
 
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white) ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
 
 A simple app to keep track of all the concerts you've been to. Made for my own personal use as a side project.
 
@@ -11,11 +11,13 @@ The goal is to have a web interface to visualize all the concerts I have been to
 ## How to install and run the app
 
 Clone this git repository.
+
 ```bash
 git clone https://github.com/MathieuGood/concerts_db.git
 ```
 
 Navigate to the project folder, create a virtual environment and activate it.
+
 ```bash
 cd concerts_db
 python -m venv venv
@@ -23,24 +25,42 @@ source venv/bin/activate
 ```
 
 Install all the dependencies.
+
 ```python
 pip install -r requirements.txt
 ```
 
 Run the app.
+
 ```bash
 python run.py
 ```
 
+## TO DO list
+
+[x] Build SQLAlchemy model
+[x] FastAPI routes
+[] FastAPI CRUD operations
+    [] Show
+    [x] Concert
+    [x] Artist
+    [x] Venue
+    [x] Address
+    [x] Photo
+    [x] Video
+    [x] Person
+[] Test constraints
+[] Add asynchronous behavior to requests
+[] React Frontend interface
 
 ## Data model
 
 Show is the main entity of the model :
-- It represents an event held at a certain date and place (Venue).
-- A show can have multiple Concerts, each one performed by an Artist.
-- It can be part of a Festival.
-- It can have multiple Persons attending it.
 
+-   It represents an event held at a certain date and place (Venue).
+-   A show can have multiple Concerts, each one performed by an Artist.
+-   It can be part of a Festival.
+-   It can have multiple Persons attending it.
 
 <table>
     <tbody>
@@ -154,4 +174,3 @@ Show is the main entity of the model :
             <td></td>
     </tbody>
 </table>
-
