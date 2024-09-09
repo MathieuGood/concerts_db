@@ -12,6 +12,7 @@ import { useState } from "react"
 import { fetchShows } from "../requests"
 
 const ShowList: React.FC = () => {
+	
     const [shows, setShows] = useState([])
     useEffect(() => {
         fetchShows().then((data) => {
@@ -21,13 +22,8 @@ const ShowList: React.FC = () => {
 
     return (
         <div className="container">
+
             <h1 className="underline">Concerts I Have Been To</h1>
-            <table className="table-auto">
-                <thead>
-                    <tr></tr>
-                </thead>
-                <tbody>{}</tbody>
-            </table>
 
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -41,6 +37,7 @@ const ShowList: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
+
                         {shows.map((show: any) => {
                             return (
                                 <TableRow key={show.id}>
@@ -54,6 +51,7 @@ const ShowList: React.FC = () => {
                                         {show.venue.address.country}
                                     </TableCell>
                                     <TableCell>
+
                                         {show.concerts.map((concert: any) => {
                                             return (
                                                 <div key={concert.artist.id}>
@@ -63,10 +61,12 @@ const ShowList: React.FC = () => {
                                                 </div>
                                             )
                                         })}
+
                                     </TableCell>
                                 </TableRow>
                             )
                         })}
+
                     </TableBody>
                 </Table>
             </TableContainer>
