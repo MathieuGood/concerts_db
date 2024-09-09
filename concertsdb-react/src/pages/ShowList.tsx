@@ -1,5 +1,13 @@
 import React, { useEffect } from "react"
-
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+} from "@mui/material"
 import { useState } from "react"
 import { fetchShows } from "../requests"
 
@@ -12,54 +20,58 @@ const ShowList: React.FC = () => {
     }, [])
 
     return (
-		<div className="container">
-            <h1>Concerts I Have Been To</h1>
-            <p>Here is the list</p>
-            <p>Shows: {shows.length}</p>
+        <div className="container">
+            <h1 className="underline">Concerts I Have Been To</h1>
             <table className="table-auto">
                 <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Venue</th>
-                        <th>City</th>
-                        <th>Country</th>
-                        <th>Artists</th>
-                    </tr>
+                    <tr></tr>
                 </thead>
-                <tbody>
-                    {shows.map((show: any) => {
-                        console.log(">>> Show >>>")
-                        console.log("  > ID: " + show.id)
-                        console.log("  > Date: " + show.event_date)
-                        console.log("  > Venue: " + show.venue.name)
-                        console.log("  > City: " + show.venue.address.city)
-                        console.log(
-                            "  > Country: " + show.venue.address.country
-                        )
-
-                        return (
-                            <tr key={show.id}>
-                                <td>{show.event_date}</td>
-                                <td>{show.venue.name}</td>
-                                <td>{show.venue.address.city}</td>
-                                <td>{show.venue.address.country}</td>
-                                <td>
-                                    {show.concerts.map((concert: any) => {
-                                        return (
-                                            <span key={concert.artist.id}>
-                                                {concert.artist.name}
-                                            </span>
-                                        )
-                                    })}
-                                </td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
+                <tbody>{}</tbody>
             </table>
+
+            <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Date</TableCell>
+                            <TableCell>Venue</TableCell>
+                            <TableCell>City</TableCell>
+                            <TableCell>Country</TableCell>
+                            <TableCell>Artists</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {shows.map((show: any) => {
+                            return (
+                                <TableRow key={show.id}>
+                                    <TableCell>{show.event_date}</TableCell>
+
+                                    <TableCell>{show.venue.name}</TableCell>
+                                    <TableCell>
+                                        {show.venue.address.city}
+                                    </TableCell>
+                                    <TableCell>
+                                        {show.venue.address.country}
+                                    </TableCell>
+                                    <TableCell>
+                                        {show.concerts.map((concert: any) => {
+                                            return (
+                                                <div key={concert.artist.id}>
+                                                    <span>
+                                                        {concert.artist.name}
+                                                    </span>
+                                                </div>
+                                            )
+                                        })}
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </div>
     )
 }
 
 export default ShowList
-1
