@@ -12,8 +12,9 @@ import { useState } from "react"
 import { fetchShows } from "../requests"
 
 const ShowList: React.FC = () => {
-	
+
     const [shows, setShows] = useState([])
+	
     useEffect(() => {
         fetchShows().then((data) => {
             setShows(data)
