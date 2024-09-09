@@ -12,6 +12,7 @@ class ShowBase(BaseModel):
 class ShowCreate(ShowBase):
     venue_id: int
     festival_id: Optional[int] = None
+    concerts: List["ConcertCreate"] = None
 
 
 class ShowResponse(ShowBase):
@@ -31,4 +32,5 @@ class ShowResponse(ShowBase):
 from schemas.VenueSchema import VenueResponse
 from schemas.FestivalSchema import FestivalResponse
 from schemas.ConcertSchema import ConcertResponse
+from schemas.ConcertSchema import ConcertCreate
 from schemas.PersonSchema import PersonResponse

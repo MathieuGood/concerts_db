@@ -1,0 +1,68 @@
+{
+	"name": "Emo Glam 666",
+	"event_date": "2006-06-06",
+	"comments": "Soirée présentée par Thomas VDB",
+
+	"venue_id": 12,
+
+	"venue": {
+		"name": "Le Batofar",
+
+		"address_id": 1,
+
+		"address": {
+			"city": "Paris",
+			"country": "France"
+		}
+	},
+
+	"attendees_ids": [1, 2],
+
+	"attendees": [
+		{
+			"firstname": "Gaëtan",
+			"lastname": "Wurtz",
+			"id": 1
+		}
+	],
+
+	"concerts_ids": [1, 2, 3],
+
+	"concerts": [
+		{
+			"comments": null,
+			"setlist": null,
+
+			"artist_id": 1,
+
+			"artist": {
+				"name": "Uncommonmenfrommars",
+				"country": "France"
+			}
+		},
+
+		{
+			"comments": null,
+			"setlist": null,
+
+			"artist_id": 2,
+
+			"artist": {
+				"name": "Dead Pop Club",
+				"country": "France"
+			}
+		},
+
+		{
+			"comments": null,
+			"setlist": null,
+
+			"artist_id": 3,
+
+			"artist": {
+				"name": "The Pookies",
+				"country": "France"
+			}
+		}
+	]
+}

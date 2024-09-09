@@ -30,15 +30,18 @@ hob_boston.address = Address(city="Boston", country="USA")
 laiterie = Venue(name="La Laiterie")
 laiterie.address = Address(city="Strasbourg", country="France")
 la_cigale = Venue(name="La Cigale")
-la_cigale.address = Address(city="Paris", country="France")
+paris = Address(city="Paris", country="France")
+la_cigale.address = paris
 bataclan = Venue(name="Bataclan")
-bataclan.address = Address(city="Paris", country="France")
+bataclan.address = paris
 zenith = Venue(name="Zenith de Nantes")
 zenith.address = Address(city="Nantes", country="France")
 achenheim = Venue(name="Le Cheval Blanc")
 achenheim.address = Address(city="Achenheim", country="France")
 grillen = Venue(name="Le Grillen")
 grillen.address = Address(city="Colmar", country="France")
+batofar = Venue(name="Batofar")
+batofar.address = paris
 
 venues = [
     fillmore,
@@ -54,7 +57,8 @@ venues = [
     bataclan,
     zenith,
     achenheim,
-    grillen
+    grillen,
+    batofar,
 ]
 
 festivals = [

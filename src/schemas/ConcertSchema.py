@@ -8,7 +8,8 @@ class ConcertBase(BaseModel):
 
 
 class ConcertCreate(ConcertBase):
-    show_id: int
+    # show_id not required because it is not known at the time
+    # show_id: int
     artist_id: int
 
 
