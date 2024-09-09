@@ -20,7 +20,10 @@ def get(db: Session, show_id: int):
 def get_all(db: Session):
     shows = db.query(Show).all()
     for show in shows:
+        show.venue.address
         show.concerts
+        for concert in show.concerts:
+            concert.artist
         show.attendees
     return shows
 
