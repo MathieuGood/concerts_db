@@ -1,5 +1,5 @@
 .DS_Store
-prompt.txt
+notes.md
 
 # SQlite database file
 flask_concerts_db.sqlite
