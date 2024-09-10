@@ -27,6 +27,7 @@ const VenueSelect: React.FC<VenueSelectProps> = ({ show, setShow }) => {
                 <MenuItem value={"La Laiterie"}>La Laiterie</MenuItem>
                 <MenuItem value={"E-Werk"}>E-Werk</MenuItem>
                 <MenuItem value={"Boston Garden"}>Boston Garden</MenuItem>
+                <MenuItem value={"House of Blues"}>House of Blues</MenuItem>
             </Select>
         </FormControl>
     )
