@@ -8,8 +8,6 @@ import {
     TableRow,
     Paper,
     Typography,
-    Card,
-    Link,
 } from "@mui/material"
 import { useState } from "react"
 import { fetchShows } from "../services/showService"
