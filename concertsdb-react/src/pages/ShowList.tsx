@@ -25,7 +25,7 @@ const ShowList: React.FC = () => {
         <div>
             <div style={{ display: "flex", alignSelf: "center" }}>
                 <img
-                    src="/assets/concertsdb-logo.svg"
+                    src="/src/assets/concertsdb-logo.svg"
                     style={{ width: "50px" }}
                 />
                 <Typography variant="h4" gutterBottom>
@@ -52,7 +52,7 @@ const ShowList: React.FC = () => {
                                     <TableCell style={{ width: "1%" }}>
                                         <a href={`/edit/${show.id}`}>
                                             <img
-                                                src="/assets/music-library.svg"
+                                                src="/src/assets/music-library.svg"
                                                 style={{ width: "25px" }}
                                             />
                                         </a>
