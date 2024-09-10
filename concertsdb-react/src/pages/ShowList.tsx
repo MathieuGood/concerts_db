@@ -12,6 +12,11 @@ import {
 import { useState } from "react"
 import { fetchShows } from "../services/showService"
 
+/**
+ * ShowList page displays a list of shows with their details.
+ *
+ * @returns The ShowList page.
+ */
 const ShowList: React.FC = () => {
     const [shows, setShows] = useState([])
 
