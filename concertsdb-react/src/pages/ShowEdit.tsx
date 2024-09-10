@@ -1,5 +1,5 @@
 import React from "react"
-import { Typography, Box } from "@mui/material"
+import { Typography, Box, Paper, Stack } from "@mui/material"
 import { useState, useEffect } from "react"
 import { fetchShow } from "../services/showService"
 import { Show } from "../models/Show"
@@ -9,6 +9,7 @@ import VenueSelect from "../components/VenueSelect"
 import FestivalSelect from "../components/FestivalSelect"
 import CommentsField from "../components/CommentsField"
 import SaveButton from "../components/SaveButton"
+import BackButton from "../components/BackButton"
 
 const ShowEdit: React.FC = () => {
     const showId = 1
@@ -21,16 +22,24 @@ const ShowEdit: React.FC = () => {
     }, [])
 
     return (
-        <Box>
-            <Typography variant="h4" gutterBottom>
-                Edit show
-            </Typography>
-            <ShowNameField show={show} setShow={setShow} />
-            <ShowDateField show={show} setShow={setShow} />
-            <VenueSelect show={show} setShow={setShow} />
-            <FestivalSelect show={show} setShow={setShow} />
-            <CommentsField show={show} setShow={setShow} />
-            <SaveButton />
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 600 }}>
+                <Typography variant="h4" gutterBottom>
+                    Edit Show
+                </Typography>
+                <Stack spacing={3}>
+                    <ShowNameField show={show} setShow={setShow} />
+                    <ShowDateField show={show} setShow={setShow} />
+                    <VenueSelect show={show} setShow={setShow} />
+                    <FestivalSelect show={show} setShow={setShow} />
+                    <CommentsField show={show} setShow={setShow} />
+                    <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <BackButton />
+                        <Box sx={{ width: 16 }} />
+                        <SaveButton />
+                    </Box>
+                </Stack>
+            </Paper>
         </Box>
     )
 }
