@@ -7,14 +7,16 @@ import {
     TableHead,
     TableRow,
     Paper,
+    Typography,
+    Card,
+    Link,
 } from "@mui/material"
 import { useState } from "react"
-import { fetchShows } from "../requests"
+import { fetchShows } from "../services/showService"
 
 const ShowList: React.FC = () => {
-
     const [shows, setShows] = useState([])
-	
+
     useEffect(() => {
         fetchShows().then((data) => {
             setShows(data)
@@ -22,14 +24,22 @@ const ShowList: React.FC = () => {
     }, [])
 
     return (
-        <div className="container">
-
-            <h1 className="underline">Concerts I Have Been To</h1>
+        <div>
+            <div style={{ display: "flex", alignSelf: "center" }}>
+                <img
+                    src="/assets/concertsdb-logo.svg"
+                    style={{ width: "50px" }}
+                />
+                <Typography variant="h4" gutterBottom>
+                    Concerts I Have Been To
+                </Typography>
+            </div>
 
             <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <Table sx={{ minWidth: 300 }}>
                     <TableHead>
                         <TableRow>
+                            <TableCell></TableCell>
                             <TableCell>Date</TableCell>
                             <TableCell>Venue</TableCell>
                             <TableCell>City</TableCell>
@@ -38,10 +48,17 @@ const ShowList: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-
                         {shows.map((show: any) => {
                             return (
                                 <TableRow key={show.id}>
+                                    <TableCell style={{ width: "1%" }}>
+                                        <a href={`/edit/${show.id}`}>
+                                            <img
+                                                src="/assets/music-library.svg"
+                                                style={{ width: "25px" }}
+                                            />
+                                        </a>
+                                    </TableCell>
                                     <TableCell>{show.event_date}</TableCell>
 
                                     <TableCell>{show.venue.name}</TableCell>
@@ -52,7 +69,6 @@ const ShowList: React.FC = () => {
                                         {show.venue.address.country}
                                     </TableCell>
                                     <TableCell>
-
                                         {show.concerts.map((concert: any) => {
                                             return (
                                                 <div key={concert.artist.id}>
@@ -62,12 +78,10 @@ const ShowList: React.FC = () => {
                                                 </div>
                                             )
                                         })}
-
                                     </TableCell>
                                 </TableRow>
                             )
                         })}
-
                     </TableBody>
                 </Table>
             </TableContainer>
