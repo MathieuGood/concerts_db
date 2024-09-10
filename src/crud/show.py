@@ -12,8 +12,11 @@ def get(db: Session, show_id: int):
         raise HTTPException(
             status_code=404, detail=f"Show with ID {show_id} not found."
         )
+    show.venue.address
     show.concerts
     show.attendees
+    for concert in show.concerts:
+        concert.artist
     return show
 
 
@@ -22,9 +25,9 @@ def get_all(db: Session):
     for show in shows:
         show.venue.address
         show.concerts
+        show.attendees
         for concert in show.concerts:
             concert.artist
-        show.attendees
     return shows
 
 
@@ -35,7 +38,7 @@ def create(db: Session, show: ShowCreate) -> Show:
             event_date=show.event_date,
             comments=show.comments,
             venue_id=show.venue_id,
-            festival_id=show.festival_id
+            festival_id=show.festival_id,
         )
 
         # add concerts to the show
@@ -43,14 +46,12 @@ def create(db: Session, show: ShowCreate) -> Show:
         print(f"List of all concerts for show '{show.name}':")
         print(concerts)
 
-
-        for concert in show.concerts :
+        for concert in show.concerts:
             new_concert = Concert()
             new_concert.artist_id = concert.artist_id
             new_concert.comments = concert.comments
             new_concert.setlist = concert.setlist
             new_concert.show = new_show
-
 
         db.add(new_show)
         db.commit()
