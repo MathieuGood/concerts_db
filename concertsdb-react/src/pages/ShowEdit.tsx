@@ -11,6 +11,11 @@ import CommentsField from "../components/CommentsField"
 import SaveButton from "../components/SaveButton"
 import BackButton from "../components/BackButton"
 
+/**
+ * ShowEdit page is used to create and edit shows.
+ *
+ * @returns The ShowEdit page.
+ */
 const ShowEdit: React.FC = () => {
     const showId = 1
     const [show, setShow] = useState<Show | null>(null)
@@ -22,7 +27,7 @@ const ShowEdit: React.FC = () => {
     }, [])
 
     return (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
             <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 600 }}>
                 <Typography variant="h4" gutterBottom>
                     Edit Show

@@ -7,6 +7,15 @@ interface VenueSelectProps {
     setShow: React.Dispatch<React.SetStateAction<Show | null>>
 }
 
+/**
+ * VenueSelect component.
+ *
+ * @component
+ * @param {VenueSelectProps} props - The props for the VenueSelect component.
+ * @param {Show} props.show - The show object.
+ * @param {function} props.setShow - The function to update the show object.
+ * @returns {JSX.Element} The VenueSelect component.
+ */
 const VenueSelect: React.FC<VenueSelectProps> = ({ show, setShow }) => {
     return (
         <FormControl fullWidth margin="normal">
