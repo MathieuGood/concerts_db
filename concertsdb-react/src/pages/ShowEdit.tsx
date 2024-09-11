@@ -16,8 +16,13 @@ import BackButton from "../components/BackButton"
  *
  * @returns The ShowEdit page.
  */
-const ShowEdit: React.FC = () => {
-    const showId = 1
+
+// Add an id parameter to the ShowEdit component
+// The id parameter is a number
+interface ShowEditProps {
+    showId: number
+}
+const ShowEdit: React.FC<ShowEditProps> = ({ showId }) => {
     const [show, setShow] = useState<Show | null>(null)
 
     useEffect(() => {

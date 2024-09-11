@@ -28,4 +28,4 @@ ujson~=5.10.0
 orjson~=3.10.6
 PyYAML~=6.0.1
 python-multipart~=0.0.9
-httpx~=1.0.0b0
+httpx~=0.23.2
