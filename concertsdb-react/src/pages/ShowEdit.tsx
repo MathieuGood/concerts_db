@@ -24,82 +24,32 @@ interface ShowEditProps {
 }
 const ShowEdit: React.FC<ShowEditProps> = ({ showId }) => {
     const [show, setShow] = useState<Show | null>(null)
+    const [concertsRows, setConcertsRows] = useState<any[]>([])
 
     useEffect(() => {
         fetchShow(showId).then((data: Show) => {
             setShow(data)
+            console.log(data)
+            console.log(parseShowsToConcertsRows(data))
+            setConcertsRows(parseShowsToConcertsRows(data))
         })
     }, [])
 
-    const rows = [
-        {
-            id: 1,
-            artist: "Snow",
-            comments: "Jon",
-            setlist: "",
-            photos: "",
-            videos: "",
-        },
-        {
-            id: 2,
-            artist: "Lannister",
-            comments: "Cersei",
-            setlist: "",
-            photos: "",
-            videos: "",
-        },
-        {
-            id: 3,
-            artist: "Lannister",
-            comments: "Jaime",
-            setlist: "",
-            photos: "",
-            videos: "",
-        },
-        {
-            id: 4,
-            artist: "Stark",
-            comments: "Arya",
-            setlist: "",
-            photos: "",
-            videos: "",
-        },
-        {
-            id: 5,
-            artist: "Targaryen",
-            comments: "Daenerys",
-            setlist: "",
-            photos: "",
-            videos: "",
-        },
-        {
-            id: 6,
-            artist: "Melisandre",
-            comments: "",
-            setlist: "",
-            photos: "",
-            videos: "",
-        },
-        {
-            id: 7,
-            artist: "Clifford",
-            comments: "Ferrara",
-            setlist: "",
-            photos: "",
-            videos: "",
-        },
-        {
-            id: 8,
-            artist: "Frances",
-            comments: "Rossini",
-            setlist: "",
-            photos: "",
-            videos: "",
-        },
-        { id: 9, artist: "Roxie", comments: "Harvey" },
-    ]
+    const parseShowsToConcertsRows = (show: Show) => {
+        const parsedRows = show.concerts.map((concert) => {
+            return {
+                id: concert.id,
+                artist: concert.artist?.name,
+                comments: concert.comments,
+                setlist: concert.setlist,
+                photos: concert.photos,
+                videos: concert.videos,
+            }
+        })
+        return parsedRows
+    }
 
-    const columns: GridColDef<(typeof rows)[number]>[] = [
+    const columns: GridColDef<(typeof concertsRows)[number]>[] = [
         {
             field: "artist",
             headerName: "Artist",
@@ -153,7 +103,7 @@ const ShowEdit: React.FC<ShowEditProps> = ({ showId }) => {
 
                     <Box sx={{ height: "auto", width: "100%" }}>
                         <DataGrid
-                            rows={rows}
+                            rows={concertsRows}
                             columns={columns}
                             disableRowSelectionOnClick
                         />
