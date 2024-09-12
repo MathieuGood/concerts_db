@@ -7,4 +7,6 @@ export interface Concert {
     show_id: number
     artist_id: number
     artist?: Artist
+    photos: string[]
+    videos: string[]
 }
