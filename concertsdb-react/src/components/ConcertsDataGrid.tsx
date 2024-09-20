@@ -41,14 +41,14 @@ const ConcertsDataGrid: React.FC<ConcertsDataGridProps> = ({ show }) => {
         },
         {
             field: "comments",
-            headerName: "Comments",
+            headerName: "📋",
             editable: true,
             sortable: false,
             disableColumnMenu: true,
         },
         {
             field: "setlist",
-            headerName: "Setlist",
+            headerName: "🎵",
             editable: true,
             description: "Songs played at the concert",
             sortable: false,
