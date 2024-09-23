@@ -1,3 +1,4 @@
+from entities.Address import Address
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -5,7 +6,7 @@ from entities.Artist import Artist
 from schemas.ArtistSchema import ArtistCreate
 
 
-def get(db: Session, artist_id: int):
+def get(db: Session, artist_id: int) -> Artist:
     artist = db.query(Artist).filter(Artist.id == artist_id).first()
     if not artist:
         raise HTTPException(
@@ -14,13 +15,22 @@ def get(db: Session, artist_id: int):
     return artist
 
 
-def get_all(db: Session):
+def get_all(db: Session) -> list[Artist]:
     return db.query(Artist).all()
 
 
 def create(db: Session, artist: ArtistCreate) -> Artist:
     try:
-        new_artist = Artist(name=artist.name, address=artist.address_id)
+        address: Address | None = (
+            db.query(Address).filter(Address.id == artist.address_id).first()
+        )
+        if not address:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Address with ID {artist.address_id} not found.",
+            )
+
+        new_artist = Artist(name=artist.name, address=address)
         db.add(new_artist)
         db.commit()
         db.refresh(new_artist)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
@@ -12,6 +12,7 @@ class ShowBase(BaseModel):
 class ShowCreate(ShowBase):
     venue_id: int
     festival_id: Optional[int] = None
+    attendees_ids: Optional[List[int]] = None
     concerts: List["ConcertCreate"] = None
 
 
@@ -24,9 +25,7 @@ class ShowResponse(ShowBase):
     festival_id: Optional[int] = None
     venue: Optional["VenueResponse"] = None
     concerts: Optional[List["ConcertResponse"]] = None
-
-    class Config:
-        from_attributes = True
+    attendees: Optional[List["PersonResponse"]] = None
 
 
 from schemas.VenueSchema import VenueResponse

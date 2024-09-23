@@ -15,10 +15,12 @@ class AddressResponse(AddressBase):
     id: int
     city: str
     country: str
-    venues: Optional[List["VenueResponse"]]  = None
+    venues: Optional[List["VenueResponse"]] = None
+    artists: Optional[List["ArtistResponse"]] = None
 
     class Config:
         from_attributes = True
 
 
+from schemas.ArtistSchema import ArtistResponse
 from schemas.VenueSchema import VenueResponse

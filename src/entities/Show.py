@@ -27,8 +27,5 @@ class Show(Base):
 
 from entities.Venue import Venue
 from entities.Festival import Festival
-from entities.Artist import Artist
 from entities.Person import Person
-from entities.Photo import Photo
-from entities.Video import Video
 from entities.Concert import Concert
