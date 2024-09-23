@@ -11,6 +11,8 @@ class Address(Base):
     country: Mapped[str] = mapped_column(nullable=False)
 
     venues: Mapped[List["Venue"]] = relationship("Venue", back_populates="address")
+    artists: Mapped[List["Artist"]] = relationship("Artist", back_populates="address")
 
 
 from entities.Venue import Venue
+from entities.Artist import Artist

@@ -16,7 +16,7 @@ def get(db: Session, show_id: int):
     show.concerts
     show.attendees
     for concert in show.concerts:
-        concert.artist
+        concert.artist.address
     return show
 
 
@@ -27,7 +27,7 @@ def get_all(db: Session):
         show.concerts
         show.attendees
         for concert in show.concerts:
-            concert.artist
+            concert.artist.address
     return shows
 
 

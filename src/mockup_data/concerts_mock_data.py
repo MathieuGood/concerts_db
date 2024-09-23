@@ -76,13 +76,14 @@ festivals = [
     ),
 ]
 
+coralsprings_address = Address(city="Coral Springs", country="USA")
+losangeles_address = Address(city="Los Angeles", country="USA")
+london_address = Address(city="London", country="England")
 
 nofx_show_artists = [
-    Artist(name="Circle Jerks", country="USA"),
-    Artist(name="Itchy", country="USA"),
-    Artist(name="The Last Gang", country="USA"),
-    Artist(name="The Meffs", country="England"),
-    Artist(name="NOFX", country="USA"),
+    Artist(name="The Last Gang", address=losangeles_address),
+    Artist(name="The Meffs", address=london_address),
+    Artist(name="NOFX", address=losangeles_address),
 ]
 
 nofx_show_attendees = [
@@ -105,10 +106,10 @@ nofx_show.name = "NOFX Final Tour"
 nofx_show.venue = ewerk
 nofx_show.attendees = nofx_show_attendees
 
-
 nfg_show = Show(event_date=datetime(year=2009, month=4, day=30))
 nfg_show.venue = hob_boston
 nfg_concert = Concert()
-nfg_concert.artist = Artist(name="New Found Glory", country="USA")
+
+nfg_concert.artist = Artist(name="New Found Glory", address=coralsprings_address)
 nfg_concert.comments = "They played all their hits!"
 nfg_show.concerts.append(nfg_concert)
