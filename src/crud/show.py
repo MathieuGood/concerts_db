@@ -1,6 +1,10 @@
+from entities.Artist import Artist
 from entities.Concert import Concert
+from entities.Festival import Festival
+from entities.Person import Person
 from entities.Show import Show
 from fastapi import HTTPException
+from entities.Venue import Venue
 from schemas.ShowSchema import ShowCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -33,6 +37,20 @@ def get_all(db: Session):
 
 def create(db: Session, show: ShowCreate) -> Show:
     try:
+
+        venue = db.query(Venue).filter(Venue.id == show.venue_id).first()
+        if not venue:
+            raise HTTPException(
+                status_code=404, detail=f"Venue with ID {show.venue_id} not found."
+            )
+
+        festival = db.query(Festival).filter(Festival.id == show.festival_id).first()
+        if show.festival_id and not festival:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Festival with ID {show.festival_id} not found.",
+            )
+
         new_show = Show(
             name=show.name,
             event_date=show.event_date,
@@ -41,13 +59,14 @@ def create(db: Session, show: ShowCreate) -> Show:
             festival_id=show.festival_id,
         )
 
-        # add concerts to the show
-        concerts = [concert for concert in show.concerts]
-        print(f"List of all concerts for show '{show.name}':")
-        print(concerts)
-
         for concert in show.concerts:
             new_concert = Concert()
+            artist_id = db.query(Artist).filter(Artist.id == concert.artist_id).first()
+            if not artist_id:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Artist with ID {concert.artist_id} not found.",
+                )
             new_concert.artist_id = concert.artist_id
             new_concert.comments = concert.comments
             new_concert.setlist = concert.setlist
@@ -56,6 +75,21 @@ def create(db: Session, show: ShowCreate) -> Show:
         db.add(new_show)
         db.commit()
         db.refresh(new_show)
+
+        print(f"\033[93mAttendees for show '{show.name}':\033[0m")
+        print(f"\033[93m{show.attendees_ids}\033[0m")
+
+        if show.attendees_ids:
+            attendees = db.query(Person).filter(Person.id.in_(show.attendees_ids)).all()
+            print(f"\033[93mAttendees for show '{show.name}':\033[0m")
+            print(f"\033[93m{attendees}\033[0m")
+            new_show.attendees.extend(attendees)
+            db.commit()
+            db.refresh(new_show)
+
+        # The response of the API does not currently include the concerts and attendees
+        # for the show. This is because the relationships between shows, concerts, and
+        # attendees are not yet defined in the ShowResponse schema. This will be added
         return new_show
     except IntegrityError:
         db.rollback()

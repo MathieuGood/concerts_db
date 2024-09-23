@@ -5,7 +5,7 @@ from entities.Address import Address
 from schemas.AddressSchema import AddressCreate
 
 
-def get(db: Session, address_id: int):
+def get(db: Session, address_id: int) -> Address:
     address = db.query(Address).filter(Address.id == address_id).first()
     if not address:
         raise HTTPException(
@@ -14,7 +14,7 @@ def get(db: Session, address_id: int):
     return address
 
 
-def get_all(db: Session):
+def get_all(db: Session) -> list[Address]:
     return db.query(Address).all()
 
 
@@ -52,7 +52,8 @@ def update(
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Address '{address.name}' already exists."
+            status_code=400,
+            detail=f"Address '{address.city}, {address.country}' already exists.",
         )
 
 
@@ -60,6 +61,8 @@ def delete(db: Session, address_id: int) -> dict[str, str] | HTTPException:
     deleted_address: Address | None = (
         db.query(Address).filter(Address.id == address_id).first()
     )
+    print(f"\033[93m{deleted_address.city}\033[0m")
+    print(f"\033[93m{deleted_address.country}\033[0m")
     if not deleted_address:
         return {"message": f"Address #{address_id} does not exist."}
     address = f"{deleted_address.city}, {deleted_address.country}"

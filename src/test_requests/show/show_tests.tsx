@@ -8,10 +8,6 @@ const showWithIds = {
 	attendees_ids: [1, 2],
 
 	concerts_ids: [1, 2, 3]
-
-	// Nécéssite la création préalable d'une venue
-	// Nécéssite la création préalable des attendeees
-	// Nécéssite la création préalable des concerts
 }
 
 const showWithCompleteConcert = {
@@ -24,7 +20,6 @@ const showWithCompleteConcert = {
 	concerts: [
 		{
 			artist_id: 1,
-			name: "Concert 1",
 			comments: "Concert de 20h",
 			setlist: "Song 1, Song 2",
 			photos: ["Photo1", "Photo2"],
@@ -32,17 +27,12 @@ const showWithCompleteConcert = {
 		},
 		{
 			artist_id: 3,
-			name: "Concert 2",
 			comments: "Concert de 21h",
 			setlist: "Song 3, Song 4",
 			photos: ["Photo3", "Photo4"],
 			videos: ["Video3", "Video4"]
 		}
 	]
-
-	// Nécéssite la création préalable d'une venue
-	// Nécéssite la création préalable des attendeees
-	// Nécéssite la création préalable des artists
 }
 
 const createVenue = {
