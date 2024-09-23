@@ -40,60 +40,26 @@ uvicorn main:app --reload
 ## TO DO list
 
 - [x] Build SQLAlchemy model
+
+### FastAPI
+
 - [x] FastAPI routes
-- [ ] FastAPI CRUD operations
-    - [ ] Show
-    - [x] Concert
-    - [x] Artist
-    - [x] Venue
-    - [x] Address
-    - [x] Photo
-    - [x] Video
-    - [x] Person
-- [ ] Test CRUD
-    - [ ] Show
-        - [ ] Create
-        - [ ] Read
-        - [ ] Update
-        - [ ] Delete
-    - [ ] Concert
-        - [ ] Create
-        - [ ] Read
-        - [ ] Update
-        - [ ] Delete
-    - [ ] Artist
-        - [ ] Create
-        - [ ] Read
-        - [ ] Update
-        - [ ] Delete
-    - [ ] Venue
-        - [ ] Create
-        - [ ] Read
-        - [ ] Update
-        - [ ] Delete
-    - [ ] Address
-        - [ ] Create
-        - [ ] Read
-        - [ ] Update
-        - [ ] Delete
-    - [ ] Photo
-        - [ ] Create
-        - [ ] Read
-        - [ ] Update
-        - [ ] Delete
-    - [ ] Video
-        - [ ] Create
-        - [ ] Read
-        - [ ] Update
-        - [ ] Delete
-    - [ ] Person
-        - [ ] Create
-        - [ ] Read
-        - [ ] Update
-        - [ ] Delete
-- [ ] Test constraints
-- [ ] Add asynchronous behavior to requests
-- [ ] React Frontend interface
+
+
+#### CRUD
+
+| Entity   | Get All | Get | Create | Update | Delete |
+|----------|---------|-----|--------|--------|--------|
+| artist   | [x]     | [x] | [x]    | [x]    | [ ]    |
+| address  | [x]     | [x] | [x]    | [x]    | [ ]    |
+| concert  | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
+| festival | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
+| person   | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
+| photo    | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
+| show     | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
+| venue    | [x]     | [x] | [ ]    | [ ]    | [ ]    |
+| video    | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
+
 
 ## Data model
 
