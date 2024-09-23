@@ -1,21 +1,47 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Run FastAPI",
-            "type": "shell",
-            "command": "uvicorn main:app --reload",
-            "options": {
-                "cwd": "${workspaceFolder}/src"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": [],
-            "detail": "Run FastAPI server"
-        }
-    ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run FastAPI",
+			"type": "shell",
+			"command": "uvicorn main:app --reload",
+			"options": {
+				"cwd": "${workspaceFolder}/src"
+			},
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": [],
+			"detail": "Run FastAPI server",
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"group": "backend"
+			}
+		},
+		{
+			"label": "Run React",
+			"type": "shell",
+			"command": "npm run dev",
+			"options": {
+				"cwd": "${workspaceFolder}/concertsdb-react"
+			},
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": [],
+			"detail": "Run React app",
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"group": "frontend"
+			}
+		},
+		{
+			"label": "Run Both",
+			"dependsOn": ["Run FastAPI", "Run React"],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
 }
