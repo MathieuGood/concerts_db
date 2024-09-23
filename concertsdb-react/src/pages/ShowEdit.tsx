@@ -11,6 +11,7 @@ import CommentsField from "../components/CommentsField"
 import SaveButton from "../components/SaveButton"
 import BackButton from "../components/BackButton"
 import ConcertsDataGrid from "../components/ConcertsDataGrid"
+import AttendeeSelect from "../components/AttendeeSelect"
 
 interface ShowEditProps {
     showId: number
@@ -36,6 +37,7 @@ const ShowEdit: React.FC<ShowEditProps> = ({ showId }) => {
                     <ShowDateField show={show} setShow={setShow} />
                     <VenueSelect show={show} setShow={setShow} />
                     <FestivalSelect show={show} setShow={setShow} />
+                    <AttendeeSelect show={show} setShow={setShow} />
                     <CommentsField show={show} setShow={setShow} />
                     <ConcertsDataGrid show={show} />
                     <Box sx={{ display: "flex", justifyContent: "center" }}>
