@@ -6,16 +6,16 @@ from sqlalchemy.orm import Session, sessionmaker
 from database.database import delete_database, seed_data
 from entities.Base import Base
 from config import Config
-from api.routes.root import router as root_router
-from api.routes.address import router as address_router
-from api.routes.artist import router as artist_router
-from api.routes.concert import router as concert_router
-from api.routes.festival import router as festival_router
-from api.routes.person import router as person_router
-from api.routes.photo import router as photo_router
-from api.routes.show import router as show_router
-from api.routes.venue import router as venue_router
-from api.routes.video import router as video_router
+from routes.root import router as root_router
+from routes.address import router as address_router
+from routes.artist import router as artist_router
+from routes.concert import router as concert_router
+from routes.festival import router as festival_router
+from routes.person import router as person_router
+from routes.photo import router as photo_router
+from routes.show import router as show_router
+from routes.venue import router as venue_router
+from routes.video import router as video_router
 
 
 @asynccontextmanager
