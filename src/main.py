@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
-from database.database import delete_database, seed_data
+from database.database import delete_db, seed_data
 from entities.base import Base
 from config import Config
 from routes.root import router as root_router
@@ -21,7 +21,7 @@ from routes.video import router as video_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Perform any necessary setup operations
-    delete_database()
+    delete_db()
     engine: Engine = create_engine(Config.SQLALCHEMY_DATABASE_URI, echo=True)
     Base.metadata.create_all(engine)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

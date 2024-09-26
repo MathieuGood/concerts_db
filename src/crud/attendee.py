@@ -20,7 +20,9 @@ def get_all(db: Session):
 
 def create(db: Session, attendee: AttendeeCreate) -> Attendee:
     try:
-        new_attendee = Attendee(firstname=attendee.firstname, lastname=attendee.lastname)
+        new_attendee = Attendee(
+            firstname=attendee.firstname, lastname=attendee.lastname
+        )
         db.add(new_attendee)
         db.commit()
         db.refresh(new_attendee)
@@ -35,7 +37,9 @@ def create(db: Session, attendee: AttendeeCreate) -> Attendee:
 
 def update(db: Session, attendee_id: int, attendee: AttendeeCreate) -> Attendee:
     try:
-        updated_attendee: Attendee = db.query(Attendee).filter(Attendee.id == attendee_id).first()
+        updated_attendee: Attendee = (
+            db.query(Attendee).filter(Attendee.id == attendee_id).first()
+        )
         if updated_attendee is None:
             raise HTTPException(
                 status_code=404, detail=f"Attendee with ID {attendee_id} not found."
@@ -53,8 +57,10 @@ def update(db: Session, attendee_id: int, attendee: AttendeeCreate) -> Attendee:
         )
 
 
-def delete(db: Session, attendee_id: int):
-    deleted_attendee: Attendee = db.query(Attendee).filter(Attendee.id == attendee_id).first()
+def delete(db: Session, attendee_id: int) -> dict[str, str] | HTTPException:
+    deleted_attendee: Attendee = (
+        db.query(Attendee).filter(Attendee.id == attendee_id).first()
+    )
     if not deleted_attendee:
         return {"message": f"Attendee #{attendee_id} does not exist."}
 
