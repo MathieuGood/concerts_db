@@ -21,4 +21,4 @@ class ArtistResponse(ArtistBase):
         from_attributes = True
 
 
-from schemas.ConcertSchema import ConcertResponse
+from schemas.concert import ConcertResponse

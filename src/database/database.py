@@ -1,14 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from entities.Base import Base
+from entities.base import Base
 from config import Config
 from sqlalchemy.orm import Session
 from mockup_data.concerts_mock_data import venues, nofx_show, nfg_show, festivals
-from repositories.VenueRepository import VenueRepository
-from repositories.PersonRepository import PersonRepository
-from repositories.FestivalRepository import FestivalRepository
-from repositories.ShowRepository import ShowRepository
-from repositories.ArtistRepository import ArtistRepository
+from repositories.venue import VenueRepository
+from repositories.attendee import AttendeeRepository
+from repositories.festival import FestivalRepository
+from repositories.show import ShowRepository
+from repositories.artist import ArtistRepository
 
 
 def delete_database() -> None:
@@ -31,7 +31,7 @@ def delete_database() -> None:
 def seed_data(session: Session) -> None:
     venue_repository = VenueRepository(session)
     show_repository = ShowRepository(session)
-    person_repository = PersonRepository(session)
+    attendee_repository = AttendeeRepository(session)
     festival_repository = FestivalRepository(session)
     artist_repository = ArtistRepository(session)
     venue_repository.add_multiple(venues)

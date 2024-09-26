@@ -37,16 +37,16 @@ const names = [
     "Kelly Snyder",
 ]
 
-function getStyles(name: string, personName: readonly string[], theme: Theme) {
+function getStyles(name: string, attendeeName: readonly string[], theme: Theme) {
     return {
-        fontWeight: personName.includes(name)
+        fontWeight: attendeeName.includes(name)
             ? theme.typography.fontWeightMedium
             : theme.typography.fontWeightRegular,
     }
 }
 const AttendeeSelect: React.FC<AttendeeSelectProps> = ({ show, setShow }) => {
     const theme = useTheme()
-    const [selectedAttendees, setPersonName] = React.useState<string[]>([])
+    const [selectedAttendees, setSelectedAttendeesName] = React.useState<string[]>([])
 
     console.log("AttendeeSelect show", show)
 
@@ -56,7 +56,7 @@ const AttendeeSelect: React.FC<AttendeeSelectProps> = ({ show, setShow }) => {
         const {
             target: { value },
         } = event
-        setPersonName(
+        setSelectedAttendeesName(
             // On autofill we get a stringified value.
             typeof value === "string" ? value.split(",") : value
         )

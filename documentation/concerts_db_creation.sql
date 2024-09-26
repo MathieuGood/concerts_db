@@ -15,11 +15,11 @@ CREATE TABLE Festivals(
    PRIMARY KEY(id_festival)
 );
 
-CREATE TABLE Persons(
-   id_person INT,
+CREATE TABLE Attendees(
+   id_attendee INT,
    firstname VARCHAR(120) NOT NULL,
    lastname VARCHAR(120),
-   PRIMARY KEY(id_person)
+   PRIMARY KEY(id_attendee)
 );
 
 CREATE TABLE Addresses(
@@ -58,8 +58,8 @@ CREATE TABLE perform(
 
 CREATE TABLE attend(
    id_concert INT,
-   id_person INT,
-   PRIMARY KEY(id_concert, id_person),
+   id_attendee INT,
+   PRIMARY KEY(id_concert, id_attendee),
    FOREIGN KEY(id_concert) REFERENCES Concerts(id_concert),
-   FOREIGN KEY(id_person) REFERENCES Persons(id_person)
+   FOREIGN KEY(id_attendee) REFERENCES Attendees(id_attendee)
 );

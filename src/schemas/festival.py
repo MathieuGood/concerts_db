@@ -18,4 +18,4 @@ class FestivalResponse(FestivalBase):
         from_attributes = True
 
 
-from schemas.ShowSchema import ShowResponse
+from schemas.show import ShowResponse

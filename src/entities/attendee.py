@@ -1,11 +1,15 @@
 from typing import List
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from entities.Base import Base
+from entities.base import Base
 
 
-class Person(Base):
+class Attendee(Base):
 
-    __tablename__ = "persons"
+    __tablename__ = "attendees"
+    __table_args__ = (
+        UniqueConstraint("firstname", "lastname", name="_firstname_lastname_uc"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     firstname: Mapped[str] = mapped_column(nullable=False)
@@ -16,5 +20,5 @@ class Person(Base):
     )
 
 
-from entities.Show import Show
-from entities.ShowPersonAssociation import show_person_association
+from entities.show import Show
+from entities.show_attendee_association import show_attendee_association

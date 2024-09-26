@@ -1,8 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from entities.Address import Address
-from schemas.AddressSchema import AddressCreate
+from entities.address import Address
+from schemas.address import AddressCreate
 
 
 def get(db: Session, address_id: int) -> Address:

@@ -1,9 +1,9 @@
-from entities.Address import Address
+from entities.address import Address
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from entities.Artist import Artist
-from schemas.ArtistSchema import ArtistCreate
+from entities.artist import Artist
+from schemas.artist import ArtistCreate
 
 
 def get(db: Session, artist_id: int) -> Artist:

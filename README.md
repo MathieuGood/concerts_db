@@ -37,29 +37,27 @@ cd src
 uvicorn main:app --reload
 ```
 
-## TO DO list
+## Roadmap
 
-- [x] Build SQLAlchemy model
+-   [x] Build SQLAlchemy model
 
 ### FastAPI
 
-- [x] FastAPI routes
-
+-   [x] FastAPI routes
 
 #### CRUD
 
 | Entity   | Get All | Get | Create | Update | Delete |
-|----------|---------|-----|--------|--------|--------|
+| -------- | ------- | --- | ------ | ------ | ------ |
 | artist   | [x]     | [x] | [x]    | [x]    | [ ]    |
 | address  | [x]     | [x] | [x]    | [x]    | [ ]    |
 | concert  | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
 | festival | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
-| person   | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
-| photo    | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
+| person   | [x]     | [x] | [x]    | [x]    | [ ]    |
+| photo    | [x]     | [x] | [x]    | [x]    | [x]    |
 | show     | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
-| venue    | [x]     | [x] | [ ]    | [ ]    | [ ]    |
-| video    | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
-
+| venue    | [x]     | [x] | [x]    | [x]    | [ ]    |
+| video    | [x]     | [x] | [x]    | [x]    | [x]    |
 
 ## Data model
 
@@ -68,7 +66,7 @@ Show is the main entity of the model :
 -   It represents an event held at a certain date and place (Venue).
 -   A show can have multiple Concerts, each one performed by an Artist.
 -   It can be part of a Festival.
--   It can have multiple Persons attending it.
+-   It can have multiple Attendees attending it.
 
 <table>
     <tbody>
@@ -93,7 +91,7 @@ Show is the main entity of the model :
                     <li>Concert : list of concerts performed at the show (one-to-many relationship)</li>
                     <li>Venue : venue where the show took place (many-to-one relationship)</li>
                     <li>Festival : festival where the show took place (many-to-one relationship)</li>
-                    <li>Person : list of people who attended the show (many-to-many relationship)</li>
+                    <li>Attendees : list of people who attended the show (many-to-many relationship)</li>
                 </ul>
             </td>
         </tr>
@@ -171,7 +169,7 @@ Show is the main entity of the model :
             <td></td>
         </tr>
         <tr>
-            <td>Person</td>
+            <td>Attendee</td>
             <td>
                 <ul>
                     <li>id : unique autoincrementing integer</li>

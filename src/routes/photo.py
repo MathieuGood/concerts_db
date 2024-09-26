@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from crud.photo import get, get_all, create, update, delete
 from database.database import get_db
-from schemas.PhotoSchema import PhotoCreate
+from schemas.photo import PhotoCreate
 
 router = APIRouter()
 session = Depends(get_db)

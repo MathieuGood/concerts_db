@@ -2,16 +2,16 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
-class PersonBase(BaseModel):
+class AttendeeBase(BaseModel):
     firstname: str
     lastname: Optional[str] = None
 
 
-class PersonCreate(PersonBase):
+class AttendeeCreate(AttendeeBase):
     pass
 
 
-class PersonResponse(PersonBase):
+class AttendeeResponse(AttendeeBase):
     id: int
     shows: Optional[List["ShowResponse"]] = None
 
@@ -19,4 +19,4 @@ class PersonResponse(PersonBase):
         from_attributes = True
 
 
-from schemas.ShowSchema import ShowResponse
+from schemas.show import ShowResponse

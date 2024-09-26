@@ -21,5 +21,5 @@ class VenueResponse(BaseModel):
         from_attributes = True
 
 
-from schemas.AddressSchema import AddressResponse
-from schemas.ShowSchema import ShowResponse
+from schemas.address import AddressResponse
+from schemas.show import ShowResponse

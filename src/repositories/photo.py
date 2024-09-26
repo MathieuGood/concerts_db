@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from entities.Photo import Photo
-from repositories.BaseRepository import BaseRepository
+from entities.photo import Photo
+from repositories.base import BaseRepository
 
 
 class PhotoRepository(BaseRepository[Photo]):

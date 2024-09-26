@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import date
-from entities.Base import Base
+from entities.base import Base
 
 
 class Show(Base):
@@ -20,12 +20,12 @@ class Show(Base):
     festival: Mapped["Festival"] = relationship("Festival", back_populates="shows")
 
     concerts: Mapped[List["Concert"]] = relationship("Concert", back_populates="show")
-    attendees: Mapped[List["Person"]] = relationship(
-        "Person", secondary="show_attendees", back_populates="shows"
+    attendees: Mapped[List["Attendee"]] = relationship(
+        "Attendee", secondary="show_attendees", back_populates="shows"
     )
 
 
-from entities.Venue import Venue
-from entities.Festival import Festival
-from entities.Person import Person
-from entities.Concert import Concert
+from entities.venue import Venue
+from entities.festival import Festival
+from entities.attendee import Attendee
+from entities.concert import Concert

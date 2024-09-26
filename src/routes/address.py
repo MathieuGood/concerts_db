@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from crud.address import get, get_all, create, update, delete
 from database.database import get_db
-from schemas.AddressSchema import AddressCreate
+from schemas.address import AddressCreate
 
 router = APIRouter()
 session = Depends(get_db)

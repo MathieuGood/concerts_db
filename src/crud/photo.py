@@ -1,6 +1,6 @@
-from entities.Photo import Photo
+from entities.photo import Photo
 from fastapi import HTTPException
-from schemas.PhotoSchema import PhotoCreate
+from schemas.photo import PhotoCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 

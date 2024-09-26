@@ -1,6 +1,6 @@
-from entities.Concert import Concert
+from entities.concert import Concert
 from fastapi import HTTPException
-from schemas.ConcertSchema import ConcertCreate
+from schemas.concert import ConcertCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 

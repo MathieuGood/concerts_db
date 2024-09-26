@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from crud.venue import get, get_all, create, update, delete
 from database.database import get_db
-from schemas.VenueSchema import VenueCreate
+from schemas.venue import VenueCreate
 
 router = APIRouter()
 session = Depends(get_db)

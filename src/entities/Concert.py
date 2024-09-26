@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from entities.Base import Base
+from entities.base import Base
 
 
 class Concert(Base):
@@ -20,8 +20,8 @@ class Concert(Base):
     videos: Mapped[List["Video"]] = relationship("Video", back_populates="concert")
 
 
-from entities.Artist import Artist
-from entities.Person import Person
-from entities.Photo import Photo
-from entities.Video import Video
-from entities.Show import Show
+from entities.artist import Artist
+from entities.attendee import Attendee
+from entities.photo import Photo
+from entities.video import Video
+from entities.show import Show
