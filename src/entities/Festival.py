@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from entities.Base import Base
+from entities.base import Base
 
 
 class Festival(Base):
@@ -12,4 +12,4 @@ class Festival(Base):
     shows: Mapped[List["Show"]] = relationship("Show", back_populates="festival")
 
 
-from entities.Show import Show
+from entities.show import Show

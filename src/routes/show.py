@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from crud.show import get, get_all, create, update, delete
 from database.database import get_db
-from schemas.ShowSchema import ShowCreate
+from schemas.show import ShowCreate
 
 router = APIRouter()
 session = Depends(get_db)

@@ -1,11 +1,11 @@
-from entities.Artist import Artist
-from entities.Concert import Concert
-from entities.Festival import Festival
-from entities.Person import Person
-from entities.Show import Show
+from entities.artist import Artist
+from entities.concert import Concert
+from entities.festival import Festival
+from entities.attendee import Attendee
+from entities.show import Show
+from entities.venue import Venue
+from schemas.show import ShowCreate
 from fastapi import HTTPException
-from entities.Venue import Venue
-from schemas.ShowSchema import ShowCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -80,7 +80,7 @@ def create(db: Session, show: ShowCreate) -> Show:
         print(f"\033[93m{show.attendees_ids}\033[0m")
 
         if show.attendees_ids:
-            attendees = db.query(Person).filter(Person.id.in_(show.attendees_ids)).all()
+            attendees = db.query(Attendee).filter(Attendee.id.in_(show.attendees_ids)).all()
             print(f"\033[93mAttendees for show '{show.name}':\033[0m")
             print(f"\033[93m{attendees}\033[0m")
             new_show.attendees.extend(attendees)

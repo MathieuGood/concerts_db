@@ -1,10 +1,11 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from entities.Base import Base
+from entities.base import Base
 
 
 class Video(Base):
     __tablename__ = "videos"
+    __table_args__ = (UniqueConstraint("path", "concert_id", name="_path_concert_uc"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     path: Mapped[str] = mapped_column(nullable=False)
@@ -13,4 +14,4 @@ class Video(Base):
     concert: Mapped["Concert"] = relationship("Concert", back_populates="videos")
 
 
-from entities.Concert import Concert
+from entities.concert import Concert

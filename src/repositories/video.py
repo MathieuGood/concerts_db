@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from entities.Video import Video
-from repositories.BaseRepository import BaseRepository
+from entities.video import Video
+from repositories.base import BaseRepository
 
 
 class VideoRepository(BaseRepository[Video]):

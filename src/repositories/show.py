@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from entities.Show import Show
-from repositories.BaseRepository import BaseRepository
+from entities.show import Show
+from repositories.base import BaseRepository
 
 
 class ShowRepository(BaseRepository[Show]):

@@ -4,14 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from database.database import delete_database, seed_data
-from entities.Base import Base
+from entities.base import Base
 from config import Config
 from routes.root import router as root_router
 from routes.address import router as address_router
 from routes.artist import router as artist_router
 from routes.concert import router as concert_router
 from routes.festival import router as festival_router
-from routes.person import router as person_router
+from routes.attendee import router as attendee_router
 from routes.photo import router as photo_router
 from routes.show import router as show_router
 from routes.venue import router as venue_router
@@ -45,7 +45,7 @@ app.include_router(address_router)
 app.include_router(artist_router)
 app.include_router(concert_router)
 app.include_router(festival_router)
-app.include_router(person_router)
+app.include_router(attendee_router)
 app.include_router(photo_router)
 app.include_router(show_router)
 app.include_router(venue_router)

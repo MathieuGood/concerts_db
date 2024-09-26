@@ -28,7 +28,7 @@ class ConcertResponse(ConcertBase):
         from_attributes = True
 
 
-from schemas.ShowSchema import ShowResponse
-from schemas.ArtistSchema import ArtistResponse
-from schemas.PhotoSchema import PhotoResponse
-from schemas.VideoSchema import VideoResponse
+from schemas.show import ShowResponse
+from schemas.artist import ArtistResponse
+from schemas.photo import PhotoResponse
+from schemas.video import VideoResponse

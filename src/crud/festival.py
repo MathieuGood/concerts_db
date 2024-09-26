@@ -1,6 +1,6 @@
-from entities.Festival import Festival
+from entities.festival import Festival
 from fastapi import HTTPException
-from schemas.FestivalSchema import FestivalCreate
+from schemas.festival import FestivalCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 

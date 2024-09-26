@@ -22,5 +22,5 @@ class AddressResponse(AddressBase):
         from_attributes = True
 
 
-from schemas.ArtistSchema import ArtistResponse
-from schemas.VenueSchema import VenueResponse
+from schemas.artist import ArtistResponse
+from schemas.venue import VenueResponse

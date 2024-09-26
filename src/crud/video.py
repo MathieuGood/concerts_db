@@ -1,6 +1,6 @@
-from entities.Video import Video
+from entities.video import Video
 from fastapi import HTTPException
-from schemas.VideoSchema import VideoCreate
+from schemas.video import VideoCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 

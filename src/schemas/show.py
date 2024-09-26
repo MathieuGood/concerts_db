@@ -25,11 +25,11 @@ class ShowResponse(ShowBase):
     festival_id: Optional[int] = None
     venue: Optional["VenueResponse"] = None
     concerts: Optional[List["ConcertResponse"]] = None
-    attendees: Optional[List["PersonResponse"]] = None
+    attendees: Optional[List["AttendeeResponse"]] = None
 
 
-from schemas.VenueSchema import VenueResponse
-from schemas.FestivalSchema import FestivalResponse
-from schemas.ConcertSchema import ConcertResponse
-from schemas.ConcertSchema import ConcertCreate
-from schemas.PersonSchema import PersonResponse
+from schemas.venue import VenueResponse
+from schemas.festival import FestivalResponse
+from schemas.concert import ConcertResponse
+from schemas.concert import ConcertCreate
+from schemas.attendee import AttendeeResponse

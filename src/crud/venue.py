@@ -1,6 +1,6 @@
-from entities.Venue import Venue
+from entities.venue import Venue
 from fastapi import HTTPException
-from schemas.VenueSchema import VenueCreate
+from schemas.venue import VenueCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 

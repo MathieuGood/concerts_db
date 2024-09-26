@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from crud.concert import get, get_all, create, update, delete
 from database.database import get_db
-from schemas.ConcertSchema import ConcertCreate
+from schemas.concert import ConcertCreate
 
 router = APIRouter()
 session = Depends(get_db)
