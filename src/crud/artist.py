@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from entities.artist import Artist
 from schemas.artist import ArtistCreate
+from repositories.artist import ArtistRepository
 
 
 def get(db: Session, artist_id: int) -> Artist:
@@ -17,6 +18,9 @@ def get(db: Session, artist_id: int) -> Artist:
 
 def get_all(db: Session) -> list[Artist]:
     return db.query(Artist).all()
+    # Alternative using repository
+    # artist_respository = ArtistRepository(db)
+    # return artist_respository.get_all()
 
 
 def create(db: Session, artist: ArtistCreate) -> Artist:
@@ -69,6 +73,13 @@ def delete(db: Session, artist_id: int) -> dict[str, str] | HTTPException:
     if not deleted_artist:
         return {"message": f"Artist #{artist_id} does not exist."}
     artist_name = deleted_artist.name
-    db.delete(deleted_artist)
-    db.commit()
-    return {"message": f"Artist #{artist_id} '{artist_name}' deleted."}
+    try:
+        db.delete(deleted_artist)
+        db.commit()
+        return {"message": f"Artist #{artist_id} '{artist_name}' deleted."}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete artist '{artist_name}', they are still associated with shows.",
+        )
