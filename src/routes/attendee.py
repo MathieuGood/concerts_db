@@ -11,28 +11,28 @@ router = APIRouter()
 
 
 @router.get("/attendee/{attendee_id}")
-def get_attendee(attendee_id: int, db: Session = session):
+async def get_attendee(attendee_id: int, db: Session = session):
     return get(db, attendee_id)
 
 
 @router.get("/attendee/")
-def get_all_attendees(db: Session = session):
+async def get_all_attendees(db: Session = session):
     return get_all(db)
 
 
 # Create attendee
 @router.post("/attendee/")
-def create_attendee(attendee: AttendeeCreate, db: Session = session):
+async def create_attendee(attendee: AttendeeCreate, db: Session = session):
     return create(db, attendee)
 
 
 # Update attendee
 @router.put("/attendee/{attendee_id}")
-def update_attendee(attendee_id: int, attendee: AttendeeCreate, db: Session = session):
+async def update_attendee(attendee_id: int, attendee: AttendeeCreate, db: Session = session):
     return update(db, attendee_id, attendee)
 
 
 # Delete attendee
 @router.delete("/attendee/{attendee_id}")
-def delete_attendee(attendee_id: int, db: Session = session):
+async def delete_attendee(attendee_id: int, db: Session = session):
     return delete(db, attendee_id)
