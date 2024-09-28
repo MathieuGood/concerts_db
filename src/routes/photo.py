@@ -11,28 +11,28 @@ router = APIRouter()
 
 
 @router.get("/photo/{photo_id}")
-def get_photo(photo_id: int, db: Session = session):
+async def get_photo(photo_id: int, db: Session = session):
     return get(db, photo_id)
 
 
 @router.get("/photo/")
-def get_all_photos(db: Session = session):
+async def get_all_photos(db: Session = session):
     return get_all(db)
 
 
 # Create photo
 @router.post("/photo/")
-def create_photo(photo: PhotoCreate, db: Session = session):
+async def create_photo(photo: PhotoCreate, db: Session = session):
     return create(db, photo)
 
 
 # Update photo
 @router.put("/photo/{photo_id}")
-def update_photo(photo_id: int, photo: PhotoCreate, db: Session = session):
+async def update_photo(photo_id: int, photo: PhotoCreate, db: Session = session):
     return update(db, photo_id, photo)
 
 
 # Delete photo
 @router.delete("/photo/{photo_id}")
-def delete_photo(photo_id: int, db: Session = session):
+async def delete_photo(photo_id: int, db: Session = session):
     return delete(db, photo_id)

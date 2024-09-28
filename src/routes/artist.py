@@ -11,25 +11,25 @@ router = APIRouter()
 
 
 @router.get("/artist/{artist_id}")
-def get_artist(artist_id: int, db: Session = session):
+async def get_artist(artist_id: int, db: Session = session):
     return get(db, artist_id)
 
 
 @router.get("/artist/")
-def get_all_artists(db: Session = session):
+async def get_all_artists(db: Session = session):
     return get_all(db)
 
 
 @router.post("/artist/")
-def create_artist(artist: ArtistCreate, db: Session = session):
+async def create_artist(artist: ArtistCreate, db: Session = session):
     return create(db, artist)
 
 
 @router.put("/artist/{artist_id}")
-def update_artist(artist_id: int, artist: ArtistCreate, db: Session = session):
+async def update_artist(artist_id: int, artist: ArtistCreate, db: Session = session):
     return update(db, artist_id, artist)
 
 
 @router.delete("/artist/{artist_id}")
-def delete_artist(artist_id: int, db: Session = session):
+async def delete_artist(artist_id: int, db: Session = session):
     return delete(db, artist_id)
