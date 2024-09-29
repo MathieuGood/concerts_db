@@ -3,9 +3,7 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from entities.base import Base
 
-
 class Attendee(Base):
-
     __tablename__ = "attendees"
     __table_args__ = (
         UniqueConstraint("firstname", "lastname", name="_firstname_lastname_uc"),
