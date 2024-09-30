@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from database.database import delete_db, seed_data
-from entities.base import Base
+from models.base import Base
 from config import Config
 from routes.root import router as root_router
 from routes.address import router as address_router

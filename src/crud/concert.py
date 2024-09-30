@@ -1,4 +1,4 @@
-from entities.concert import Concert
+from models.concert import Concert
 from fastapi import HTTPException
 from schemas.concert import ConcertCreate
 from sqlalchemy.exc import IntegrityError

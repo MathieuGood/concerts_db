@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from entities.festival import Festival
+from models.festival import Festival
 from repositories.base import BaseRepository
 
 

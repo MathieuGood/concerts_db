@@ -1,4 +1,4 @@
-from entities.photo import Photo
+from models.photo import Photo
 from fastapi import HTTPException
 from schemas.photo import PhotoCreate
 from sqlalchemy.exc import IntegrityError

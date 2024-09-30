@@ -1,4 +1,4 @@
-from entities.festival import Festival
+from models.festival import Festival
 from fastapi import HTTPException
 from schemas.festival import FestivalCreate
 from sqlalchemy.exc import IntegrityError

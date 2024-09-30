@@ -1,8 +1,8 @@
-from entities.address import Address
+from models.address import Address
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from entities.artist import Artist
+from models.artist import Artist
 from schemas.artist import ArtistCreate
 from repositories.artist import ArtistRepository
 

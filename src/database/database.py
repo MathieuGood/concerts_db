@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from entities.base import Base
+from models.base import Base
 from config import Config
 from sqlalchemy.orm import Session
 from mockup_data.concerts_mock_data import venues, nofx_show, nfg_show, festivals
