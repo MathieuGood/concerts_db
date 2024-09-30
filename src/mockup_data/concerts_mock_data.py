@@ -61,7 +61,7 @@ venues = [
     batofar,
 ]
 
-festivals = [
+other_festivals = [
     Festival(
         name="Punk Rock Bowling",
     ),
@@ -74,6 +74,7 @@ festivals = [
     Festival(
         name="Rock en Seine",
     ),
+    Festival(name="Punk In Drublic"),
 ]
 
 coralsprings_address = Address(city="Coral Springs", country="USA")
@@ -102,14 +103,59 @@ for artist in nofx_show_artists:
     concert.artist = artist
     concert.show = nofx_show
 
+nofx_show.concerts[2].photos = [
+    Photo(
+        path="Photo of Fat Mike",
+    ),
+    Photo(path="Photo of Eric Melvin"),
+]
+nofx_show.concerts[2].videos = [
+    Video(
+        path="Video of The Decline",
+    ),
+    Video(path="Video of Linoleum"),
+]
 nofx_show.name = "NOFX Final Tour"
 nofx_show.venue = ewerk
 nofx_show.attendees = nofx_show_attendees
+nofx_show.festival = other_festivals[4]
 
 nfg_show = Show(event_date=datetime(year=2009, month=4, day=30))
+nfg_show.attendees = [
+    Attendee(firstname="Samuel", lastname="Witenberg"),
+]
 nfg_show.venue = hob_boston
 nfg_concert = Concert()
+nfg_concert.photos = [
+    Photo(
+        path="Photo of Jordan Pundik",
+    ),
+    Photo(path="Photo of Chad Gilbert"),
+]
+nfg_concert.videos = [
+    Video(
+        path="Video of My Friends Over You",
+    ),
+    Video(path="Video of Hit or Miss"),
+]
 
 nfg_concert.artist = Artist(name="New Found Glory", address=coralsprings_address)
 nfg_concert.comments = "They played all their hits!"
-nfg_show.concerts.append(nfg_concert)
+nfg_concert.show = nfg_show
+
+
+other_addresses = [
+    Address(city="Truchtersheim", country="France"),
+    Address(city="Wittenheim", country="France"),
+]
+
+
+other_artists = [
+    Artist(name="The Offspring", address=losangeles_address),
+    Artist(name="Rancid", address=losangeles_address),
+]
+
+other_attendees = [
+    Attendee(firstname="Graham", lastname="Chapman"),
+    Attendee(firstname="John", lastname="Cleese"),
+]

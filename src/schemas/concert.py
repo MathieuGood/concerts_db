@@ -8,9 +8,10 @@ class ConcertBase(BaseModel):
 
 
 class ConcertCreate(ConcertBase):
-    # show_id not required because it is not known at the time
-    # show_id: int
+    show_id: Optional[int] = None
     artist_id: int
+    photos : Optional[List[str]] = None
+    videos : Optional[List[str]] = None
 
 
 class ConcertResponse(ConcertBase):

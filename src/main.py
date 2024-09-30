@@ -31,8 +31,6 @@ async def lifespan(app: FastAPI):
     print("Data added to the database")
     print("")
     yield
-
-    # Shutdown: Perform any necessary cleanup operations
     print("Application shutdown")
 
 

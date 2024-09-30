@@ -67,7 +67,7 @@ def delete(db: Session, attendee_id: int) -> dict[str, str] | HTTPException:
     if deleted_attendee.shows:
         raise HTTPException(
             status_code=400,
-            detail=f"Cannot delete '{deleted_attendee.firstname} {deleted_attendee.lastname}', they are still associated with shows.",
+            detail=f"Cannot delete '{deleted_attendee.firstname} {deleted_attendee.lastname}', it is still associated with shows.",
         )
     try:
         db.delete(deleted_attendee)

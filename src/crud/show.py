@@ -1,43 +1,49 @@
+from typing import List
 from models.artist import Artist
 from models.concert import Concert
 from models.festival import Festival
 from models.attendee import Attendee
+from models.photo import Photo
 from models.show import Show
 from models.venue import Venue
+from models.video import Video
 from schemas.show import ShowCreate
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 
-def get(db: Session, show_id: int):
+def get(db: Session, show_id: int) -> Show:
     show = db.query(Show).filter(Show.id == show_id).first()
     if not show:
         raise HTTPException(
             status_code=404, detail=f"Show with ID {show_id} not found."
         )
     show.venue.address
-    show.concerts
     show.attendees
+    show.festival
     for concert in show.concerts:
         concert.artist.address
+        concert.photos
+        concert.videos
     return show
 
 
-def get_all(db: Session):
+def get_all(db: Session) -> List[Show]:
     shows = db.query(Show).all()
     for show in shows:
         show.venue.address
-        show.concerts
         show.attendees
+        show.festival
         for concert in show.concerts:
             concert.artist.address
+            concert.photos
+            concert.videos
     return shows
 
 
 def create(db: Session, show: ShowCreate) -> Show:
     try:
-
         venue = db.query(Venue).filter(Venue.id == show.venue_id).first()
         if not venue:
             raise HTTPException(
@@ -58,39 +64,49 @@ def create(db: Session, show: ShowCreate) -> Show:
             venue_id=show.venue_id,
             festival_id=show.festival_id,
         )
-
-        for concert in show.concerts:
-            new_concert = Concert()
-            artist_id = db.query(Artist).filter(Artist.id == concert.artist_id).first()
-            if not artist_id:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"Artist with ID {concert.artist_id} not found.",
-                )
-            new_concert.artist_id = concert.artist_id
-            new_concert.comments = concert.comments
-            new_concert.setlist = concert.setlist
-            new_concert.show = new_show
-
         db.add(new_show)
         db.commit()
         db.refresh(new_show)
 
-        print(f"\033[93mAttendees for show '{show.name}':\033[0m")
-        print(f"\033[93m{show.attendees_ids}\033[0m")
+        for concert in show.concerts:
+            artist = db.query(Artist).filter(Artist.id == concert.artist_id).first()
+            if not artist:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Artist with ID {concert.artist_id} not found.",
+                )
+            new_concert = Concert(
+                comments=concert.comments,
+                setlist=concert.setlist,
+                show_id=new_show.id,
+                artist_id=concert.artist_id,
+            )
+
+            db.add(new_concert)
+            db.commit()
+            db.refresh(new_concert)
+
+            for photo_url in concert.photos:
+                new_photo = Photo(path=photo_url, concert_id=new_concert.id)
+                db.add(new_photo)
+
+            for video_url in concert.videos:
+                new_video = Video(path=video_url, concert_id=new_concert.id)
+                db.add(new_video)
+
+        db.commit()
+        db.refresh(new_show)
 
         if show.attendees_ids:
-            attendees = db.query(Attendee).filter(Attendee.id.in_(show.attendees_ids)).all()
-            print(f"\033[93mAttendees for show '{show.name}':\033[0m")
-            print(f"\033[93m{attendees}\033[0m")
+            attendees = (
+                db.query(Attendee).filter(Attendee.id.in_(show.attendees_ids)).all()
+            )
             new_show.attendees.extend(attendees)
             db.commit()
             db.refresh(new_show)
 
-        # The response of the API does not currently include the concerts and attendees
-        # for the show. This is because the relationships between shows, concerts, and
-        # attendees are not yet defined in the ShowResponse schema. This will be added
         return new_show
+
     except IntegrityError:
         db.rollback()
         raise HTTPException(
@@ -116,7 +132,7 @@ def update(db: Session, show_id: int, show: ShowCreate) -> Show:
         )
 
 
-def delete(db: Session, show_id: int):
+def delete(db: Session, show_id: int) -> dict:
     deleted_show: Show = db.query(Show).filter(Show.id == show_id).first()
     if not deleted_show:
         return {"message": f"Show #{show_id} does not exist."}

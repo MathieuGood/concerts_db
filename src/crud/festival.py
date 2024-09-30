@@ -59,6 +59,20 @@ def delete(db: Session, festival_id: int):
     if not deleted_festival:
         return {"message": f"Festival #{festival_id} does not exist."}
     festival_name = deleted_festival.name
-    db.delete(deleted_festival)
-    db.commit()
-    return {"message": f"Festival #{festival_id} '{festival_name}' deleted."}
+
+    if deleted_festival.shows:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete Festival '{festival_name}, it is still associated with shows.",
+        )
+
+    try:
+        db.delete(deleted_festival)
+        db.commit()
+        return {"message": f"Festival #{festival_id} '{festival_name}' deleted."}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete Festival '{festival_name}', it is still associated with shows.",
+        )

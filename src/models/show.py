@@ -19,7 +19,9 @@ class Show(Base):
     venue: Mapped["Venue"] = relationship("Venue", back_populates="shows")
     festival: Mapped["Festival"] = relationship("Festival", back_populates="shows")
 
-    concerts: Mapped[List["Concert"]] = relationship("Concert", back_populates="show")
+    concerts: Mapped[List["Concert"]] = relationship(
+        "Concert", back_populates="show", cascade="all, delete-orphan"
+    )
     attendees: Mapped[List["Attendee"]] = relationship(
         "Attendee", secondary="show_attendees", back_populates="shows"
     )

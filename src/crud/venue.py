@@ -38,9 +38,7 @@ def create(db: Session, venue: VenueCreate) -> Venue:
 
 def update(db: Session, venue_id: int, venue: VenueCreate) -> Venue:
     try:
-        updated_venue: Venue = (
-            db.query(Venue).filter(Venue.id == venue_id).first()
-        )
+        updated_venue: Venue = db.query(Venue).filter(Venue.id == venue_id).first()
         if updated_venue is None:
             raise HTTPException(
                 status_code=404, detail=f"Venue with ID {venue_id} not found."
@@ -58,11 +56,23 @@ def update(db: Session, venue_id: int, venue: VenueCreate) -> Venue:
 
 
 def delete(db: Session, venue_id: int):
-    deleted_venue: Venue = (
-        db.query(Venue).filter(Venue.id == venue_id).first()
-    )
+    deleted_venue: Venue = db.query(Venue).filter(Venue.id == venue_id).first()
     if not deleted_venue:
         return {"message": f"Venue #{venue_id} does not exist."}
-    db.delete(deleted_venue)
-    db.commit()
-    return {"message": f"Venue #{venue_id} '{deleted_venue.name}' deleted."}
+
+    if deleted_venue.shows:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Venue '{deleted_venue.name}, {deleted_venue.address.city}' cannot be deleted because it has shows asssociated to it.",
+        )
+
+    try:
+        db.delete(deleted_venue)
+        db.commit()
+        return {"message": f"Venue #{venue_id} '{deleted_venue.name}' deleted."}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail=f"Venue '{deleted_venue.name}' could not be deleted.",
+        )
