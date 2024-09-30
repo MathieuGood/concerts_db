@@ -55,14 +55,13 @@ uvicorn main:app --reload
 | concert  | [x]     | [x] | [x]    | [x]    | [x]    |
 | festival | [x]     | [x] | [x]    | [x]    | [x]    |
 | photo    | [x]     | [x] | [x]    | [x]    | [x]    |
-| show     | [x]     | [x] | [x]    | [ ]    | [ ]    |
+| show     | [x]     | [x] | [x]    | [x]    | [ ]    |
 | venue    | [x]     | [x] | [x]    | [x]    | [x]    |
 | video    | [x]     | [x] | [x]    | [x]    | [x]    |
 
 ## Data model
 
 Show is the main entity of the model :
-
 -   It represents an event held at a certain date and place (Venue).
 -   A show can have multiple Concerts, each one performed by an Artist.
 -   It can be part of a Festival.

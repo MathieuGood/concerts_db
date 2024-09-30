@@ -153,6 +153,9 @@ other_addresses = [
 other_artists = [
     Artist(name="The Offspring", address=losangeles_address),
     Artist(name="Rancid", address=losangeles_address),
+    Artist(name="Pennywise", address=losangeles_address),
+    Artist(name="Bad Religion", address=losangeles_address),
+    Artist(name="Green Day", address=losangeles_address),
 ]
 
 other_attendees = [
