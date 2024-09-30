@@ -184,7 +184,7 @@ def delete(db: Session, show_id: int) -> dict:
     deleted_show: Show = db.query(Show).filter(Show.id == show_id).first()
     if not deleted_show:
         return {"message": f"Show #{show_id} does not exist."}
-    show_name = deleted_show.name
+    show_desc = f"{deleted_show.name} at {deleted_show.venue.name} on {deleted_show.event_date}"
     db.delete(deleted_show)
     db.commit()
-    return {"message": f"Show #{show_id} '{show_name}' deleted."}
+    return {"message": f"Show #{show_id} '{show_desc}' deleted."}
