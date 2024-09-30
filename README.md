@@ -39,11 +39,13 @@ uvicorn main:app --reload
 
 ## Roadmap
 
--   [x] Build SQLAlchemy model
--   [x] FastAPI routes
--   [ ] Test all CRUD operations
--   [ ] Create custom Exception handlers
--   [ ] Switch from SQLite to PostgreSQL database
+- [x] Build SQLAlchemy model
+- [x] FastAPI routes
+- [x] Test all CRUD operations
+- [ ] Create custom Exception handlers
+- [ ] Switch from SQLite to PostgreSQL database
+- [ ] Write unit tests for API
+- [ ] Add authentication
 
 ### CRUD Tests
 
@@ -55,7 +57,7 @@ uvicorn main:app --reload
 | concert  | [x]     | [x] | [x]    | [x]    | [x]    |
 | festival | [x]     | [x] | [x]    | [x]    | [x]    |
 | photo    | [x]     | [x] | [x]    | [x]    | [x]    |
-| show     | [x]     | [x] | [x]    | [x]    | [ ]    |
+| show     | [x]     | [x] | [x]    | [x]    | [x]    |
 | venue    | [x]     | [x] | [x]    | [x]    | [x]    |
 | video    | [x]     | [x] | [x]    | [x]    | [x]    |
 
