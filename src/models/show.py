@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import date
 from models.base import Base
@@ -7,6 +7,7 @@ from models.base import Base
 
 class Show(Base):
     __tablename__ = "shows"
+    __table_args__ = (UniqueConstraint("event_date", "venue_id", name="_date_venue_uc"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=True)

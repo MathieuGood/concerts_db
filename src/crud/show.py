@@ -121,7 +121,55 @@ def update(db: Session, show_id: int, show: ShowCreate) -> Show:
             raise HTTPException(
                 status_code=404, detail=f"Show with ID {show_id} not found."
             )
+    
         updated_show.name = show.name
+        updated_show.event_date = show.event_date
+        updated_show.comments = show.comments
+        updated_show.venue_id = show.venue_id
+        updated_show.festival_id = show.festival_id
+        updated_show.attendees_id = show.attendees_ids
+
+        updated_show.attendees.clear()
+        for attendee_id in show.attendees_ids:
+            attendee = db.query(Attendee).filter(Attendee.id == attendee_id).first()
+            if not attendee:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Attendee with ID {attendee_id} not found.",
+                )
+            updated_show.attendees.append(attendee)
+
+        updated_show.concerts.clear()
+        new_concerts = []
+        for concert in show.concerts:
+
+            artist = db.query(Artist).filter(Artist.id == concert.artist_id).first()
+            if not artist:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Artist with ID {concert.artist_id} not found.",
+                )
+            new_concert = Concert(
+                comments=concert.comments,
+                setlist=concert.setlist,
+                show_id=updated_show.id,
+                artist_id=concert.artist_id,
+            )
+            new_concerts.append(new_concert)
+
+            db.add(new_concert)
+            db.commit()
+            db.refresh(new_concert)
+
+            for photo_url in concert.photos:
+                new_photo = Photo(path=photo_url, concert_id=new_concert.id)
+                db.add(new_photo)
+
+            for video_url in concert.videos:
+                new_video = Video(path=video_url, concert_id=new_concert.id)
+                db.add(new_video)
+
+     
         db.commit()
         db.refresh(updated_show)
         return updated_show
