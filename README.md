@@ -40,23 +40,23 @@ uvicorn main:app --reload
 ## Roadmap
 
 -   [x] Build SQLAlchemy model
-
-### FastAPI
-
 -   [x] FastAPI routes
+-   [ ] Test all CRUD operations
+-   [ ] Create custom Exception handlers
+-   [ ] Switch from SQLite to PostgreSQL database
 
-#### CRUD
+### CRUD Tests
 
 | Entity   | Get All | Get | Create | Update | Delete |
 | -------- | ------- | --- | ------ | ------ | ------ |
-| artist   | [x]     | [x] | [x]    | [x]    | [ ]    |
-| address  | [x]     | [x] | [x]    | [x]    | [ ]    |
-| concert  | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
-| festival | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
-| person   | [x]     | [x] | [x]    | [x]    | [ ]    |
+| address  | [x]     | [x] | [x]    | [x]    | [x]    |
+| artist   | [x]     | [x] | [x]    | [x]    | [x]    |
+| attendee | [x]     | [x] | [x]    | [x]    | [x]    |
+| concert  | [x]     | [x] | [x]    | [x]    | [x]    |
+| festival | [x]     | [x] | [x]    | [x]    | [x]    |
 | photo    | [x]     | [x] | [x]    | [x]    | [x]    |
-| show     | [ ]     | [ ] | [ ]    | [ ]    | [ ]    |
-| venue    | [x]     | [x] | [x]    | [x]    | [ ]    |
+| show     | [x]     | [x] | [x]    | [ ]    | [ ]    |
+| venue    | [x]     | [x] | [x]    | [x]    | [x]    |
 | video    | [x]     | [x] | [x]    | [x]    | [x]    |
 
 ## Data model
@@ -66,7 +66,7 @@ Show is the main entity of the model :
 -   It represents an event held at a certain date and place (Venue).
 -   A show can have multiple Concerts, each one performed by an Artist.
 -   It can be part of a Festival.
--   It can have multiple Attendees attending it.
+-   It can have multiple Attendees associated to it.
 
 <table>
     <tbody>
@@ -117,7 +117,7 @@ Show is the main entity of the model :
             <td>
                 <ul>
                     <li>id : unique autoincrementing integer</li>
-                    <li>country : varchar</li>
+                    <li>Address : address of the artist (many-to-one relationship)</li>
                 </ul>
             </td>
             <td>

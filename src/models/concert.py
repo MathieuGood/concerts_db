@@ -16,12 +16,15 @@ class Concert(Base):
 
     artist_id: Mapped[int] = mapped_column(ForeignKey("artists.id"), nullable=False)
     artist: Mapped["Artist"] = relationship("Artist", back_populates="concerts")
-    photos: Mapped[List["Photo"]] = relationship("Photo", back_populates="concert")
-    videos: Mapped[List["Video"]] = relationship("Video", back_populates="concert")
+    photos: Mapped[List["Photo"]] = relationship(
+        "Photo", back_populates="concert", cascade="all, delete-orphan"
+    )
+    videos: Mapped[List["Video"]] = relationship(
+        "Video", back_populates="concert", cascade="all, delete-orphan"
+    )
 
 
 from models.artist import Artist
-from models.attendee import Attendee
 from models.photo import Photo
 from models.video import Video
 from models.show import Show

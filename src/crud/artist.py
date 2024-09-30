@@ -73,6 +73,7 @@ def delete(db: Session, artist_id: int) -> dict[str, str] | HTTPException:
     if not deleted_artist:
         return {"message": f"Artist #{artist_id} does not exist."}
     artist_name = deleted_artist.name
+    
     try:
         db.delete(deleted_artist)
         db.commit()

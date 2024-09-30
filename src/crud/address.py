@@ -61,11 +61,24 @@ def delete(db: Session, address_id: int) -> dict[str, str] | HTTPException:
     deleted_address: Address | None = (
         db.query(Address).filter(Address.id == address_id).first()
     )
-    print(f"\033[93m{deleted_address.city}\033[0m")
-    print(f"\033[93m{deleted_address.country}\033[0m")
+
     if not deleted_address:
         return {"message": f"Address #{address_id} does not exist."}
     address = f"{deleted_address.city}, {deleted_address.country}"
-    db.delete(deleted_address)
-    db.commit()
-    return {"message": f"Address #{address_id} '{address}' deleted."}
+
+    if deleted_address.venues or deleted_address.artists:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete address '{address}' as it is associated with one or more venues or artists",
+        )
+
+    try:
+        db.delete(deleted_address)
+        db.commit()
+        return {"message": f"Address #{address_id} '{address}' deleted."}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete address '{address}', it is still associated with one or more venues.",
+        )
