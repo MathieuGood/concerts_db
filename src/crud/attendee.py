@@ -1,4 +1,4 @@
-from entities.attendee import Attendee
+from models.attendee import Attendee
 from fastapi import HTTPException
 from schemas.attendee import AttendeeCreate
 from sqlalchemy.exc import IntegrityError

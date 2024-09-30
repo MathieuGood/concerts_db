@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from entities.show import Show
+from models.show import Show
 from repositories.base import BaseRepository
 
 

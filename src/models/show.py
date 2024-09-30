@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import date
-from entities.base import Base
+from models.base import Base
 
 
 class Show(Base):
@@ -25,7 +25,7 @@ class Show(Base):
     )
 
 
-from entities.venue import Venue
-from entities.festival import Festival
-from entities.attendee import Attendee
-from entities.concert import Concert
+from models.venue import Venue
+from models.festival import Festival
+from models.attendee import Attendee
+from models.concert import Concert

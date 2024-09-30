@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from repositories.base import BaseRepository
-from entities.attendee import Attendee
+from models.attendee import Attendee
 
 
 class AttendeeRepository(BaseRepository[Attendee]):

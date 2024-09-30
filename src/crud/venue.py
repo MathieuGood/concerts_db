@@ -1,4 +1,4 @@
-from entities.venue import Venue
+from models.venue import Venue
 from fastapi import HTTPException
 from schemas.venue import VenueCreate
 from sqlalchemy.exc import IntegrityError

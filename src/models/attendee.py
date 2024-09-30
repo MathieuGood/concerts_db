@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from entities.base import Base
+from models.base import Base
 
 class Attendee(Base):
     __tablename__ = "attendees"
@@ -18,5 +18,5 @@ class Attendee(Base):
     )
 
 
-from entities.show import Show
-from entities.show_attendee_association import show_attendee_association
+from models.show import Show
+from models.show_attendee_association import show_attendee_association

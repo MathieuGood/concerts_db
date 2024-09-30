@@ -1,5 +1,5 @@
 from sqlalchemy import Table, Column, ForeignKey
-from entities.base import Base
+from models.base import Base
 
 show_attendee_association = Table(
     "show_attendees",

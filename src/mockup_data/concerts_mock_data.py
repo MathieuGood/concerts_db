@@ -1,13 +1,13 @@
 from datetime import datetime
-from entities.address import Address
-from entities.venue import Venue
-from entities.concert import Concert
-from entities.artist import Artist
-from entities.festival import Festival
-from entities.attendee import Attendee
-from entities.photo import Photo
-from entities.video import Video
-from entities.show import Show
+from models.address import Address
+from models.venue import Venue
+from models.concert import Concert
+from models.artist import Artist
+from models.festival import Festival
+from models.attendee import Attendee
+from models.photo import Photo
+from models.video import Video
+from models.show import Show
 
 
 fillmore = Venue(name="The Fillmore", address=None)

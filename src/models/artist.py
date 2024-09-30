@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from entities.base import Base
+from models.base import Base
 
 
 class Artist(Base):
@@ -16,5 +16,5 @@ class Artist(Base):
     concerts: Mapped[List["Concert"]] = relationship("Concert", back_populates="artist")
 
 
-from entities.concert import Concert
-from entities.address import Address
+from models.concert import Concert
+from models.address import Address

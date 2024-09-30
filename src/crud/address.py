@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from entities.address import Address
+from models.address import Address
 from schemas.address import AddressCreate
 
 

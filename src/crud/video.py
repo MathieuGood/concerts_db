@@ -1,4 +1,4 @@
-from entities.video import Video
+from models.video import Video
 from fastapi import HTTPException
 from schemas.video import VideoCreate
 from sqlalchemy.exc import IntegrityError

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from entities.concert import Concert
+from models.concert import Concert
 from repositories.base import BaseRepository
 
 

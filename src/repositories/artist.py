@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from entities.artist import Artist
+from models.artist import Artist
 from repositories.base import BaseRepository
 
 

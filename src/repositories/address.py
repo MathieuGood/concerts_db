@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from entities.address import Address
+from models.address import Address
 from repositories.base import BaseRepository
 
 
