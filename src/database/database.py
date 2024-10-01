@@ -54,7 +54,7 @@ def seed_data(session: Session) -> None:
 
 
 def get_db():
-    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI, echo=True)
+    engine = create_engine(Config.DATABASE_URI, echo=True)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base.metadata.create_all(engine)
     db = SessionLocal()

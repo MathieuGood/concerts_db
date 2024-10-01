@@ -22,7 +22,7 @@ from routes.video import router as video_router
 async def lifespan(app: FastAPI):
     # Startup: Perform any necessary setup operations
     delete_db()
-    engine: Engine = create_engine(Config.SQLALCHEMY_DATABASE_URI, echo=True)
+    engine: Engine = create_engine(Config.DATABASE_URI, echo=True)
     Base.metadata.create_all(engine)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     db: Session = SessionLocal()
@@ -36,7 +36,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI()
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(root_router)
 app.include_router(address_router)

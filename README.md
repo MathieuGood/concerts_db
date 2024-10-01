@@ -39,13 +39,13 @@ uvicorn main:app --reload
 
 ## Roadmap
 
-- [x] Build SQLAlchemy model
-- [x] FastAPI routes
-- [x] Test all CRUD operations
-- [ ] Create custom Exception handlers
-- [ ] Switch from SQLite to PostgreSQL database
-- [ ] Write unit tests for API
-- [ ] Add authentication
+-   [x] Build SQLAlchemy model
+-   [x] FastAPI routes
+-   [x] Test all CRUD operations
+-   [ ] Create custom Exception handlers
+-   [ ] Switch from SQLite to PostgreSQL database
+-   [ ] Write unit tests for API
+-   [ ] Add authentication
 
 ### CRUD Tests
 
@@ -64,6 +64,7 @@ uvicorn main:app --reload
 ## Data model
 
 Show is the main entity of the model :
+
 -   It represents an event held at a certain date and place (Venue).
 -   A show can have multiple Concerts, each one performed by an Artist.
 -   It can be part of a Festival.
