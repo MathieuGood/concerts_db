@@ -37,7 +37,7 @@
 		},
 		{
 			"label": "Run Both",
-			"dependsOn": ["Run FastAPI", "Run React"],
+			"dependsOn": ["Run React", "Run FastAPI"],
 			"group": {
 				"kind": "build",
 				"isDefault": true

@@ -5,7 +5,7 @@ from models.base import Base
 
 class Video(Base):
     __tablename__ = "videos"
-    __table_args__ = (UniqueConstraint("path", "concert_id", name="_path_concert_uc"),)
+    __table_args__ = (UniqueConstraint("path", "concert_id", name="_videopath_concert_uc"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     path: Mapped[str] = mapped_column(nullable=False)
