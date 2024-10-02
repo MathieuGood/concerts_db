@@ -41,6 +41,12 @@ def seed_data(session: Session) -> None:
     print("\033[93mData seeded to database\033[0m")
 
 
+def drop_and_recreate_all_tables(engine: create_engine) -> None:
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(engine)
+    print("\033[93mAll tables dropped and recreated\033[0m")
+
+
 def get_db():
     engine = create_engine(Config.DATABASE_URI, echo=True)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
