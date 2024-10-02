@@ -23,19 +23,6 @@ from repositories.show import ShowRepository
 from repositories.artist import ArtistRepository
 
 
-def delete_db() -> None:
-    import os
-
-    try:
-        db_file = "flask_concerts_db.sqlite"
-        os.remove(db_file)
-        print(f"*** Database file removed : {os.getcwd()}/{db_file}***")
-    except FileNotFoundError as e:
-        print(f"*** Database file not found : {os.getcwd()}/{db_file}***")
-        print(e)
-        pass
-
-
 def seed_data(session: Session) -> None:
     venue_repository = VenueRepository(session)
     show_repository = ShowRepository(session)
@@ -51,6 +38,7 @@ def seed_data(session: Session) -> None:
     attendee_repository.add_multiple(other_attendees)
     artist_repository.add_multiple(other_artists)
     session.commit()
+    print("\033[93mData seeded to database\033[0m")
 
 
 def get_db():
