@@ -43,7 +43,7 @@ uvicorn main:app --reload
 -   [x] FastAPI routes
 -   [x] Test all CRUD operations
 -   [ ] Create custom Exception handlers
--   [ ] Switch from SQLite to PostgreSQL database
+-   [x] Switch from SQLite to PostgreSQL database
 -   [ ] Write unit tests for API
 -   [ ] Add authentication
 
