@@ -50,8 +50,8 @@ def drop_and_recreate_all_tables(engine: create_engine) -> None:
 def get_db():
     engine = create_engine(Config.DATABASE_URI, echo=True)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    Base.metadata.create_all(engine)
-    db = SessionLocal()
+    # Base.metadata.create_all(engine)
+    db : Session = SessionLocal()
     try:
         yield db
     finally:

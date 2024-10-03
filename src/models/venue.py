@@ -18,5 +18,4 @@ class Venue(Base):
 
 
 from models.address import Address
-from models.concert import Concert
 from models.show import Show
