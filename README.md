@@ -42,9 +42,10 @@ uvicorn main:app --reload
 -   [x] Build SQLAlchemy model
 -   [x] FastAPI routes
 -   [x] Test all CRUD operations
--   [ ] Create custom Exception handlers
 -   [x] Switch from SQLite to PostgreSQL database
 -   [ ] Write unit tests for API
+-   [ ] Create custom Exception handlers
+-   [ ] Implement logger
 -   [ ] Add authentication
 
 ### CRUD Tests

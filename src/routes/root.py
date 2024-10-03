@@ -1,12 +1,9 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from database.database import get_db
+from fastapi import APIRouter
 
 
 router = APIRouter()
-session = Depends(get_db)
 
 
 @router.get("/")
 async def read_root():
-    return "Hello World"
+    return "Welcome to the 'Concerts I Have Been To' API"
