@@ -4,7 +4,8 @@
 		{
 			"label": "Run FastAPI",
 			"type": "shell",
-			"command": "uvicorn main:app --reload",
+            "command": "${workspaceFolder}/.venv/bin/python",
+            "args": ["-m", "uvicorn", "main:app", "--reload"],
 			"options": {
 				"cwd": "${workspaceFolder}/src"
 			},
