@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 
 
@@ -18,8 +18,7 @@ class AddressResponse(AddressBase):
     venues: Optional[List["VenueResponse"]] = None
     artists: Optional[List["ArtistResponse"]] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 from schemas.artist import ArtistResponse

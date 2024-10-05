@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class VideoBase(BaseModel):
@@ -14,8 +14,7 @@ class VideoResponse(VideoBase):
     id: int
     concert: Optional["ConcertResponse"] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 from schemas.concert import ConcertResponse
