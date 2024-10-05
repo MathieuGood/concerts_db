@@ -7,8 +7,6 @@ from schemas.concert import ConcertCreate
 router = APIRouter()
 session = Depends(get_db)
 
-router = APIRouter()
-
 
 @router.get("/concert/{concert_id}")
 async def get_concert(concert_id: int, db: Session = session):
@@ -28,7 +26,9 @@ async def create_concert(concert: ConcertCreate, db: Session = session):
 
 # Update concert
 @router.put("/concert/{concert_id}")
-async def update_concert(concert_id: int, concert: ConcertCreate, db: Session = session):
+async def update_concert(
+    concert_id: int, concert: ConcertCreate, db: Session = session
+):
     return update(db, concert_id, concert)
 
 

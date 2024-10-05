@@ -7,8 +7,6 @@ from schemas.festival import FestivalCreate
 router = APIRouter()
 session = Depends(get_db)
 
-router = APIRouter()
-
 
 @router.get("/festival/{festival_id}")
 async def get_festival(festival_id: int, db: Session = session):
@@ -28,7 +26,9 @@ async def create_festival(festival: FestivalCreate, db: Session = session):
 
 # Update festival
 @router.put("/festival/{festival_id}")
-async def update_festival(festival_id: int, festival: FestivalCreate, db: Session = session):
+async def update_festival(
+    festival_id: int, festival: FestivalCreate, db: Session = session
+):
     return update(db, festival_id, festival)
 
 

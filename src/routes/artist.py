@@ -7,8 +7,6 @@ from schemas.artist import ArtistCreate
 router = APIRouter()
 session = Depends(get_db)
 
-router = APIRouter()
-
 
 @router.get("/artist/{artist_id}")
 async def get_artist(artist_id: int, db: Session = session):

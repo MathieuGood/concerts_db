@@ -7,8 +7,6 @@ from schemas.venue import VenueCreate
 router = APIRouter()
 session = Depends(get_db)
 
-router = APIRouter()
-
 
 @router.get("/venue/{venue_id}")
 async def get_venue(venue_id: int, db: Session = session):
