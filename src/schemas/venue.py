@@ -4,16 +4,17 @@ from typing import List, Optional
 
 class VenueBase(BaseModel):
     name: str
+    address_id: int
 
 
 class VenueCreate(VenueBase):
-    address_id: int
+    pass
 
 
 class VenueResponse(BaseModel):
     id: int
-    name: str
-    address_id: int
+    # name: str
+    # address_id: int
     address: Optional["AddressResponse"] = None
     shows: Optional[List["ShowResponse"]] = None
 

@@ -1,8 +1,9 @@
+from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from crud.show import get, get_all, create, update, delete
 from database.database import get_db
-from schemas.show import ShowCreate
+from schemas.show import ShowCreate, ShowResponse
 
 router = APIRouter()
 session = Depends(get_db)
@@ -15,7 +16,11 @@ async def get_show(show_id: int, db: Session = session):
     return get(db, show_id)
 
 
-@router.get("/show/")
+# @router.get("/show/")
+# async def get_all_shows(db: Session = session):
+#     return get_all(db)
+
+@router.get("/show/", response_model=list[ShowResponse])
 async def get_all_shows(db: Session = session):
     return get_all(db)
 

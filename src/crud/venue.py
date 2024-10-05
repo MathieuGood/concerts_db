@@ -2,12 +2,17 @@ from models.venue import Venue
 from fastapi import HTTPException
 from schemas.venue import VenueCreate
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 
 def get(db: Session, venue_id: int):
-    venue = db.query(Venue).filter(Venue.id == venue_id).first()
-    venue.address
+    venue = (
+        db.query(Venue)
+        .options(joinedload(Venue.address))
+        .filter(Venue.id == venue_id)
+        .first()
+    )
+
     if not venue:
         raise HTTPException(
             status_code=404, detail=f"Venue with ID {venue_id} not found."
@@ -16,9 +21,7 @@ def get(db: Session, venue_id: int):
 
 
 def get_all(db: Session):
-    venues = db.query(Venue).all()
-    for venue in venues:
-        venue.address
+    venues = db.query(Venue).options(joinedload(Venue.address)).all()
     return venues
 
 
