@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 
 
@@ -17,8 +17,7 @@ class VenueResponse(BaseModel):
     address: Optional["AddressResponse"] = None
     shows: Optional[List["ShowResponse"]] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 from schemas.address import AddressResponse

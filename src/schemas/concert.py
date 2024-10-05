@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 
 
@@ -10,8 +10,8 @@ class ConcertBase(BaseModel):
 class ConcertCreate(ConcertBase):
     show_id: Optional[int] = None
     artist_id: int
-    photos : Optional[List[str]] = None
-    videos : Optional[List[str]] = None
+    photos: Optional[List[str]] = None
+    videos: Optional[List[str]] = None
 
 
 class ConcertResponse(ConcertBase):
@@ -25,8 +25,7 @@ class ConcertResponse(ConcertBase):
     photos: Optional[List["PhotoResponse"]] = None
     videos: Optional[List["VideoResponse"]] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 from schemas.show import ShowResponse

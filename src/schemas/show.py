@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 from datetime import date
 
@@ -26,6 +26,8 @@ class ShowResponse(ShowBase):
     venue: Optional["VenueResponse"] = None
     concerts: Optional[List["ConcertResponse"]] = None
     attendees: Optional[List["AttendeeResponse"]] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 from schemas.venue import VenueResponse
