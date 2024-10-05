@@ -10,35 +10,43 @@ from models.video import Video
 from schemas.show import ShowCreate
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 
 def get(db: Session, show_id: int) -> Show:
-    show = db.query(Show).filter(Show.id == show_id).first()
+    show = (
+        db.query(Show)
+        .options(
+            joinedload(Show.venue),
+            joinedload(Show.attendees),
+            joinedload(Show.festival),
+            joinedload(Show.concerts).joinedload(Concert.artist),
+            joinedload(Show.concerts).joinedload(Concert.photos),
+            joinedload(Show.concerts).joinedload(Concert.videos),
+        )
+        .filter(Show.id == show_id)
+        .first()
+    )
     if not show:
         raise HTTPException(
             status_code=404, detail=f"Show with ID {show_id} not found."
         )
-    show.venue.address
-    show.attendees
-    show.festival
-    for concert in show.concerts:
-        concert.artist.address
-        concert.photos
-        concert.videos
     return show
 
 
 def get_all(db: Session) -> List[Show]:
-    shows = db.query(Show).all()
-    for show in shows:
-        show.venue.address
-        show.attendees
-        show.festival
-        for concert in show.concerts:
-            concert.artist.address
-            concert.photos
-            concert.videos
+    shows = (
+        db.query(Show)
+        .options(
+            joinedload(Show.venue),
+            joinedload(Show.attendees),
+            joinedload(Show.festival),
+            joinedload(Show.concerts).joinedload(Concert.artist),
+            joinedload(Show.concerts).joinedload(Concert.photos),
+            joinedload(Show.concerts).joinedload(Concert.videos),
+        )
+        .all()
+    )
     return shows
 
 
@@ -121,7 +129,7 @@ def update(db: Session, show_id: int, show: ShowCreate) -> Show:
             raise HTTPException(
                 status_code=404, detail=f"Show with ID {show_id} not found."
             )
-    
+
         updated_show.name = show.name
         updated_show.event_date = show.event_date
         updated_show.comments = show.comments
@@ -169,7 +177,6 @@ def update(db: Session, show_id: int, show: ShowCreate) -> Show:
                 new_video = Video(path=video_url, concert_id=new_concert.id)
                 db.add(new_video)
 
-     
         db.commit()
         db.refresh(updated_show)
         return updated_show
@@ -184,7 +191,9 @@ def delete(db: Session, show_id: int) -> dict:
     deleted_show: Show = db.query(Show).filter(Show.id == show_id).first()
     if not deleted_show:
         return {"message": f"Show #{show_id} does not exist."}
-    show_desc = f"{deleted_show.name} at {deleted_show.venue.name} on {deleted_show.event_date}"
+    show_desc = (
+        f"{deleted_show.name} at {deleted_show.venue.name} on {deleted_show.event_date}"
+    )
     db.delete(deleted_show)
     db.commit()
     return {"message": f"Show #{show_id} '{show_desc}' deleted."}

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Optional
+from typing import Optional
 from datetime import date
 
 
@@ -12,20 +12,20 @@ class ShowBase(BaseModel):
 class ShowCreate(ShowBase):
     venue_id: int
     festival_id: Optional[int] = None
-    attendees_ids: Optional[List[int]] = None
-    concerts: List["ConcertCreate"] = None
+    attendees_ids: Optional[list[int]] = None
+    concerts: list["ConcertCreate"] = None
 
 
 class ShowResponse(ShowBase):
     id: int
-    name: str
-    event_date: str
-    comments: Optional[str] = None
+    # name: str
+    # event_date: str
+    # comments: Optional[str] = None
     venue_id: int
     festival_id: Optional[int] = None
     venue: Optional["VenueResponse"] = None
-    concerts: Optional[List["ConcertResponse"]] = None
-    attendees: Optional[List["AttendeeResponse"]] = None
+    concerts: Optional[list["ConcertResponse"]] = None
+    attendees: Optional[list["AttendeeResponse"]] = None
 
     model_config = ConfigDict(from_attributes=True)
 

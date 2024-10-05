@@ -18,9 +18,6 @@ def get(db: Session, artist_id: int) -> Artist:
 
 def get_all(db: Session) -> list[Artist]:
     return db.query(Artist).all()
-    # Alternative using repository
-    # artist_respository = ArtistRepository(db)
-    # return artist_respository.get_all()
 
 
 def create(db: Session, artist: ArtistCreate) -> Artist:
@@ -73,7 +70,7 @@ def delete(db: Session, artist_id: int) -> dict[str, str] | HTTPException:
     if not deleted_artist:
         return {"message": f"Artist #{artist_id} does not exist."}
     artist_name = deleted_artist.name
-    
+
     try:
         db.delete(deleted_artist)
         db.commit()
