@@ -7,8 +7,6 @@ from schemas.attendee import AttendeeCreate
 router = APIRouter()
 session = Depends(get_db)
 
-router = APIRouter()
-
 
 @router.get("/attendee/{attendee_id}")
 async def get_attendee(attendee_id: int, db: Session = session):
@@ -28,7 +26,9 @@ async def create_attendee(attendee: AttendeeCreate, db: Session = session):
 
 # Update attendee
 @router.put("/attendee/{attendee_id}")
-async def update_attendee(attendee_id: int, attendee: AttendeeCreate, db: Session = session):
+async def update_attendee(
+    attendee_id: int, attendee: AttendeeCreate, db: Session = session
+):
     return update(db, attendee_id, attendee)
 
 
