@@ -8,8 +8,6 @@ from schemas.show import ShowCreate, ShowResponse
 router = APIRouter()
 session = Depends(get_db)
 
-router = APIRouter()
-
 
 @router.get("/show/{show_id}")
 async def get_show(show_id: int, db: Session = session):
@@ -19,6 +17,7 @@ async def get_show(show_id: int, db: Session = session):
 # @router.get("/show/")
 # async def get_all_shows(db: Session = session):
 #     return get_all(db)
+
 
 @router.get("/show/", response_model=list[ShowResponse])
 async def get_all_shows(db: Session = session):

@@ -7,8 +7,6 @@ from schemas.video import VideoCreate
 router = APIRouter()
 session = Depends(get_db)
 
-router = APIRouter()
-
 
 @router.get("/video/{video_id}")
 async def get_video(video_id: int, db: Session = session):

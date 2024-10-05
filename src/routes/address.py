@@ -7,8 +7,6 @@ from schemas.address import AddressCreate
 router = APIRouter()
 session = Depends(get_db)
 
-router = APIRouter()
-
 
 @router.get("/address/{address_id}")
 async def get_address(address_id: int, db: Session = session):
@@ -28,7 +26,9 @@ async def create_address(address: AddressCreate, db: Session = session):
 
 # Update address
 @router.put("/address/{address_id}")
-async def update_address(address_id: int, address: AddressCreate, db: Session = session):
+async def update_address(
+    address_id: int, address: AddressCreate, db: Session = session
+):
     return update(db, address_id, address)
 
 

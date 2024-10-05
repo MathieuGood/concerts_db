@@ -7,8 +7,6 @@ from schemas.photo import PhotoCreate
 router = APIRouter()
 session = Depends(get_db)
 
-router = APIRouter()
-
 
 @router.get("/photo/{photo_id}")
 async def get_photo(photo_id: int, db: Session = session):
