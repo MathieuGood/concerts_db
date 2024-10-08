@@ -5,34 +5,30 @@ from database.database import get_db
 from schemas.address import AddressCreate
 
 router = APIRouter()
-session = Depends(get_db)
 
 
 @router.get("/address/{address_id}")
-async def get_address(address_id: int, db: Session = session):
+async def get_address(address_id: int, db: Session = Depends(get_db)):
     return get(db, address_id)
 
 
 @router.get("/address/")
-async def get_all_addresss(db: Session = session):
+async def get_all_addresss(db: Session = Depends(get_db)):
     return get_all(db)
 
 
-# Create address
 @router.post("/address/")
-async def create_address(address: AddressCreate, db: Session = session):
+async def create_address(address: AddressCreate, db: Session = Depends(get_db)):
     return create(db, address)
 
 
-# Update address
 @router.put("/address/{address_id}")
 async def update_address(
-    address_id: int, address: AddressCreate, db: Session = session
+    address_id: int, address: AddressCreate, db: Session = Depends(get_db)
 ):
     return update(db, address_id, address)
 
 
-# Delete address
 @router.delete("/address/{address_id}")
-async def delete_address(address_id: int, db: Session = session):
+async def delete_address(address_id: int, db: Session = Depends(get_db)):
     return delete(db, address_id)
