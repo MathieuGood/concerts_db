@@ -4,9 +4,7 @@
 
 A simple app to keep track of all the concerts you've been to. Made for my own personal use as a side project.
 
-Right now, I am learning to build a Flask app based on a SQLAlchemy model. This project is a way to practice and learn more about these technologies.
-
-The goal is to have a web interface to visualize all the concerts I have been to and to be able to add new ones.
+Built with FastAPI and SQLAlchemy.
 
 ## How to install and run the app
 
