@@ -1,9 +1,5 @@
-from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models.address import Address
-from models.artist import Artist
-from models.attendee import Attendee
 from models.base import Base
 from config import Config
 from sqlalchemy.orm import Session
@@ -24,12 +20,16 @@ from repositories.show import ShowRepository
 from repositories.artist import ArtistRepository
 
 
-engine = create_engine(Config.DATABASE_URI, echo=True)
+engine = create_engine(
+    Config.DATABASE_URI,
+    echo=True,
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def get_db():
-    # Base.metadata.create_all(engine)
+    print(f"Connecting to database: {Config.DATABASE_URI}")
+    Base.metadata.create_all(engine)
     db: Session = SessionLocal()
     try:
         yield db
