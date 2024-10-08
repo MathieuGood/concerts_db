@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-# from contextlib import asynccontextmanager
-# from sqlalchemy import Engine, create_engine
-# from sqlalchemy.orm import Session, sessionmaker
-# from database.database import drop_and_recreate_all_tables, seed_data
-# from config import Config
+from contextlib import asynccontextmanager
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from database.database import drop_and_recreate_all_tables, seed_data
+from config import Config
 
 from routes.root import router as root_router
 from routes.address import router as address_router
@@ -19,27 +18,25 @@ from routes.venue import router as venue_router
 from routes.video import router as video_router
 
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     engine: Engine = create_engine(Config.DATABASE_URI, echo=True)
-#     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-#     db: Session = SessionLocal()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    engine: Engine = create_engine(Config.DATABASE_URI, echo=True)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db: Session = SessionLocal()
 
-#     if Config.DEMO_MODE:
-#         print("Running in demo mode")
-#         drop_and_recreate_all_tables(engine=engine)
-#         seed_data(db)
+    if Config.DEMO_MODE:
+        print("Running in demo mode")
+        drop_and_recreate_all_tables(engine=engine)
+        seed_data(db)
 
-#     db.close()
+    db.close()
 
-#     yield
-#     print("Application shutdown")
-
-
-# app = FastAPI(lifespan=lifespan)
+    yield
+    print("Application shutdown")
 
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -60,4 +57,4 @@ app.include_router(show_router)
 app.include_router(venue_router)
 app.include_router(video_router)
 
-# app.router.lifespan_context = lifespan
+app.router.lifespan_context = lifespan
