@@ -4,8 +4,10 @@ from sqlalchemy import Engine, StaticPool, create_engine
 from sqlalchemy.orm import sessionmaker
 from main import app
 from config import Config
-from src.database.database import get_db
-from src.models.base import Base
+from database.database import get_db
+from models.base import Base
+# from src.database.database import get_db
+# from src.models.base import Base
 
 print("Loading conftest.py")
 
@@ -21,40 +23,66 @@ def engine() -> Engine:
     )
 
 
+# @pytest.fixture(scope="function")
+# def test_db():
+#     Base.metadata.create_all(bind=engine)
+#     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+#     db = TestingSessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
+#         Base.metadata.drop_all(bind=engine)
+
+
+# @pytest.fixture(scope="function")
+# def override_get_db():
+#     def _override_get_db():
+#         print("Using test database")
+#         db = test_db
+#         try:
+#             yield db
+#         finally:
+#             pass
+
+#     return _override_get_db
+
+
+# @pytest.fixture(scope="function")
+# def test_app(override_get_db):
+#     print("Applying dependency override")
+#     app.dependency_overrides[get_db] = override_get_db
+#     yield app
+#     print("Clearing dependency override")
+#     app.dependency_overrides.clear()
+
+
+# @pytest.fixture(scope="function")
+# def client(test_app):
+#     return TestClient(test_app)
+
+
 @pytest.fixture(scope="function")
-def test_db():
+def client():
+    print(f"Using database URI: {Config.TEST_DATABASE_URI}")
+    engine = create_engine(
+        Config.TEST_DATABASE_URI,
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+        echo=True,)
     Base.metadata.create_all(bind=engine)
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-        Base.metadata.drop_all(bind=engine)
 
-
-@pytest.fixture(scope="function")
-def override_get_db():
-    def _override_get_db():
-        print("Using test database")
-        db = test_db
+    def override_get_db():
+        db = TestingSessionLocal()
         try:
             yield db
         finally:
-            pass
+            db.close()
 
-    return _override_get_db
-
-
-@pytest.fixture(scope="function")
-def test_app(override_get_db):
-    print("Applying dependency override")
     app.dependency_overrides[get_db] = override_get_db
-    yield app
-    print("Clearing dependency override")
+    with TestClient(app) as client:
+        yield client
+
+    Base.metadata.drop_all(bind=engine)
     app.dependency_overrides.clear()
-
-
-@pytest.fixture(scope="function")
-def client(test_app):
-    return TestClient(test_app)
