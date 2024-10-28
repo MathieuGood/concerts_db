@@ -1,4 +1,4 @@
-def test_create_show(client):
+def test_show_create(client):
     response = client.post(
         "/show/",
         json={
@@ -7,7 +7,7 @@ def test_create_show(client):
             "comments": "Amazing festival, first time I saw Incubus live!",
             "venue_id": "1",
             "festival_id": "1",
-            "attendees_id": "1",
+            "attendees_ids": ["1"],
             "concerts": [
                 {
                     "artist_id": 1,
@@ -28,19 +28,15 @@ def test_create_show(client):
     )
     assert response_data["venue_id"] == 1
     assert response_data["festival_id"] == 1
-    assert response_data["attendees_id"] == 1
+    assert response_data["attendees"][0]["id"] == 1
+    assert response_data["attendees"][0]["firstname"] == "John"
+    assert response_data["attendees"][0]["lastname"] == "Cleese"
     assert response_data["concerts"][0]["artist_id"] == 1
     assert response_data["concerts"][0]["comments"] == "Mike was on fire!"
     assert (
         response_data["concerts"][0]["setlist"]
         == "Pardon Me, Stellar, Drive, Wish You Were Here, Megalomaniac, Talk Shows on Mute, Nice to Know You, Warning, Sick Sad Little World, Anna Molly, Love Hurts, Adolescents, Dig, Are You In?, A Crow"
     )
-    assert response_data["concerts"][0]["photos"] == [
-        "Photo of Brandon",
-        "Photo of Mike",
-    ]
-    assert response_data["concerts"][0]["videos"] == [
-        "Video of Pardon Me",
-        "Video of Stellar",
-    ]
+    assert response_data["concerts"][0]["photos"][0]["path"] == "Photo of Brandon"
+    assert response_data["concerts"][0]["videos"][0]['path'] =="Video of Pardon Me"
     assert "id" in response_data

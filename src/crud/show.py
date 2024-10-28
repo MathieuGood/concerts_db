@@ -110,8 +110,16 @@ def create(db: Session, show: ShowCreate) -> Show:
                 db.query(Attendee).filter(Attendee.id.in_(show.attendees_ids)).all()
             )
             new_show.attendees.extend(attendees)
-            db.commit()
+            db.commit() 
             db.refresh(new_show)
+        
+        #TODO : Find cleaner way to return attendees and concerts. With Pydantic Response Model???
+        for attendee in new_show.attendees:
+            print(attendee)
+        for concert in new_show.concerts:
+            print(concert.artist)
+            print(concert.photos)
+            print(concert.videos)
 
         return new_show
 

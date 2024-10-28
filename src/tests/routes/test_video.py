@@ -1,4 +1,4 @@
-def test_create_video(client):
+def test_video_create(client):
     response = client.post(
         "/video/",
         json={

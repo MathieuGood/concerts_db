@@ -1,4 +1,4 @@
-def test_create_venue(client):
+def test_venue_create(client):
     response = client.post(
         "/venue/",
         json={

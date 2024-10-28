@@ -1,4 +1,4 @@
-def test_create_attendee(client):
+def test_attendee_create(client):
     response = client.post(
         "/attendee/",
         json={

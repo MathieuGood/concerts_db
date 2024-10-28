@@ -1,4 +1,4 @@
-def test_create_artist(client):
+def test_artist_create(client):
     response = client.post(
         "/artist/",
         json={
@@ -9,5 +9,5 @@ def test_create_artist(client):
     assert response.status_code == 200
     response_data = response.json()
     assert response_data["name"] == "Incubus"
-    assert response_data["address_id"] == "1"
+    assert response_data["address_id"] == 1
     assert "id" in response_data

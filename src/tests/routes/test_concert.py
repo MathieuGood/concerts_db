@@ -1,4 +1,4 @@
-def test_create_concert(client):
+def test_concert_create(client):
     response = client.post(
         "/concert/",
         json={

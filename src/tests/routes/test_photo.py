@@ -1,4 +1,4 @@
-def test_create_photo(client):
+def test_photo_create(client):
     response = client.post(
         "/photo/",
         json={
