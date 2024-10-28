@@ -25,6 +25,7 @@ def create(db: Session, artist: ArtistCreate) -> Artist:
         address: Address | None = (
             db.query(Address).filter(Address.id == artist.address_id).first()
         )
+
         if not address:
             raise HTTPException(
                 status_code=404,

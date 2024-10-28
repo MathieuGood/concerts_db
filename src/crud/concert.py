@@ -1,5 +1,7 @@
+from models.artist import Artist
 from models.concert import Concert
 from fastapi import HTTPException
+from models.show import Show
 from schemas.concert import ConcertCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
@@ -38,12 +40,26 @@ def get_all(db: Session):
 
 def create(db: Session, concert: ConcertCreate) -> Concert:
     try:
+
+        show: Show | None = db.query(Show).filter(Show.id == concert.show_id).first()
+        if not show:
+            raise HTTPException(
+                status_code=404, detail=f"Show with ID {concert.show_id} not found."
+            )
+
+        artist = db.query(Artist).filter(Artist.id == concert.artist_id).first()
+        if not artist:
+            raise HTTPException(
+                status_code=404, detail=f"Artist with ID {concert.artist_id} not found."
+            )
+
         new_concert = Concert(
             comments=concert.comments,
             setlist=concert.setlist,
             show_id=concert.show_id,
             artist_id=concert.artist_id,
         )
+        # TODO : Add check for existing show_id and artist_id
         db.add(new_concert)
         db.commit()
         db.refresh(new_concert)
