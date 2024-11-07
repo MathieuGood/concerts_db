@@ -8,7 +8,7 @@ export interface Show {
     name: string
     event_date: string
     venue_id: number
-    venue?: Venue
+    venue: Venue
     concerts: Concert[]
     attendees: Attendee[]
     comments: string

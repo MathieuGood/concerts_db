@@ -4,11 +4,19 @@ import { getShow } from "../services/showService"
 import { Show } from "../models/Show"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs from "dayjs"
-import { Button, MenuItem, Select, TextField } from "@mui/material"
+import { Button, TextField } from "@mui/material"
+import { getVenues } from "../services/venueService"
+import { getFestivals } from "../services/festivalService"
+import { Festival } from "../models/Festival"
+import { Venue } from "../models/Venue"
+import FestivalSelect from "../components/FestivalSelect"
+import ShowEditRow from "../components/ShowEditRow"
 
 const ShowEdit: React.FC = () => {
 	const { showId } = useParams<{ showId: string }>()
 	const [show, setShow] = useState<Show>()
+	const [festivals, setFestivals] = useState<Festival[]>([])
+	const [venues, setVenues] = useState<Venue[]>([])
 
 	useEffect(() => {
 		console.log(`Show Edit for ID ${showId}`)
@@ -21,13 +29,13 @@ const ShowEdit: React.FC = () => {
 	}, [showId])
 
 	useEffect(() => {
-		// Get all festivals
-		console.log("Get all festivals")
-		console.log("Current festival of show", show?.festival)
-	}, [show])
+		getVenues().then(venues => {
+			setVenues(venues)
+		})
 
-	useEffect(() => {
-		console.log("Show name :", show?.name)
+		getFestivals().then(festivals => {
+			setFestivals(festivals)
+		})
 	}, [show])
 
 	return (
@@ -38,94 +46,58 @@ const ShowEdit: React.FC = () => {
 			</div>
 			<table className="table-auto w-full">
 				<tbody>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Show id</td>
-						<td>{show?.id}</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Date</td>
-						<td>
-							<DatePicker
-								label="Event date"
-								value={show?.event_date ? dayjs(show.event_date) : null}
-								onChange={date => {
-									setShow({ ...show, event_date: date?.toISOString() } as Show)
-								}}
-							/>
-						</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Name</td>
-						<td>
-							<TextField
-								value={show?.name}
-								onChange={name => {
-									setShow({ ...show, name: name.target.value } as Show)
-								}}
-							/>
-						</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Festival</td>
-						<td>
-							<Select
-								value={show?.festival ? show?.festival?.id : ""}
-								label={show?.festival ? show?.festival?.name : ""}
-								onChange={event => {
-									const selectedFestival = event.target.value
-									console.log("Selected festival", selectedFestival)
-									setShow({
-										...show,
-										festival: { id: selectedFestival, name: selectedFestival }
-									} as Show)
-									console.log("Show after setting festival", show?.festival)
-								}}>
-								<MenuItem value="V1">Valeur 1</MenuItem>
-								<MenuItem value={undefined}>!UNDEFINED!</MenuItem>
-								<MenuItem value="1">Punk In Drublic</MenuItem>
-							</Select>
-						</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Comments</td>
-						<td>
-							{" "}
-							<TextField
-								value={show?.comments}
-								onChange={comments => {
-									setShow({ ...show, name: comments.target.value } as Show)
-								}}
-							/>
-						</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Concerts count</td>
-						<td>{show?.concerts.length}</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Artists</td>
-						<td>{show?.concerts.map(concert => concert.artist?.name).join(", ")}</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Venue name</td>
-						<td>{show?.venue?.name}</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Venue city</td>
-						<td>{show?.venue?.address?.city}</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Venue country</td>
-						<td>{show?.venue?.address?.country}</td>
-					</tr>
-					<tr>
-						<td className="font-semibold w-1 whitespace-nowrap pr-6">Attendees</td>
-						<td>
-							{show?.attendees
-								.map(attendee => attendee.firstname + " " + attendee.lastname)
-								.join(", ")}
-						</td>
-					</tr>
+					<ShowEditRow label="ID">{show?.id}</ShowEditRow>
+
+					<ShowEditRow label="Date">
+						<DatePicker
+							label="Event date"
+							value={show?.event_date ? dayjs(show.event_date) : null}
+							onChange={date => {
+								setShow({ ...show, event_date: date?.toISOString() } as Show)
+							}}
+						/>
+					</ShowEditRow>
+
+					<ShowEditRow label="Name">
+						<TextField
+							value={show?.name || ""}
+							onChange={name => {
+								setShow({ ...show, name: name.target.value } as Show)
+							}}
+						/>
+					</ShowEditRow>
+
+					<ShowEditRow label="Festival">
+						<FestivalSelect show={show} setShow={setShow} festivals={festivals} />
+					</ShowEditRow>
+
+					<ShowEditRow label="Comments">
+						{" "}
+						<TextField
+							value={show?.comments || ""}
+							onChange={comments => {
+								setShow({ ...show, name: comments.target.value } as Show)
+							}}
+						/>
+					</ShowEditRow>
+
+					<ShowEditRow label="Concerts count">{show?.concerts.length}</ShowEditRow>
+
+					<ShowEditRow label="Artists">
+						{show?.concerts.map(concert => concert.artist?.name).join(", ")}
+					</ShowEditRow>
+
+					<ShowEditRow label="Venue name">{show?.venue?.name}</ShowEditRow>
+
+					<ShowEditRow label="Venue city">{show?.venue?.address?.city}</ShowEditRow>
+
+					<ShowEditRow label="Venue country">{show?.venue?.address?.country}</ShowEditRow>
+
+					<ShowEditRow label="Attendees">
+						{show?.attendees
+							.map(attendee => attendee.firstname + " " + attendee.lastname)
+							.join(", ")}
+					</ShowEditRow>
 				</tbody>
 			</table>
 		</div>
