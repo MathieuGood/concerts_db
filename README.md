@@ -11,7 +11,7 @@ Built with FastAPI and SQLAlchemy.
 Clone this git repository.
 
 ```bash
-git clone https://github.com/MathieuGood/concerts_db.git
+git clone https://github.com/MathieuGood/concerts_db
 ```
 
 Navigate to the project folder, create a virtual environment and activate it.
@@ -41,7 +41,7 @@ uvicorn main:app --reload
 -   [x] FastAPI routes
 -   [x] Test all CRUD operations
 -   [x] Switch from SQLite to PostgreSQL database
--   [ ] Write unit tests for API
+-   [x] Write unit tests for API
 -   [ ] Create custom Exception handlers
 -   [ ] Implement logger
 -   [ ] Add authentication
