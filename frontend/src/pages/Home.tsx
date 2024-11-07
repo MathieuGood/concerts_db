@@ -1,9 +1,7 @@
-import React from "react"
-
 const Home: React.FC = () => {
 	return (
-		<div>
-			<h1 className="text-3xl font-bold">Hello world!</h1>
+		<div className="">
+			<h1 className="text-2xl">Hello world! And concerts!</h1>
 		</div>
 	)
 }

@@ -1,95 +1,72 @@
-import React, { useEffect } from "react"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    Typography,
-} from "@mui/material"
-import { useState } from "react"
-import { fetchShows } from "../services/showService"
+import { DataGrid, GridColDef, GridRowsProp } from "@mui/x-data-grid"
+import { getShows } from "../services/showService"
+import { useEffect, useState } from "react"
+import { Show } from "../models/Show"
 
-/**
- * ShowList page displays a list of shows with their details.
- *
- * @returns The ShowList page.
- */
 const ShowList: React.FC = () => {
-    const [shows, setShows] = useState([])
+	const [shows, setShows] = useState<Show[]>([])
 
-    useEffect(() => {
-        fetchShows().then((data) => {
-            setShows(data)
-        })
-    }, [])
+	const columns: GridColDef[] = [
+		{ field: "id", headerName: "ID", width: 20 },
+		{ field: "eventDate", headerName: "Event Date", width: 88 },
+		{ field: "name", headerName: "Name", flex: 1 },
+		{ field: "festival", headerName: "Festival", flex: 1 },
+		{ field: "comments", headerName: "Comments", flex: 1 },
+		{ field: "concertsCount", headerName: "Concerts", width: 20 },
+		{ field: "artists", headerName: "Artists", flex: 1 },
+		{ field: "venueName", headerName: "Venue Name", flex: 1 },
+		{ field: "venueCity", headerName: "Venue City", flex: 1 },
+		{ field: "venueCountry", headerName: "Venue Country", flex: 1 },
+		{ field: "attendees", headerName: "Attendees", flex: 1 }
+	]
 
-    return (
-        <div>
-            <div style={{ display: "flex", alignSelf: "center" }}>
-                <img
-                    src="/src/assets/concertsdb-logo.svg"
-                    style={{ width: "50px" }}
-                />
-                <Typography variant="h4" gutterBottom>
-                    Concerts I Have Been To
-                </Typography>
-            </div>
+	const buildRows: GridRowsProp = shows.map(show => {
+		console.log("Creating row for show", show)
+		const allRows = {
+			id: show.id,
+			eventDate: show.event_date,
+			name: show.name,
+			festival: show.festival?.name,
+			comments: show.comments,
+			concertsCount: show.concerts.length,
+			artists: show.concerts.map(concert => concert.artist?.name).join(", "),
+			venueName: show.venue?.name,
+			venueCity: show.venue?.address?.city,
+			venueCountry: show.venue?.address?.country,
+			attendees: show.attendees
+				.map(attendee => attendee.firstname + " " + attendee.lastname)
+				.join(", ")
+		}
+		return allRows
+	})
 
-            <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 300 }}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell>Date</TableCell>
-                            <TableCell>Venue</TableCell>
-                            <TableCell>City</TableCell>
-                            <TableCell>Country</TableCell>
-                            <TableCell>Artists</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {shows.map((show: any) => {
-                            return (
-                                <TableRow key={show.id}>
-                                    <TableCell style={{ width: "1%" }}>
-                                        <a href={`/edit/${show.id}`}>
-                                            <img
-                                                src="/src/assets/music-library.svg"
-                                                style={{ width: "25px" }}
-                                            />
-                                        </a>
-                                    </TableCell>
-                                    <TableCell>{show.event_date}</TableCell>
+	useEffect(() => {
+		getShows().then(shows => {
+			console.log(shows)
+			setShows(shows)
+		})
+	}, [])
 
-                                    <TableCell>{show.venue.name}</TableCell>
-                                    <TableCell>
-                                        {show.venue.address.city}
-                                    </TableCell>
-                                    <TableCell>
-                                        {show.venue.address.country}
-                                    </TableCell>
-                                    <TableCell>
-                                        {show.concerts.map((concert: any) => {
-                                            return (
-                                                <div key={concert.artist.id}>
-                                                    <span>
-                                                        {concert.artist.name}
-                                                    </span>
-                                                </div>
-                                            )
-                                        })}
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </div>
-    )
+	return (
+		<div className="">
+			<h1 className="text-2xl">List of Shows</h1>
+			<div className="h-80 w-full">
+				<DataGrid
+					rows={buildRows}
+					columns={columns}
+					className="bg-white shadow-md rounded-lg"
+					sx={{
+						"& .MuiDataGrid-cell": {
+							fontSize: "0.70rem"
+						},
+						"& .MuiDataGrid-columnHeaderTitle": {
+							fontSize: "0.70rem"
+						}
+					}}
+				/>
+			</div>
+		</div>
+	)
 }
 
 export default ShowList
