@@ -54,6 +54,10 @@ const ShowList: React.FC = () => {
 				<DataGrid
 					rows={buildRows}
 					columns={columns}
+					onRowClick={row => {
+						console.log("Row clicked", row.row.id)
+						window.location.href = `/edit/${row.row.id}`
+					}}
 					className="bg-white shadow-md rounded-lg"
 					sx={{
 						"& .MuiDataGrid-cell": {
