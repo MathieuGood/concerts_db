@@ -32,6 +32,5 @@ class ShowResponse(ShowBase):
 
 from schemas.venue import VenueResponse
 from schemas.festival import FestivalResponse
-from schemas.concert import ConcertResponse
-from schemas.concert import ConcertCreate
+from schemas.concert import ConcertResponse, ConcertCreate
 from schemas.attendee import AttendeeResponse

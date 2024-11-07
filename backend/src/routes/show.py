@@ -13,7 +13,7 @@ async def get_show(show_id: int, db: Session = Depends(get_db)):
     return get(db, show_id)
 
 
-@router.get("/show/", response_model=list[ShowResponse])
+@router.get("/show/")
 async def get_all_shows(db: Session = Depends(get_db)):
     return get_all(db)
 

@@ -51,7 +51,8 @@ def update(db: Session, venue_id: int, venue: VenueCreate) -> Venue:
         db.commit()
         db.refresh(updated_venue)
         return updated_venue
-    except IntegrityError:
+    except IntegrityError as e:
+        print("IntegrityError", e)
         db.rollback()
         raise HTTPException(
             status_code=400, detail=f"Venue '{venue.name}' already exists."

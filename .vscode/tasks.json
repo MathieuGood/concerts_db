@@ -4,10 +4,10 @@
 		{
 			"label": "Run FastAPI",
 			"type": "shell",
-            "command": "${workspaceFolder}/.venv/bin/python",
+            "command": "${workspaceFolder}/backend/.venv/bin/python",
             "args": ["-m", "uvicorn", "main:app", "--reload"],
 			"options": {
-				"cwd": "${workspaceFolder}/src"
+				"cwd": "${workspaceFolder}/backend/src"
 			},
 			"group": "build",
 			"isBackground": true,
@@ -24,7 +24,7 @@
 			"type": "shell",
 			"command": "npm run dev",
 			"options": {
-				"cwd": "${workspaceFolder}/concertsdb-react"
+				"cwd": "${workspaceFolder}/frontend"
 			},
 			"group": "build",
 			"isBackground": true,

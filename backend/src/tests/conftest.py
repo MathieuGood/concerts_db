@@ -50,7 +50,6 @@ def client():
 
 
 def seed_data(session):
-
     address = Address(city="Los Angeles", country="USA")
     session.add(address)
 

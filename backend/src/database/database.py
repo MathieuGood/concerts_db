@@ -28,7 +28,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def get_db():
-    print(f"Connecting to database: {Config.DATABASE_URI}")
+    print(f"Connecting to PRODUCTION database: {Config.DATABASE_URI}")
     Base.metadata.create_all(engine)
     db: Session = SessionLocal()
     try:
