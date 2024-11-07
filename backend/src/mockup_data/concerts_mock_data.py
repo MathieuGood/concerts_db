@@ -88,8 +88,8 @@ nofx_show_artists = [
 ]
 
 nofx_show_attendees = [
-    Attendee(firstname="Franck", lastname="Ludwig"),
-    Attendee(firstname="Agnès", lastname="Maillard"),
+    Attendee(firstname="Eric", lastname="Idle"),
+    Attendee(firstname="Michael", lastname="Palin"),
 ]
 
 nofx_show = Show(
@@ -122,7 +122,7 @@ nofx_show.festival = other_festivals[4]
 
 nfg_show = Show(event_date=datetime(year=2009, month=4, day=30))
 nfg_show.attendees = [
-    Attendee(firstname="Samuel", lastname="Witenberg"),
+    Attendee(firstname="Laurent", lastname="Broomhead"),
 ]
 nfg_show.venue = hob_boston
 nfg_concert = Concert()
