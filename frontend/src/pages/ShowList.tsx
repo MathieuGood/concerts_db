@@ -21,7 +21,6 @@ const ShowList: React.FC = () => {
 	]
 
 	const buildRows: GridRowsProp = shows.map(show => {
-		console.log("Creating row for show", show)
 		const allRows = {
 			id: show.id,
 			eventDate: show.event_date,
@@ -42,7 +41,6 @@ const ShowList: React.FC = () => {
 
 	useEffect(() => {
 		getShows().then(shows => {
-			console.log(shows)
 			setShows(shows)
 		})
 	}, [])

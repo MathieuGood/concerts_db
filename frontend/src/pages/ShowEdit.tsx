@@ -11,19 +11,25 @@ import { Festival } from "../models/Festival"
 import { Venue } from "../models/Venue"
 import FestivalSelect from "../components/FestivalSelect"
 import ShowEditRow from "../components/ShowEditRow"
+import VenueSelect from "../components/VenueSelect"
+import AttendeeMultiSelect from "../components/AttendeeMultiSelect"
+import { Attendee } from "../models/Attendee"
+import { getAttendees } from "../services/attendeeService"
 
 const ShowEdit: React.FC = () => {
 	const { showId } = useParams<{ showId: string }>()
 	const [show, setShow] = useState<Show>()
 	const [festivals, setFestivals] = useState<Festival[]>([])
 	const [venues, setVenues] = useState<Venue[]>([])
+	const [attendees, setAttendees] = useState<Attendee[]>([])
 
 	useEffect(() => {
-		console.log(`Show Edit for ID ${showId}`)
 		if (showId) {
 			getShow(Number(showId)).then(show => {
 				setShow(show)
-				console.log(show)
+				console.log(
+					`Loading show ${show.id} / ${show.event_date} / ${show.venue?.name} / ${show.venue?.address?.city}, ${show.venue?.address?.country}`
+				)
 			})
 		}
 	}, [showId])
@@ -35,6 +41,10 @@ const ShowEdit: React.FC = () => {
 
 		getFestivals().then(festivals => {
 			setFestivals(festivals)
+		})
+
+		getAttendees().then(attendees => {
+			setAttendees(attendees)
 		})
 	}, [show])
 
@@ -71,6 +81,15 @@ const ShowEdit: React.FC = () => {
 						<FestivalSelect show={show} setShow={setShow} festivals={festivals} />
 					</ShowEditRow>
 
+					<ShowEditRow label="Venue">
+						<VenueSelect show={show} setShow={setShow} venues={venues} />
+					</ShowEditRow>
+
+					<ShowEditRow label="Venue info">
+						{show?.venue?.name} / {show?.venue?.address?.city},
+						{` ${show?.venue?.address?.country}`}
+					</ShowEditRow>
+
 					<ShowEditRow label="Comments">
 						{" "}
 						<TextField
@@ -87,16 +106,14 @@ const ShowEdit: React.FC = () => {
 						{show?.concerts.map(concert => concert.artist?.name).join(", ")}
 					</ShowEditRow>
 
-					<ShowEditRow label="Venue name">{show?.venue?.name}</ShowEditRow>
-
-					<ShowEditRow label="Venue city">{show?.venue?.address?.city}</ShowEditRow>
-
-					<ShowEditRow label="Venue country">{show?.venue?.address?.country}</ShowEditRow>
-
 					<ShowEditRow label="Attendees">
 						{show?.attendees
 							.map(attendee => attendee.firstname + " " + attendee.lastname)
 							.join(", ")}
+					</ShowEditRow>
+
+					<ShowEditRow label="AttendeeMultiSelect">
+						<AttendeeMultiSelect show={show} setShow={setShow} attendees={attendees} />
 					</ShowEditRow>
 				</tbody>
 			</table>

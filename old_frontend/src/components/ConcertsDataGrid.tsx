@@ -70,8 +70,6 @@ const ConcertsDataGrid: React.FC<ConcertsDataGridProps> = ({ show }) => {
         },
     ]
 
-    console.log("Show data in ConcertsDataGrid component:")
-    console.log(show)
     return (
         <Box sx={{ height: "auto", width: "100%" }}>
             <DataGrid
