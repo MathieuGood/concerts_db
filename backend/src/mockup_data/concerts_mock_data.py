@@ -94,14 +94,26 @@ nofx_show_attendees = [
 
 nofx_show = Show(
     event_date=datetime(year=2024, month=6, day=1),
-    comments="NOFX played The Decline, it was exceptional",
+    comments="The only good show was NOFX.",
 )
 
 
-for artist in nofx_show_artists:
-    concert = Concert()
-    concert.artist = artist
+nofx_show_concerts = [
+    Concert(
+        artist=nofx_show_artists[0],
+        comments="Totally overrated band",
+    ),
+    Concert(artist=nofx_show_artists[1]),
+    Concert(
+        artist=nofx_show_artists[2],
+        comments="They played the Decline, it was huge.",
+        setlist="60%, Play Video, The Man I Killed, Benny Got Blowed Up",
+    ),
+]
+
+for concert in nofx_show_concerts:
     concert.show = nofx_show
+
 
 nofx_show.concerts[2].photos = [
     Photo(
@@ -124,6 +136,7 @@ nfg_show = Show(event_date=datetime(year=2009, month=4, day=30))
 nfg_show.attendees = [
     Attendee(firstname="Laurent", lastname="Broomhead"),
 ]
+nfg_show.comments = "One of my best show nights ever"
 nfg_show.venue = hob_boston
 nfg_concert = Concert()
 nfg_concert.photos = [
@@ -140,7 +153,7 @@ nfg_concert.videos = [
 ]
 
 nfg_concert.artist = Artist(name="New Found Glory", address=coralsprings_address)
-nfg_concert.comments = "They played all their hits!"
+nfg_concert.comments = "They played all their hits! I got Cyrus's drumstick."
 nfg_concert.show = nfg_show
 
 

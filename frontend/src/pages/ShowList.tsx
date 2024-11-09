@@ -52,7 +52,7 @@ const ShowList: React.FC = () => {
 				<DataGrid
 					rows={buildRows}
 					columns={columns}
-					onRowClick={row => {
+					onRowDoubleClick={row => {
 						console.log("Row clicked", row.row.id)
 						window.location.href = `/edit/${row.row.id}`
 					}}

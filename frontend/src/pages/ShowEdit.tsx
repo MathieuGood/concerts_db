@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { getShow } from "../services/showService"
+import { getShow, updateShow } from "../services/showService"
 import { Show } from "../models/Show"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs from "dayjs"
@@ -15,6 +15,9 @@ import VenueSelect from "../components/VenueSelect"
 import AttendeeMultiSelect from "../components/AttendeeMultiSelect"
 import { Attendee } from "../models/Attendee"
 import { getAttendees } from "../services/attendeeService"
+import { getArtists } from "../services/artistService"
+import { Artist } from "../models/Artist"
+import ConcertEditTable from "../components/ConcertEditTable"
 
 const ShowEdit: React.FC = () => {
 	const { showId } = useParams<{ showId: string }>()
@@ -22,6 +25,11 @@ const ShowEdit: React.FC = () => {
 	const [festivals, setFestivals] = useState<Festival[]>([])
 	const [venues, setVenues] = useState<Venue[]>([])
 	const [attendees, setAttendees] = useState<Attendee[]>([])
+	const [artists, setArtists] = useState<Artist[]>([])
+
+	const saveShow = (showId: number, show: Show) => {
+		updateShow(showId, show).then(response => console.log(response))
+	}
 
 	useEffect(() => {
 		if (showId) {
@@ -46,6 +54,12 @@ const ShowEdit: React.FC = () => {
 		getAttendees().then(attendees => {
 			setAttendees(attendees)
 		})
+
+		getArtists().then(artists => {
+			setArtists(artists)
+		})
+
+		console.log(`Show updated ${new Date().toISOString()}`, show)
 	}, [show])
 
 	return (
@@ -86,8 +100,7 @@ const ShowEdit: React.FC = () => {
 					</ShowEditRow>
 
 					<ShowEditRow label="Venue info">
-						{show?.venue?.name} / {show?.venue?.address?.city},
-						{` ${show?.venue?.address?.country}`}
+						{`${show?.venue?.name} / ${show?.venue?.address?.city}, ${show?.venue?.address?.country}`}
 					</ShowEditRow>
 
 					<ShowEditRow label="Comments">
@@ -100,23 +113,14 @@ const ShowEdit: React.FC = () => {
 						/>
 					</ShowEditRow>
 
-					<ShowEditRow label="Concerts count">{show?.concerts.length}</ShowEditRow>
-
-					<ShowEditRow label="Artists">
-						{show?.concerts.map(concert => concert.artist?.name).join(", ")}
-					</ShowEditRow>
-
-					<ShowEditRow label="Attendees">
-						{show?.attendees
-							.map(attendee => attendee.firstname + " " + attendee.lastname)
-							.join(", ")}
-					</ShowEditRow>
-
 					<ShowEditRow label="AttendeeMultiSelect">
 						<AttendeeMultiSelect show={show} setShow={setShow} attendees={attendees} />
 					</ShowEditRow>
 				</tbody>
 			</table>
+
+			<ConcertEditTable show={show} setShow={setShow} artists={artists} />
+			<Button onClick={() => saveShow(Number(showId), show!)}>Save show</Button>
 		</div>
 	)
 }

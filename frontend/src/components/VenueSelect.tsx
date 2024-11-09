@@ -14,26 +14,17 @@ export const VenueSelect: React.FC<{
 			onChange={event => {
 				const selectedVenueId = event.target.value
 				console.log(`Selected venue >>> ID ${selectedVenueId}`)
-				if (selectedVenueId === 0) {
-					setShow({
-						...show,
-						venue: { id: 0, name: "No venue" }
-					} as Show)
-					return
-				}
 
 				setShow({
 					...show,
 					venue: { id: selectedVenueId, name: selectedVenueId }
 				} as Show)
 			}}>
-			<MenuItem value={0}>No venue</MenuItem>
 			{venues.map(venue => (
 				<MenuItem key={venue.id} value={venue.id}>
 					{venue.name}
 				</MenuItem>
 			))}
-			<MenuItem value={0}>No venue</MenuItem>
 		</Select>
 	)
 }
