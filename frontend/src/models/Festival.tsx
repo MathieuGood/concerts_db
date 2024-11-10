@@ -1,4 +1,4 @@
 export interface Festival {
-	id: number
+	id: number | null
 	name: string
 }

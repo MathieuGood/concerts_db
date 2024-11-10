@@ -15,8 +15,6 @@ export const getShow = async (id: number): Promise<Show> => {
 }
 
 export const updateShow = async (id: number, show: Show): Promise<Show> => {
-	console.log("Function updateShow")
-	console.log("Content of show json sent to API :", show)
 	const response = await axios.put(`${API_URL}${route}/${id}`, parseShowToAPIFormat(show), {
 		headers: {
 			"Content-Type": "application/json"
@@ -26,7 +24,6 @@ export const updateShow = async (id: number, show: Show): Promise<Show> => {
 }
 
 export const parseShowToAPIFormat = (show: Show) => {
-	console.log("Show to parse =>", show)
 	const parsedShow = {
 		name: show.name,
 		event_date: show.event_date,
