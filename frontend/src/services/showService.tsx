@@ -17,6 +17,33 @@ export const getShow = async (id: number): Promise<Show> => {
 export const updateShow = async (id: number, show: Show): Promise<Show> => {
 	console.log("Function updateShow")
 	console.log("Content of show json sent to API :", show)
-	const response = await axios.put(`${API_URL}${route}/${id}`, show)
+	const response = await axios.put(`${API_URL}${route}/${id}`, parseShowToAPIFormat(show), {
+		headers: {
+			"Content-Type": "application/json"
+		}
+	})
 	return response.data
+}
+
+export const parseShowToAPIFormat = (show: Show) => {
+	console.log("Show to parse =>", show)
+	const parsedShow = {
+		name: show.name,
+		event_date: show.event_date,
+		comments: show.comments,
+		venue_id: show.venue.id,
+		festival_id: show.festival?.id,
+		attendees_ids: show.attendees?.map(attendee => attendee.id),
+		concerts: show.concerts.map(concert => {
+			return {
+				artist_id: concert.artist.id,
+				comments: concert.comments,
+				setlist: concert.setlist,
+				photos: concert.photos.map(photo => photo?.path),
+				videos: concert.videos.map(video => video.path)
+			}
+		})
+	}
+	console.log("Parsed show =>", parsedShow)
+	return parsedShow
 }

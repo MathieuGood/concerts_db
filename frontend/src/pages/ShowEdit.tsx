@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { getShow, updateShow } from "../services/showService"
+import { getShow, parseShowToAPIFormat, updateShow } from "../services/showService"
 import { Show } from "../models/Show"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs from "dayjs"
@@ -108,7 +108,7 @@ const ShowEdit: React.FC = () => {
 						<TextField
 							value={show?.comments || ""}
 							onChange={comments => {
-								setShow({ ...show, name: comments.target.value } as Show)
+								setShow({ ...show, comments: comments.target.value } as Show)
 							}}
 						/>
 					</ShowEditRow>
@@ -120,7 +120,13 @@ const ShowEdit: React.FC = () => {
 			</table>
 
 			<ConcertEditTable show={show} setShow={setShow} artists={artists} />
-			<Button onClick={() => saveShow(Number(showId), show!)}>Save show</Button>
+			<Button
+				onClick={() => {
+					if (show) parseShowToAPIFormat(show)
+					saveShow(Number(showId), show!)
+				}}>
+				Save show
+			</Button>
 		</div>
 	)
 }
