@@ -1,45 +1,3 @@
-// import { MenuItem, Select } from "@mui/material"
-// import { Festival } from "../models/Festival"
-// import { Show } from "../models/Show"
-
-// export const FestivalSelect: React.FC<{
-// 	show?: Show
-// 	setShow: (show: Show) => void
-// 	festivals: Festival[]
-// }> = ({ show, setShow, festivals }) => {
-// 	return (
-// 		<Select
-// 			value={show?.festival !== null && festivals.length > 0 ? show?.festival?.id : ""}
-// 			label={"Festival"}
-// 			onChange={event => {
-// 				const selectedFestivalId = event.target.value
-// 				console.log(`Selected festival >>> ID ${selectedFestivalId}`)
-// 				if (selectedFestivalId === "") {
-// 					console.log("FestivalID is equal to empty string")
-// 					setShow({
-// 						...show,
-// 						festival: null
-// 					} as Show)
-// 					return
-// 				}
-
-// 				setShow({
-// 					...show,
-// 					festival: { id: selectedFestivalId, name: selectedFestivalId }
-// 				} as Show)
-// 			}}>
-// 			<MenuItem value={""}>No festival</MenuItem>
-// 			{festivals.map(festival => (
-// 				<MenuItem key={festival.id} value={festival.id || ""}>
-// 					{festival.name}
-// 				</MenuItem>
-// 			))}
-// 		</Select>
-// 	)
-// }
-
-// export default FestivalSelect
-
 import { MenuItem, Select } from "@mui/material"
 import { Festival } from "../models/Festival"
 import { Show } from "../models/Show"
@@ -65,6 +23,7 @@ export const FestivalSelect: React.FC<{
 			onChange={event => {
 				const selectedFestivalId = event.target.value
 				console.log(`Selected festival >>> ID ${selectedFestivalId}`)
+
 				if (selectedFestivalId === "") {
 					console.log("FestivalID is equal to empty string")
 					setShow({
