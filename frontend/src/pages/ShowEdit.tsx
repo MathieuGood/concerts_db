@@ -17,7 +17,7 @@ import { Attendee } from "../models/Attendee"
 import { getAttendees } from "../services/attendeeService"
 import { getArtists } from "../services/artistService"
 import { Artist } from "../models/Artist"
-import ConcertEditTable from "../components/ConcertEditTable"
+import ConcertsDataGrid from "../components/ConcertsDataGrid"
 
 const ShowEdit: React.FC = () => {
 	const { showId } = useParams<{ showId: string }>()
@@ -113,17 +113,20 @@ const ShowEdit: React.FC = () => {
 						/>
 					</ShowEditRow>
 
-					<ShowEditRow label="AttendeeMultiSelect">
+					<ShowEditRow label="Attendees">
 						<AttendeeMultiSelect show={show} setShow={setShow} attendees={attendees} />
 					</ShowEditRow>
 				</tbody>
 			</table>
 
-			<ConcertEditTable show={show} setShow={setShow} artists={artists} />
+			{/* <ConcertEditTable show={show} setShow={setShow} artists={artists} /> */}
+			{show !== undefined && <ConcertsDataGrid show={show} setShow={setShow} artists={artists} />}
 			<Button
 				onClick={() => {
-					if (show) parseShowToAPIFormat(show)
-					saveShow(Number(showId), show!)
+					if (show) {
+						parseShowToAPIFormat(show)
+						saveShow(Number(showId), show!)
+					}
 				}}>
 				Save show
 			</Button>

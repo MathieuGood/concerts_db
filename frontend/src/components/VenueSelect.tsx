@@ -9,7 +9,7 @@ export const VenueSelect: React.FC<{
 }> = ({ show, setShow, venues }) => {
 	return (
 		<Select
-			value={show?.venue && venues.length > 0 ? show?.venue?.id : 0}
+			value={show?.venue && venues.length > 0 ? show?.venue?.id : ""}
 			label={show?.venue && venues.length > 0 ? show?.venue.name : "No venue"}
 			onChange={event => {
 				const selectedVenueId = event.target.value

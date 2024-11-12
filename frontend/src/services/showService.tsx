@@ -20,6 +20,7 @@ export const updateShow = async (id: number, show: Show): Promise<Show> => {
 			"Content-Type": "application/json"
 		}
 	})
+	console.log("updateShow RESPONSE :", response.status, response.statusText)
 	return response.data
 }
 

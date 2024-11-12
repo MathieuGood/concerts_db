@@ -13,7 +13,6 @@ export const FestivalSelect: React.FC<{
 			label={"Festival"}
 			displayEmpty
 			renderValue={selected => {
-				console.log("Selected is : ", selected)
 				if (selected === 0) {
 					return <em>No festival</em>
 				}
@@ -22,10 +21,8 @@ export const FestivalSelect: React.FC<{
 			}}
 			onChange={event => {
 				const selectedFestivalId = event.target.value
-				console.log(`Selected festival >>> ID ${selectedFestivalId}`)
 
-				if (selectedFestivalId === "") {
-					console.log("FestivalID is equal to empty string")
+				if (selectedFestivalId === "") { 
 					setShow({
 						...show,
 						festival: null

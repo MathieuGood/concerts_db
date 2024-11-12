@@ -21,7 +21,7 @@ const ShowList: React.FC = () => {
 	]
 
 	const buildRows: GridRowsProp = shows.map(show => {
-		const allRows = {
+		return {
 			id: show.id,
 			eventDate: show.event_date,
 			name: show.name,
@@ -32,11 +32,12 @@ const ShowList: React.FC = () => {
 			venueName: show.venue?.name,
 			venueCity: show.venue?.address?.city,
 			venueCountry: show.venue?.address?.country,
-			attendees: show.attendees
-				.map(attendee => attendee.firstname + " " + attendee.lastname)
-				.join(", ")
+			attendees: show.attendees?.length
+				? show.attendees
+						.map(attendee => attendee.firstname + " " + attendee.lastname)
+						.join(", ")
+				: ""
 		}
-		return allRows
 	})
 
 	useEffect(() => {
