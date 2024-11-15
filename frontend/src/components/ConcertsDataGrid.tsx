@@ -4,8 +4,8 @@ import {
 	DataGrid,
 	GridColDef,
 	GridRenderEditCellParams,
-	GridRowsProp,
-	GridCellEditStopParams
+	GridRowModel,
+	GridRowsProp
 } from "@mui/x-data-grid"
 import { MenuItem, Select } from "@mui/material"
 import { Concert } from "../models/Concert"
@@ -17,7 +17,6 @@ const ConcertDataGrid: React.FC<{
 }> = ({ show, setShow, artists }) => {
 	const handleArtistChange = (rowIndex: number, artistId: number) => {
 		const updatedConcerts = show.concerts.map((concert, index) => {
-			console.log(concert)
 			if (index === rowIndex) {
 				return { ...concert, artist: artists.find(artist => artist.id === artistId) }
 			}
@@ -26,17 +25,16 @@ const ConcertDataGrid: React.FC<{
 		setShow({ ...show, concerts: updatedConcerts })
 	}
 
-	const handleCellEditCommit = (params: GridCellEditStopParams) => {
-		const { id, field, value } = params
+	const handleProcessRowUpdate = (newRow: GridRowModel) => {
 		const updatedConcerts = show.concerts.map(concert => {
-			if (concert.id === id) {
-				return { ...concert, [field]: value }
+			if (concert.id === newRow.id) {
+				return { ...concert, ...newRow }
 			}
 			return concert
 		})
 		setShow({ ...show, concerts: updatedConcerts })
+		return newRow
 	}
-
 	const renderArtistCell = (params: GridRenderEditCellParams) => {
 		const concert = params.row as Concert
 		const rowNumber = params.row.rowIndex
@@ -51,7 +49,9 @@ const ConcertDataGrid: React.FC<{
 				fullWidth
 				variant="standard">
 				{artists.map(artist => (
-					<MenuItem value={artist.id}>{artist.name}</MenuItem>
+					<MenuItem key={artist.id} value={artist.id}>
+						{artist.name}
+					</MenuItem>
 				))}
 			</Select>
 		)
@@ -66,8 +66,18 @@ const ConcertDataGrid: React.FC<{
 			renderCell: params => renderArtistCell(params)
 		},
 		{ field: "comments", headerName: "Comments", minWidth: 200, maxWidth: 300, editable: true },
-		{ field: "photos", headerName: "Photos", width: 20 },
-		{ field: "videos", headerName: "Videos", width: 20 },
+		{
+			field: "photos",
+			headerName: "Photos",
+			width: 20,
+			valueFormatter: (value: Array<string>) => value.length
+		},
+		{
+			field: "videos",
+			headerName: "Videos",
+			width: 20,
+			valueFormatter: (value: Array<string>) => value.length
+		},
 		{ field: "setlist", headerName: "Setlist", minWidth: 150, editable: true }
 	]
 
@@ -77,14 +87,14 @@ const ConcertDataGrid: React.FC<{
 			rowIndex: index,
 			artist: concert.artist,
 			comments: concert.comments,
-			photos: concert.photos.length,
-			videos: concert.videos.length,
+			photos: concert.photos,
+			videos: concert.videos,
 			setlist: concert.setlist
 		}
 		return concertRows
 	})
 
-	return <DataGrid columns={columns} rows={rows} onCellEditCommit={handleCellEditCommit} />
+	return <DataGrid columns={columns} rows={rows} processRowUpdate={handleProcessRowUpdate} />
 }
 
 export default ConcertDataGrid
