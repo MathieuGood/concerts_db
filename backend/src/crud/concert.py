@@ -39,8 +39,8 @@ def get_all(db: Session):
 
 
 def create(db: Session, concert: ConcertCreate) -> Concert:
+    print("CRUD CREATE Concert", concert)
     try:
-
         show: Show | None = db.query(Show).filter(Show.id == concert.show_id).first()
         if not show:
             raise HTTPException(

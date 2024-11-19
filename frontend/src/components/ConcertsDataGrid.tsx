@@ -7,6 +7,7 @@ import {
 	GridRowModel,
 	GridRowsProp
 } from "@mui/x-data-grid"
+import DeleteIcon from "@mui/icons-material/Delete"
 import { MenuItem, Select } from "@mui/material"
 import { Concert } from "../models/Concert"
 
@@ -35,6 +36,7 @@ const ConcertDataGrid: React.FC<{
 		setShow({ ...show, concerts: updatedConcerts })
 		return newRow
 	}
+
 	const renderArtistCell = (params: GridRenderEditCellParams) => {
 		const concert = params.row as Concert
 		const rowNumber = params.row.rowIndex
@@ -54,6 +56,14 @@ const ConcertDataGrid: React.FC<{
 					</MenuItem>
 				))}
 			</Select>
+		)
+	}
+
+	const renderDeleteCell = (params: GridRenderEditCellParams) => {
+		return (
+			<DeleteIcon
+				onClick={() => console.log(`Clicked on delete for row #${params.row.rowIndex}`)}
+			/>
 		)
 	}
 
@@ -78,7 +88,13 @@ const ConcertDataGrid: React.FC<{
 			width: 20,
 			valueFormatter: (value: Array<string>) => value.length
 		},
-		{ field: "setlist", headerName: "Setlist", minWidth: 150, editable: true }
+		{ field: "setlist", headerName: "Setlist", minWidth: 150, editable: true },
+		{
+			field: "actions",
+			type: "actions",
+			width: 20,
+			renderCell: params => renderDeleteCell(params)
+		}
 	]
 
 	const rows: GridRowsProp = show.concerts.map((concert, index) => {
