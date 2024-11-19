@@ -62,7 +62,12 @@ const ConcertDataGrid: React.FC<{
 	const renderDeleteCell = (params: GridRenderEditCellParams) => {
 		return (
 			<DeleteIcon
-				onClick={() => console.log(`Clicked on delete for row #${params.row.rowIndex}`)}
+				onClick={() => {
+					const updatedConcerts = show.concerts.filter(
+						(concert, index) => index !== params.row.rowIndex
+					)
+					setShow({ ...show, concerts: updatedConcerts })
+				}}
 			/>
 		)
 	}
