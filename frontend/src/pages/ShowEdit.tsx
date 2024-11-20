@@ -31,6 +31,21 @@ const ShowEdit: React.FC = () => {
 		updateShow(show).then(response => console.log(response))
 	}
 
+	const updateAllSelectContent = () => {
+		getVenues().then(venues => {
+			setVenues(venues)
+		})
+		getFestivals().then(festivals => {
+			setFestivals(festivals)
+		})
+		getAttendees().then(attendees => {
+			setAttendees(attendees)
+		})
+		getArtists().then(artists => {
+			setArtists(artists)
+		})
+	}
+
 	useEffect(() => {
 		if (showId) {
 			getShow(Number(showId)).then(show => {
@@ -40,25 +55,10 @@ const ShowEdit: React.FC = () => {
 				)
 			})
 		}
+		updateAllSelectContent()
 	}, [showId])
 
 	useEffect(() => {
-		getVenues().then(venues => {
-			setVenues(venues)
-		})
-
-		getFestivals().then(festivals => {
-			setFestivals(festivals)
-		})
-
-		getAttendees().then(attendees => {
-			setAttendees(attendees)
-		})
-
-		getArtists().then(artists => {
-			setArtists(artists)
-		})
-
 		console.log(`Show updated ${new Date().toISOString()}`, show)
 	}, [show])
 
