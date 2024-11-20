@@ -45,6 +45,7 @@ def get_all(db: Session) -> List[Show]:
             joinedload(Show.concerts).joinedload(Concert.photos),
             joinedload(Show.concerts).joinedload(Concert.videos),
         )
+        .order_by(Show.event_date.desc())
         .all()
     )
     return shows
