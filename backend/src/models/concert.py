@@ -23,8 +23,15 @@ class Concert(Base):
         "Video", back_populates="concert", cascade="all, delete-orphan"
     )
 
+    def __repr__(self) -> str:
+        return (
+            f"<Concert id={self.id} artist_id={self.artist_id} show_id={self.show_id}>"
+        )
+
 
 from models.artist import Artist
 from models.photo import Photo
 from models.video import Video
 from models.show import Show
+
+

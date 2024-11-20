@@ -34,14 +34,17 @@ export const parseShowToAPIFormat = (show: Show) => {
 		attendees_ids: show.attendees?.map(attendee => attendee.id),
 		concerts: show.concerts.map(concert => {
 			return {
+				id: concert.id,
 				artist_id: concert.artist.id,
 				comments: concert.comments,
 				setlist: concert.setlist,
-				photos: concert.photos.map(photo => photo?.path),
-				videos: concert.videos.map(video => video.path)
+				photos_ids: concert.photos.map(photo => photo?.id),
+				videos_ids: concert.videos.map(video => video.id)
 			}
 		})
 	}
 	console.log("Parsed show =>", parsedShow)
 	return parsedShow
 }
+
+

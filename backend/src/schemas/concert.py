@@ -3,6 +3,7 @@ from typing import List, Optional
 
 
 class ConcertBase(BaseModel):
+    id: Optional[int]
     comments: str
     setlist: Optional[str] = None
 
@@ -10,8 +11,8 @@ class ConcertBase(BaseModel):
 class ConcertCreate(ConcertBase):
     show_id: Optional[int] = None
     artist_id: int
-    photos: Optional[List[str]] = None
-    videos: Optional[List[str]] = None
+    photos_ids: Optional[List[int]] = None
+    videos_ids: Optional[List[int]] = None
 
 
 class ConcertResponse(ConcertBase):

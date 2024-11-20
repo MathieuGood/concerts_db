@@ -18,9 +18,6 @@ class ShowCreate(ShowBase):
 
 class ShowResponse(ShowBase):
     id: int
-    # name: str
-    # event_date: str
-    # comments: Optional[str] = None
     venue_id: int
     festival_id: Optional[int] = None
     venue: Optional["VenueResponse"] = None
