@@ -1,4 +1,4 @@
 [tool.pytest.ini_options]
-pythonpath = "src"
+pythonpath = "backend/src"
 addopts = ["--import-mode=importlib"]
-testpaths = ["src/tests"]
+testpaths = ["backend/src/tests"]

@@ -28,7 +28,17 @@ const ShowEdit: React.FC = () => {
 	const [artists, setArtists] = useState<Artist[]>([])
 
 	const saveShow = (show: Show) => {
-		updateShow(show).then(response => console.log(response))
+		updateShow(show)
+			.then(response => {
+				console.log(response)
+				return getShow(Number(showId))
+			})
+			.then(show => {
+				setShow(show)
+				console.log(
+					`Loading show ${show.id} / ${show.event_date} / ${show.venue?.name} / ${show.venue?.address?.city}, ${show.venue?.address?.country}`
+				)
+			})
 	}
 
 	const updateAllSelectContent = () => {
@@ -44,6 +54,32 @@ const ShowEdit: React.FC = () => {
 		getArtists().then(artists => {
 			setArtists(artists)
 		})
+	}
+
+	const addEmptyConcert = () => {
+		if (show) {
+			const newId = () => {
+				let minId = 0
+				show.concerts.forEach(concert => {
+					if (concert.id !== undefined && concert.id < minId) {
+						minId = concert.id
+					}
+				})
+				console.log("minId IS", minId)
+				return minId - 1
+			}
+
+			const newConcert = {
+				id: newId(),
+				show_id: show.id,
+				artist: {} as Artist,
+				comments: "",
+				setlist: "",
+				photos: [],
+				videos: []
+			}
+			setShow({ ...show, concerts: [...show.concerts, newConcert] })
+		}
 	}
 
 	useEffect(() => {
@@ -117,6 +153,13 @@ const ShowEdit: React.FC = () => {
 					</ShowEditRow>
 				</tbody>
 			</table>
+
+			<Button
+				onClick={() => {
+					addEmptyConcert()
+				}}>
+				Add concert
+			</Button>
 
 			{show !== undefined && (
 				<ConcertsDataGrid show={show} setShow={setShow} artists={artists} />

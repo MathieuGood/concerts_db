@@ -29,13 +29,23 @@ const ConcertDataGrid: React.FC<{
 	}
 
 	const handleProcessRowUpdate = (newRow: GridRowModel) => {
+		console.log("newRow", newRow)
 		const updatedConcerts = show.concerts.map(concert => {
+			console.log("Checking if concert.id === newRow.id", concert.id, newRow.id)
 			if (concert.id === newRow.id) {
+				console.log(
+					"Updating concert",
+					concert.id,
+					concert.artist,
+					concert.comments,
+					concert.setlist
+				)
 				return { ...concert, ...newRow }
 			}
 			return concert
 		})
-		setShow({ ...show, concerts: updatedConcerts })
+		const updatedShow = { ...show, concerts: updatedConcerts }
+		setShow(updatedShow)
 		return newRow
 	}
 
@@ -80,7 +90,8 @@ const ConcertDataGrid: React.FC<{
 			field: "artist",
 			headerName: "Artist",
 			width: 250,
-			renderCell: params => renderArtistCell(params)
+			renderCell: params => renderArtistCell(params),
+			editable: true
 		},
 		{ field: "comments", headerName: "Comments", minWidth: 200, maxWidth: 300, editable: true },
 		{
@@ -117,7 +128,14 @@ const ConcertDataGrid: React.FC<{
 		return concertRows
 	})
 
-	return <DataGrid columns={columns} rows={rows} processRowUpdate={handleProcessRowUpdate} />
+	return (
+		<DataGrid
+			columns={columns}
+			rows={rows}
+			processRowUpdate={handleProcessRowUpdate}
+			// initialState={{ sorting: { sortModel: [{ field: "id", sort: "asc" }] } }}
+		/>
+	)
 }
 
 export default ConcertDataGrid
