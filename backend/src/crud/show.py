@@ -31,6 +31,7 @@ def get(db: Session, show_id: int) -> Show:
         raise HTTPException(
             status_code=404, detail=f"Show with ID {show_id} not found."
         )
+    show.concerts = sorted(show.concerts, key=lambda concert: concert.id)
     return show
 
 
