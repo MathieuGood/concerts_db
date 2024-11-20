@@ -15,10 +15,13 @@ export const VenueSelect: React.FC<{
 				const selectedVenueId = event.target.value
 				console.log(`Selected venue >>> ID ${selectedVenueId}`)
 
-				setShow({
-					...show,
-					venue: { id: selectedVenueId, name: selectedVenueId }
-				} as Show)
+				const selectedVenue = venues.find(venue => venue.id === selectedVenueId)
+				if (selectedVenue) {
+					setShow({
+						...show,
+						venue: { id: selectedVenue.id, name: selectedVenue.name, address: selectedVenue.address }
+					} as Show)
+				}
 			}}>
 			{venues.map(venue => (
 				<MenuItem key={venue.id} value={venue.id}>
