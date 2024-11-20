@@ -14,8 +14,8 @@ export const getShow = async (id: number): Promise<Show> => {
 	return response.data
 }
 
-export const updateShow = async (id: number, show: Show): Promise<Show> => {
-	const response = await axios.put(`${API_URL}${route}/${id}`, parseShowToAPIFormat(show), {
+export const updateShow = async (show: Show): Promise<Show> => {
+	const response = await axios.put(`${API_URL}${route}/${show.id}`, parseShowToAPIFormat(show), {
 		headers: {
 			"Content-Type": "application/json"
 		}

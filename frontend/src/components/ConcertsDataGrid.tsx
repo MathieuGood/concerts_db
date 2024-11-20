@@ -19,7 +19,9 @@ const ConcertDataGrid: React.FC<{
 	const handleArtistChange = (rowIndex: number, artistId: number) => {
 		const updatedConcerts = show.concerts.map((concert, index) => {
 			if (index === rowIndex) {
-				return { ...concert, artist: artists.find(artist => artist.id === artistId) }
+				const foundArtist = artists.find(artist => artist.id === artistId)
+				if (!foundArtist) return concert
+				return { ...concert, artist: foundArtist }
 			}
 			return concert
 		})
@@ -64,7 +66,7 @@ const ConcertDataGrid: React.FC<{
 			<DeleteIcon
 				onClick={() => {
 					const updatedConcerts = show.concerts.filter(
-						(concert, index) => index !== params.row.rowIndex
+						(_concert, index) => index !== params.row.rowIndex
 					)
 					setShow({ ...show, concerts: updatedConcerts })
 				}}

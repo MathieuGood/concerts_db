@@ -27,8 +27,8 @@ const ShowEdit: React.FC = () => {
 	const [attendees, setAttendees] = useState<Attendee[]>([])
 	const [artists, setArtists] = useState<Artist[]>([])
 
-	const saveShow = (showId: number, show: Show) => {
-		updateShow(showId, show).then(response => console.log(response))
+	const saveShow = (show: Show) => {
+		updateShow(show).then(response => console.log(response))
 	}
 
 	useEffect(() => {
@@ -104,7 +104,6 @@ const ShowEdit: React.FC = () => {
 					</ShowEditRow>
 
 					<ShowEditRow label="Comments">
-						{" "}
 						<TextField
 							value={show?.comments || ""}
 							onChange={comments => {
@@ -119,13 +118,14 @@ const ShowEdit: React.FC = () => {
 				</tbody>
 			</table>
 
-			{/* <ConcertEditTable show={show} setShow={setShow} artists={artists} /> */}
-			{show !== undefined && <ConcertsDataGrid show={show} setShow={setShow} artists={artists} />}
+			{show !== undefined && (
+				<ConcertsDataGrid show={show} setShow={setShow} artists={artists} />
+			)}
 			<Button
 				onClick={() => {
 					if (show) {
 						parseShowToAPIFormat(show)
-						saveShow(Number(showId), show!)
+						saveShow(show!)
 					}
 				}}>
 				Save show

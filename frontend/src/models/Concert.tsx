@@ -8,7 +8,7 @@ export interface Concert {
 	comments: string
 	show_id: number
 	artist_id?: number
-	artist?: Artist
+	artist: Artist
 	photos: Photo[]
 	videos: Video[]
 }
