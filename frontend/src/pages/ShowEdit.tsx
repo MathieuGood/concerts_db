@@ -22,12 +22,46 @@ import ConcertsDataGrid from "../components/ConcertsDataGrid"
 const ShowEdit: React.FC = () => {
 	const { showId } = useParams<{ showId: string }>()
 	const [show, setShow] = useState<Show>()
+	const [error, setError] = useState<string>()
 	const [festivals, setFestivals] = useState<Festival[]>([])
 	const [venues, setVenues] = useState<Venue[]>([])
 	const [attendees, setAttendees] = useState<Attendee[]>([])
 	const [artists, setArtists] = useState<Artist[]>([])
 
+	const isValidForm = (show: Show): boolean => {
+		console.log(show)
+
+		// Check if there are no empty concerts
+		show.concerts.map((concert) => {
+			return !isEmpty(concert.artist)
+		})
+
+		return true
+	}
+
+	const isEmpty = (inputValue: string | Artist): boolean => {
+		if (typeof inputValue === "object") {
+			if (Object.keys(inputValue).length === 0) {
+				setError("ALAAAAAAARMA")
+				return true
+			}
+
+			if (error?.length > 0) {
+				setError("")
+			}
+
+			return false
+		}
+
+		return inputValue.length === 0
+	}
+
+	const isMaxLength = (inputValue: string, maxLength: number): boolean => {
+		return inputValue.length > maxLength
+	}
+
 	const saveShow = (show: Show) => {
+		if (!isValidForm(show)) return
 		updateShow(show)
 			.then(response => {
 				console.log(response)
@@ -100,6 +134,7 @@ const ShowEdit: React.FC = () => {
 
 	return (
 		<div className="p-4 max-w-[1080px]">
+			{error && <p className="text-red-600 text-2xl font-bold">{error}</p>}
 			<div className="flex flex-row gap-5 mb-4">
 				<h1 className="text-2xl font-bold">Show Edit</h1>
 				<Button href={"/list"}>Back to list</Button>
