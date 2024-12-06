@@ -11,9 +11,9 @@ export const AttendeeMultiSelect: React.FC<{
 	return (
 		<Autocomplete
 			multiple
-			id="tags-standard"
+			freeSolo={false}
 			options={attendees}
-			onChange={(event, newValue: Attendee[]) => {
+			onChange={(_event, newValue: Attendee[]) => {
 				setShow({
 					...show,
 					attendees: newValue

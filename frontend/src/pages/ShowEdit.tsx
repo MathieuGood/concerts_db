@@ -29,40 +29,52 @@ const ShowEdit: React.FC = () => {
 	const [artists, setArtists] = useState<Artist[]>([])
 
 	const isValidForm = (show: Show): boolean => {
+		console.log("Function isValidForm")
 		console.log(show)
 
-		// Check if there are no empty concerts
-		show.concerts.map((concert) => {
-			return !isEmpty(concert.artist)
-		})
-
-		return true
-	}
-
-	const isEmpty = (inputValue: string | Artist): boolean => {
-		if (typeof inputValue === "object") {
-			if (Object.keys(inputValue).length === 0) {
-				setError("ALAAAAAAARMA")
-				return true
-			}
-
-			if (error?.length > 0) {
-				setError("")
-			}
+		if (show.event_date === undefined) {
+			setError("Date is empty")
 
 			return false
 		}
 
-		return inputValue.length === 0
+		return true
 	}
 
-	const isMaxLength = (inputValue: string, maxLength: number): boolean => {
-		return inputValue.length > maxLength
+	// const isMaxLength = (inputValue: string, maxLength: number): boolean => {
+	// 	return inputValue.length > maxLength
+	// }
+
+	// const isEmptyString = (inputValue: string): boolean => {
+	// 	return inputValue.length === 0
+	// }
+
+	const isEmptyArtist = (artist: Artist) => Object.keys(artist).length === 0
+
+	const isShowWithEmptyArtist = (show: Show): boolean =>
+		show.concerts.some(concert => isEmptyArtist(concert.artist))
+
+	const deleteConcertsWithEmptyArtists = (show: Show): Show => {
+		const cleanedShow: Show = {
+			...show,
+			concerts: show.concerts.filter(concert => !isEmptyArtist(concert.artist))
+		}
+		console.warn("cleanedShow", cleanedShow)
+		return cleanedShow
+	}
+
+	const removeEmptyArtists = (show: Show): Show => {
+		if (isShowWithEmptyArtist(show)) {
+			return deleteConcertsWithEmptyArtists(show)
+		}
+		return show
 	}
 
 	const saveShow = (show: Show) => {
-		if (!isValidForm(show)) return
-		updateShow(show)
+		const isValid: boolean = isValidForm(show)
+		console.info(`FINAL VALUE OF isValidForm >>> ${isValid}`)
+		if (!isValid) return
+		updateShow(removeEmptyArtists(show))
 			.then(response => {
 				console.log(response)
 				return getShow(Number(showId))
@@ -99,7 +111,6 @@ const ShowEdit: React.FC = () => {
 						minId = concert.id
 					}
 				})
-				console.log("minId IS", minId)
 				return minId - 1
 			}
 
