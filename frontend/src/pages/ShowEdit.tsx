@@ -18,6 +18,8 @@ import { getAttendees } from "../services/attendeeService"
 import { getArtists } from "../services/artistService"
 import { Artist } from "../models/Artist"
 import ConcertsDataGrid from "../components/ConcertsDataGrid"
+import FestivalEdit from "../components/FestivalEdit"
+import FestivalCreate from "../components/FestivalCreate"
 
 const ShowEdit: React.FC = () => {
 	const { showId } = useParams<{ showId: string }>()
@@ -34,7 +36,6 @@ const ShowEdit: React.FC = () => {
 
 		if (show.event_date === undefined) {
 			setError("Date is empty")
-
 			return false
 		}
 
@@ -63,18 +64,19 @@ const ShowEdit: React.FC = () => {
 		return cleanedShow
 	}
 
-	const removeEmptyArtists = (show: Show): Show => {
+	const removeEmptyArtistsIfNeeded = (show: Show): Show => {
 		if (isShowWithEmptyArtist(show)) {
 			return deleteConcertsWithEmptyArtists(show)
 		}
 		return show
 	}
 
-	const saveShow = (show: Show) => {
+	const handleUpdateShow = (show: Show) => {
 		const isValid: boolean = isValidForm(show)
 		console.info(`FINAL VALUE OF isValidForm >>> ${isValid}`)
 		if (!isValid) return
-		updateShow(removeEmptyArtists(show))
+
+		updateShow(removeEmptyArtistsIfNeeded(show))
 			.then(response => {
 				console.log(response)
 				return getShow(Number(showId))
@@ -140,7 +142,7 @@ const ShowEdit: React.FC = () => {
 	}, [showId])
 
 	useEffect(() => {
-		console.log(`Show updated ${new Date().toISOString()}`, show)
+		console.log(`STATE 'show' updated ${new Date().toISOString()}`, show)
 	}, [show])
 
 	return (
@@ -175,6 +177,8 @@ const ShowEdit: React.FC = () => {
 
 					<ShowEditRow label="Festival">
 						<FestivalSelect show={show} setShow={setShow} festivals={festivals} />
+						<Button onClick={() => console.log("Add festival")}>Add festival</Button>
+						<Button onClick={() => console.log("Edit festival")}>Edit festival</Button>
 					</ShowEditRow>
 
 					<ShowEditRow label="Venue">
@@ -214,11 +218,30 @@ const ShowEdit: React.FC = () => {
 				onClick={() => {
 					if (show) {
 						parseShowToAPIFormat(show)
-						saveShow(show!)
+						handleUpdateShow(show!)
 					}
 				}}>
 				Save show
 			</Button>
+
+			<div>
+				<p>Festival Edit and Create</p>
+				<FestivalEdit
+					festivalToEdit={show?.festival}
+					updateFestivalSelectCallback={() => {
+						updateAllSelectContent()
+					}}
+					show={show}
+					setShow={setShow}
+				/>
+				<FestivalCreate
+					updateFestivalSelectCallback={() => {
+						updateAllSelectContent()
+					}}
+					show={show!}
+					setShow={setShow}
+				/>
+			</div>
 		</div>
 	)
 }

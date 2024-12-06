@@ -21,8 +21,9 @@ export const FestivalSelect: React.FC<{
 			}}
 			onChange={event => {
 				const selectedFestivalId = event.target.value
+				const selectedFestival = festivals.find(festival => festival.id === selectedFestivalId)
 
-				if (selectedFestivalId === "") { 
+				if (selectedFestivalId === 0) { 
 					setShow({
 						...show,
 						festival: null
@@ -32,7 +33,7 @@ export const FestivalSelect: React.FC<{
 
 				setShow({
 					...show,
-					festival: { id: selectedFestivalId, name: selectedFestivalId }
+					festival: { id: selectedFestivalId, name: selectedFestival?.name }
 				} as Show)
 			}}>
 			<MenuItem value={0}>
