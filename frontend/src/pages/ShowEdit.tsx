@@ -20,6 +20,7 @@ import { Artist } from "../models/Artist"
 import ConcertsDataGrid from "../components/ConcertsDataGrid"
 import FestivalEdit from "../components/FestivalEdit"
 import FestivalCreate from "../components/FestivalCreate"
+import BasicModal from "../components/BasicModal"
 
 const ShowEdit: React.FC = () => {
 	const { showId } = useParams<{ showId: string }>()
@@ -29,6 +30,22 @@ const ShowEdit: React.FC = () => {
 	const [venues, setVenues] = useState<Venue[]>([])
 	const [attendees, setAttendees] = useState<Attendee[]>([])
 	const [artists, setArtists] = useState<Artist[]>([])
+	const [isFestivalModalOpen, setFestivalModalOpen] = useState(false)
+	const [isFestivalEditMode, setFestivalEditMode] = useState(false)
+
+	const openFestivalCreateModal = () => {
+		setFestivalEditMode(false)
+		setFestivalModalOpen(true) // Open the modal for creating a new festival
+	}
+
+	const openFestivalEditModal = () => {
+		setFestivalEditMode(true)
+		setFestivalModalOpen(true) // Open the modal for editing the festival
+	}
+
+	const closeFestivalModal = () => {
+		setFestivalModalOpen(false) // Close the modal
+	}
 
 	const isValidForm = (show: Show): boolean => {
 		console.log("Function isValidForm")
@@ -177,8 +194,33 @@ const ShowEdit: React.FC = () => {
 
 					<ShowEditRow label="Festival">
 						<FestivalSelect show={show} setShow={setShow} festivals={festivals} />
-						<Button onClick={() => console.log("Add festival")}>Add festival</Button>
-						<Button onClick={() => console.log("Edit festival")}>Edit festival</Button>
+
+						{show?.festival && (
+							<Button onClick={openFestivalEditModal}>Edit festival</Button>
+						)}
+						<Button onClick={openFestivalCreateModal}>Add new festival</Button>
+						<BasicModal open={isFestivalModalOpen} onClose={closeFestivalModal}>
+							{isFestivalEditMode ? (
+								<FestivalEdit
+									closeFestivalModal={closeFestivalModal}
+									festivalToEdit={show?.festival}
+									updateFestivalSelectCallback={() => {
+										updateAllSelectContent()
+									}}
+									show={show}
+									setShow={setShow}
+								/>
+							) : (
+								<FestivalCreate
+									closeFestivalModal={closeFestivalModal}
+									updateFestivalSelectCallback={() => {
+										updateAllSelectContent()
+									}}
+									show={show!}
+									setShow={setShow}
+								/>
+							)}
+						</BasicModal>
 					</ShowEditRow>
 
 					<ShowEditRow label="Venue">
@@ -223,25 +265,6 @@ const ShowEdit: React.FC = () => {
 				}}>
 				Save show
 			</Button>
-
-			<div>
-				<p>Festival Edit and Create</p>
-				<FestivalEdit
-					festivalToEdit={show?.festival}
-					updateFestivalSelectCallback={() => {
-						updateAllSelectContent()
-					}}
-					show={show}
-					setShow={setShow}
-				/>
-				<FestivalCreate
-					updateFestivalSelectCallback={() => {
-						updateAllSelectContent()
-					}}
-					show={show!}
-					setShow={setShow}
-				/>
-			</div>
 		</div>
 	)
 }

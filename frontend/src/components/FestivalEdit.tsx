@@ -9,7 +9,8 @@ const FestivalEdit: React.FC<{
 	updateFestivalSelectCallback: () => void
 	show?: Show
 	setShow: (show: Show) => void
-}> = ({ festivalToEdit, updateFestivalSelectCallback, show, setShow }) => {
+	closeFestivalModal: () => void
+}> = ({ festivalToEdit, updateFestivalSelectCallback, show, setShow, closeFestivalModal }) => {
 	const [festival, setFestival] = useState<Festival | undefined | null>()
 
 	useEffect(() => {
@@ -19,10 +20,16 @@ const FestivalEdit: React.FC<{
 	}, [festivalToEdit])
 
 	const handleSaveFestival = (festival: Festival) => {
-		updateFestival(festival).then(response => {
-			console.log("Festival updated: ", response)
-			updateFestivalSelectCallback()
-		})
+		updateFestival(festival)
+			.then(response => {
+				console.log("Festival updated: ", response)
+				updateFestivalSelectCallback()
+				closeFestivalModal()
+			})
+			.catch(error => {
+				alert("Error updating festival")
+				console.warn("CATCHING ERROR Error updating festival : ", error)
+			})
 	}
 
 	const handleDeleteFestival = (festival: Festival) => {
@@ -38,7 +45,7 @@ const FestivalEdit: React.FC<{
 	}
 
 	return (
-		<div>
+		<div className="flex">
 			<TextField
 				label="Name"
 				value={festival?.name || ""}
