@@ -13,3 +13,18 @@ export const getVenue = async (id: number): Promise<Venue> => {
 	const response = await axios.get(`${API_URL}${route}/${id}`)
 	return response.data
 }
+
+export const createVenue = async (venue: Venue): Promise<Venue> => {
+	const response = await axios.post(`${API_URL}${route}`, venue)
+	return response.data
+}
+
+export const updateVenue = async (venue: Venue): Promise<Venue> => {
+	const response = await axios.put(`${API_URL}${route}/${venue.id}`, venue)
+	return response.data
+}
+
+export const deleteVenue = async (id: number): Promise<Venue> => {
+	const response = await axios.delete(`${API_URL}${route}/${id}`)
+	return response.data
+}

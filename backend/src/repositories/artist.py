@@ -10,4 +10,3 @@ class ArtistRepository(BaseRepository[Artist]):
     def get_all(self):
         artists = self.session.query(Artist).all()
         return sorted(artists, key=lambda artist: artist.name)
-    
