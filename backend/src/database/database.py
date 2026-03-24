@@ -5,8 +5,8 @@ from config import Config
 from sqlalchemy.orm import Session
 from mockup_data.concerts_mock_data import (
     venues,
-    nofx_show,
-    nfg_show,
+    nofx_event,
+    nfg_event,
     other_festivals,
     other_addresses,
     other_artists,
@@ -16,7 +16,7 @@ from repositories.address import AddressRepository
 from repositories.venue import VenueRepository
 from repositories.attendee import AttendeeRepository
 from repositories.festival import FestivalRepository
-from repositories.show import ShowRepository
+from repositories.event import EventRepository
 from repositories.artist import ArtistRepository
 
 
@@ -28,8 +28,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def get_db():
-    print(f"Connecting to PRODUCTION database: {Config.DATABASE_URI}")
-    Base.metadata.create_all(engine)
     db: Session = SessionLocal()
     try:
         yield db
@@ -45,15 +43,15 @@ def drop_and_recreate_all_tables(engine: create_engine) -> None:
 
 def seed_data(session: Session) -> None:
     venue_repository = VenueRepository(session)
-    show_repository = ShowRepository(session)
+    event_repository = EventRepository(session)
     attendee_repository = AttendeeRepository(session)
     festival_repository = FestivalRepository(session)
     artist_repository = ArtistRepository(session)
     address_repository = AddressRepository(session)
     venue_repository.add_multiple(venues)
     festival_repository.add_multiple(other_festivals)
-    show_repository.add(nofx_show)
-    show_repository.add(nfg_show)
+    event_repository.add(nofx_event)
+    event_repository.add(nfg_event)
     address_repository.add_multiple(other_addresses)
     attendee_repository.add_multiple(other_attendees)
     artist_repository.add_multiple(other_artists)

@@ -7,7 +7,7 @@ from models.festival import Festival
 from models.attendee import Attendee
 from models.photo import Photo
 from models.video import Video
-from models.show import Show
+from models.event import Event
 
 
 fillmore = Venue(name="The Fillmore", address=None)
@@ -81,63 +81,63 @@ coralsprings_address = Address(city="Coral Springs", country="USA")
 losangeles_address = Address(city="Los Angeles", country="USA")
 london_address = Address(city="London", country="England")
 
-nofx_show_artists = [
+nofx_artists = [
     Artist(name="The Last Gang", address=losangeles_address),
     Artist(name="The Meffs", address=london_address),
     Artist(name="NOFX", address=losangeles_address),
 ]
 
-nofx_show_attendees = [
+nofx_attendees = [
     Attendee(firstname="Eric", lastname="Idle"),
     Attendee(firstname="Michael", lastname="Palin"),
 ]
 
-nofx_show = Show(
+nofx_event = Event(
     event_date=datetime(year=2024, month=6, day=1),
     comments="The only good show was NOFX.",
 )
 
 
-nofx_show_concerts = [
+nofx_concerts = [
     Concert(
-        artist=nofx_show_artists[0],
+        artist=nofx_artists[0],
         comments="Totally overrated band",
     ),
-    Concert(artist=nofx_show_artists[1]),
+    Concert(artist=nofx_artists[1]),
     Concert(
-        artist=nofx_show_artists[2],
+        artist=nofx_artists[2],
         comments="They played the Decline, it was huge.",
         setlist="60%, Play Video, The Man I Killed, Benny Got Blowed Up",
     ),
 ]
 
-for concert in nofx_show_concerts:
-    concert.show = nofx_show
+for concert in nofx_concerts:
+    concert.event = nofx_event
 
 
-nofx_show.concerts[2].photos = [
+nofx_event.concerts[2].photos = [
     Photo(
         path="Photo of Fat Mike",
     ),
     Photo(path="Photo of Eric Melvin"),
 ]
-nofx_show.concerts[2].videos = [
+nofx_event.concerts[2].videos = [
     Video(
         path="Video of The Decline",
     ),
     Video(path="Video of Linoleum"),
 ]
-nofx_show.name = "NOFX Final Tour"
-nofx_show.venue = ewerk
-nofx_show.attendees = nofx_show_attendees
-nofx_show.festival = other_festivals[4]
+nofx_event.name = "NOFX Final Tour"
+nofx_event.venue = ewerk
+nofx_event.attendees = nofx_attendees
+nofx_event.festival = other_festivals[4]
 
-nfg_show = Show(event_date=datetime(year=2009, month=4, day=30))
-nfg_show.attendees = [
+nfg_event = Event(event_date=datetime(year=2009, month=4, day=30))
+nfg_event.attendees = [
     Attendee(firstname="Laurent", lastname="Broomhead"),
 ]
-nfg_show.comments = "One of my best show nights ever"
-nfg_show.venue = hob_boston
+nfg_event.comments = "One of my best show nights ever"
+nfg_event.venue = hob_boston
 nfg_concert = Concert()
 nfg_concert.photos = [
     Photo(
@@ -154,7 +154,7 @@ nfg_concert.videos = [
 
 nfg_concert.artist = Artist(name="New Found Glory", address=coralsprings_address)
 nfg_concert.comments = "They played all their hits! I got Cyrus's drumstick."
-nfg_concert.show = nfg_show
+nfg_concert.event = nfg_event
 
 
 other_addresses = [

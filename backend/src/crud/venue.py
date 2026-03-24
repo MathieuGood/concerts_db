@@ -64,10 +64,10 @@ def delete(db: Session, venue_id: int):
     if not deleted_venue:
         return {"message": f"Venue #{venue_id} does not exist."}
 
-    if deleted_venue.shows:
+    if deleted_venue.events:
         raise HTTPException(
             status_code=400,
-            detail=f"Venue '{deleted_venue.name}, {deleted_venue.address.city}' cannot be deleted because it has shows asssociated to it.",
+            detail=f"Venue '{deleted_venue.name}, {deleted_venue.address.city}' cannot be deleted because it has events associated with it.",
         )
 
     try:

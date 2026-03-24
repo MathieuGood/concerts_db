@@ -14,8 +14,8 @@ class Venue(Base):
     address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
     address: Mapped["Address"] = relationship(back_populates="venues")
 
-    shows: Mapped[List["Show"]] = relationship("Show", back_populates="venue")
+    events: Mapped[List["Event"]] = relationship("Event", back_populates="venue")
 
 
 from models.address import Address
-from models.show import Show
+from models.event import Event

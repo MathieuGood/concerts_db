@@ -80,5 +80,5 @@ def delete(db: Session, artist_id: int) -> dict[str, str] | HTTPException:
         db.rollback()
         raise HTTPException(
             status_code=400,
-            detail=f"Cannot delete artist '{artist_name}', they are still associated with shows.",
+            detail=f"Cannot delete artist '{artist_name}', they are still associated with events.",
         )

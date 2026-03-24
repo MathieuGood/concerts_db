@@ -13,9 +13,9 @@ class AttendeeCreate(AttendeeBase):
 
 class AttendeeResponse(AttendeeBase):
     id: int
-    shows: Optional[List["ShowResponse"]] = None
+    events: Optional[List["EventResponse"]] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
-from schemas.show import ShowResponse
+from schemas.event import EventResponse

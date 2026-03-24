@@ -16,10 +16,10 @@ class VenueResponse(BaseModel):
     # name: str
     # address_id: int
     address: Optional["AddressResponse"] = None
-    shows: Optional[List["ShowResponse"]] = None
+    events: Optional[List["EventResponse"]] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
 from schemas.address import AddressResponse
-from schemas.show import ShowResponse
+from schemas.event import EventResponse

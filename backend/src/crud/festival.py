@@ -60,10 +60,10 @@ def delete(db: Session, festival_id: int):
         return {"message": f"Festival #{festival_id} does not exist."}
     festival_name = deleted_festival.name
 
-    if deleted_festival.shows:
+    if deleted_festival.events:
         raise HTTPException(
             status_code=400,
-            detail=f"Cannot delete Festival '{festival_name}, it is still associated with shows.",
+            detail=f"Cannot delete Festival '{festival_name}', it is still associated with events.",
         )
 
     try:
@@ -74,5 +74,5 @@ def delete(db: Session, festival_id: int):
         db.rollback()
         raise HTTPException(
             status_code=400,
-            detail=f"Cannot delete Festival '{festival_name}', it is still associated with shows.",
+            detail=f"Cannot delete Festival '{festival_name}', it is still associated with events.",
         )

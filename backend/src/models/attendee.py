@@ -13,10 +13,10 @@ class Attendee(Base):
     firstname: Mapped[str] = mapped_column(nullable=False)
     lastname: Mapped[str] = mapped_column(nullable=True)
 
-    shows: Mapped[List["Show"]] = relationship(
-        "Show", secondary="show_attendees", back_populates="attendees"
+    events: Mapped[List["Event"]] = relationship(
+        "Event", secondary="event_attendees", back_populates="attendees"
     )
 
 
-from models.show import Show
-from models.show_attendee_association import show_attendee_association
+from models.event import Event
+from models.event_attendee_association import event_attendee_association

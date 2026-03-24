@@ -5,8 +5,8 @@ from datetime import date
 from models.base import Base
 
 
-class Show(Base):
-    __tablename__ = "shows"
+class Event(Base):
+    __tablename__ = "events"
     __table_args__ = (UniqueConstraint("event_date", "venue_id", name="_date_venue_uc"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -17,14 +17,14 @@ class Show(Base):
     venue_id: Mapped[int] = mapped_column(ForeignKey("venues.id"), nullable=False)
     festival_id: Mapped[int] = mapped_column(ForeignKey("festivals.id"), nullable=True)
 
-    venue: Mapped["Venue"] = relationship("Venue", back_populates="shows")
-    festival: Mapped["Festival"] = relationship("Festival", back_populates="shows")
+    venue: Mapped["Venue"] = relationship("Venue", back_populates="events")
+    festival: Mapped["Festival"] = relationship("Festival", back_populates="events")
 
     concerts: Mapped[List["Concert"]] = relationship(
-        "Concert", back_populates="show", cascade="all, delete-orphan"
+        "Concert", back_populates="event", cascade="all, delete-orphan"
     )
     attendees: Mapped[List["Attendee"]] = relationship(
-        "Attendee", secondary="show_attendees", back_populates="shows"
+        "Attendee", secondary="event_attendees", back_populates="events"
     )
 
 

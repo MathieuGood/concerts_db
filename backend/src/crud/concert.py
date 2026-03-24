@@ -1,7 +1,7 @@
 from models.artist import Artist
 from models.concert import Concert
 from fastapi import HTTPException
-from models.show import Show
+from models.event import Event
 from schemas.concert import ConcertCreate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
@@ -41,10 +41,10 @@ def get_all(db: Session):
 def create(db: Session, concert: ConcertCreate) -> Concert:
     print("CRUD CREATE Concert", concert)
     try:
-        show: Show | None = db.query(Show).filter(Show.id == concert.show_id).first()
-        if not show:
+        event: Event | None = db.query(Event).filter(Event.id == concert.event_id).first()
+        if not event:
             raise HTTPException(
-                status_code=404, detail=f"Show with ID {concert.show_id} not found."
+                status_code=404, detail=f"Event with ID {concert.event_id} not found."
             )
 
         artist = db.query(Artist).filter(Artist.id == concert.artist_id).first()
@@ -56,10 +56,10 @@ def create(db: Session, concert: ConcertCreate) -> Concert:
         new_concert = Concert(
             comments=concert.comments,
             setlist=concert.setlist,
-            show_id=concert.show_id,
+            event_id=concert.event_id,
             artist_id=concert.artist_id,
         )
-        # TODO : Add check for existing show_id and artist_id
+        # TODO : Add check for existing event_id and artist_id
         db.add(new_concert)
         db.commit()
         db.refresh(new_concert)
@@ -82,7 +82,7 @@ def update(db: Session, concert_id: int, concert: ConcertCreate) -> Concert:
             )
         updated_concert.comments = concert.comments
         updated_concert.setlist = concert.setlist
-        updated_concert.show_id = concert.show_id
+        updated_concert.event_id = concert.event_id
         updated_concert.artist_id = concert.artist_id
         db.commit()
         db.refresh(updated_concert)

@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from models.show import Show
+from models.event import Event
 from repositories.base import BaseRepository
 
 
-class ShowRepository(BaseRepository[Show]):
+class EventRepository(BaseRepository[Event]):
     def __init__(self, session: Session):
-        super().__init__(session, Show)
+        super().__init__(session, Event)

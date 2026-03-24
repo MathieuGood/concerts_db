@@ -3,20 +3,20 @@ from typing import Optional
 from datetime import date
 
 
-class ShowBase(BaseModel):
+class EventBase(BaseModel):
     name: Optional[str] = None
     event_date: date
     comments: str
 
 
-class ShowCreate(ShowBase):
+class EventCreate(EventBase):
     venue_id: int
     festival_id: Optional[int] = None
     attendees_ids: Optional[list[int]] = None
     concerts: list["ConcertCreate"] = None
 
 
-class ShowResponse(ShowBase):
+class EventResponse(EventBase):
     id: int
     venue_id: int
     festival_id: Optional[int] = None

@@ -9,7 +9,7 @@ class ConcertBase(BaseModel):
 
 
 class ConcertCreate(ConcertBase):
-    show_id: Optional[int] = None
+    event_id: Optional[int] = None
     artist_id: int
     photos_ids: Optional[List[int]] = None
     videos_ids: Optional[List[int]] = None
@@ -19,9 +19,9 @@ class ConcertResponse(ConcertBase):
     id: int
     comments: Optional[str] = None
     setlist: Optional[str] = None
-    show_id: int
+    event_id: int
     artist_id: int
-    show: Optional["ShowResponse"] = None
+    event: Optional["EventResponse"] = None
     artist: Optional["ArtistResponse"] = None
     photos: Optional[List["PhotoResponse"]] = None
     videos: Optional[List["VideoResponse"]] = None
@@ -29,7 +29,7 @@ class ConcertResponse(ConcertBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-from schemas.show import ShowResponse
+from schemas.event import EventResponse
 from schemas.artist import ArtistResponse
 from schemas.photo import PhotoResponse
 from schemas.video import VideoResponse

@@ -11,8 +11,8 @@ class Concert(Base):
     comments: Mapped[str] = mapped_column(default="", nullable=False)
     setlist: Mapped[str] = mapped_column(nullable=True)
 
-    show_id: Mapped[int] = mapped_column(ForeignKey("shows.id"), nullable=False)
-    show: Mapped["Show"] = relationship("Show", back_populates="concerts")
+    event_id: Mapped[int] = mapped_column(ForeignKey("events.id"), nullable=False)
+    event: Mapped["Event"] = relationship("Event", back_populates="concerts")
 
     artist_id: Mapped[int] = mapped_column(ForeignKey("artists.id"), nullable=False)
     artist: Mapped["Artist"] = relationship("Artist", back_populates="concerts")
@@ -25,13 +25,11 @@ class Concert(Base):
 
     def __repr__(self) -> str:
         return (
-            f"<Concert id={self.id} artist_id={self.artist_id} show_id={self.show_id}>"
+            f"<Concert id={self.id} artist_id={self.artist_id} event_id={self.event_id}>"
         )
 
 
 from models.artist import Artist
 from models.photo import Photo
 from models.video import Video
-from models.show import Show
-
-
+from models.event import Event
