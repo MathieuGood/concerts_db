@@ -39,7 +39,6 @@ def get_all(db: Session):
 
 
 def create(db: Session, concert: ConcertCreate) -> Concert:
-    print("CRUD CREATE Concert", concert)
     try:
         event: Event | None = db.query(Event).filter(Event.id == concert.event_id).first()
         if not event:
@@ -67,7 +66,7 @@ def create(db: Session, concert: ConcertCreate) -> Concert:
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Concert '{new_concert.artist}' already exists."
+            status_code=400, detail=f"Concert for artist ID {concert.artist_id} on event ID {concert.event_id} already exists."
         )
 
 
@@ -90,7 +89,7 @@ def update(db: Session, concert_id: int, concert: ConcertCreate) -> Concert:
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Concert '{concert.artist}' already exists."
+            status_code=400, detail=f"Concert for artist ID {concert.artist_id} on event ID {concert.event_id} already exists."
         )
 
 

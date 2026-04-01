@@ -6,12 +6,12 @@ const route = "show"
 
 export const getShows = async (): Promise<Show[]> => {
 	const response = await axios.get(`${API_URL}${route}`)
-	return response.data
+	return response.data.data
 }
 
 export const getShow = async (id: number): Promise<Show> => {
 	const response = await axios.get(`${API_URL}${route}/${id}`)
-	return response.data
+	return response.data.data
 }
 
 export const updateShow = async (show: Show): Promise<Show> => {
@@ -21,7 +21,7 @@ export const updateShow = async (show: Show): Promise<Show> => {
 		}
 	})
 	console.log("updateShow RESPONSE :", response.status, response.statusText)
-	return response.data
+	return response.data.data
 }
 
 export const parseShowToAPIFormat = (show: Show) => {

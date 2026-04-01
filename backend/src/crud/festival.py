@@ -28,7 +28,7 @@ def create(db: Session, festival: FestivalCreate) -> Festival:
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Festival '{new_festival.name}' already exists."
+            status_code=400, detail=f"Festival '{festival.name}' already exists."
         )
 
 

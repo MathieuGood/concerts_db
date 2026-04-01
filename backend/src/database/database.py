@@ -8,11 +8,9 @@ from mockup_data.concerts_mock_data import (
     nofx_event,
     nfg_event,
     other_festivals,
-    other_addresses,
     other_artists,
     other_attendees,
 )
-from repositories.address import AddressRepository
 from repositories.venue import VenueRepository
 from repositories.attendee import AttendeeRepository
 from repositories.festival import FestivalRepository
@@ -47,12 +45,10 @@ def seed_data(session: Session) -> None:
     attendee_repository = AttendeeRepository(session)
     festival_repository = FestivalRepository(session)
     artist_repository = ArtistRepository(session)
-    address_repository = AddressRepository(session)
     venue_repository.add_multiple(venues)
     festival_repository.add_multiple(other_festivals)
     event_repository.add(nofx_event)
     event_repository.add(nfg_event)
-    address_repository.add_multiple(other_addresses)
     attendee_repository.add_multiple(other_attendees)
     artist_repository.add_multiple(other_artists)
     session.commit()

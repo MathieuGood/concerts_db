@@ -6,12 +6,12 @@ const route = "concert"
 
 export const getConcerts = async (): Promise<Concert[]> => {
 	const response = await axios.get(`${API_URL}${route}`)
-	return response.data
+	return response.data.data
 }
 
 export const getConcert = async (id: number): Promise<Concert> => {
 	const response = await axios.get(`${API_URL}${route}/${id}`)
-	return response.data
+	return response.data.data
 }
 
 export const updateConcert = async (concert: Concert): Promise<Concert> => {
@@ -21,7 +21,7 @@ export const updateConcert = async (concert: Concert): Promise<Concert> => {
 		}
 	})
 	console.log("updateConcert RESPONSE :", response.status, response.statusText)
-	return response.data
+	return response.data.data
 }
 
 export const parseConcertToAPIFormat = (concert: Concert) => {

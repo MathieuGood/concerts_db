@@ -1,37 +1,37 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
 from crud.photo import get, get_all, create, update, delete
 from database.database import get_db
-from schemas.photo import PhotoCreate
+from schemas.photo import PhotoCreate, PhotoResponse
+from schemas.response import ApiResponse
 
 router = APIRouter()
 
 
-@router.get("/photo/{photo_id}")
-async def get_photo(photo_id: int, db: Session = Depends(get_db)):
-    return get(db, photo_id)
-
-
-@router.get("/photo/")
+@router.get("/photo/", response_model=ApiResponse[List[PhotoResponse]])
 async def get_all_photos(db: Session = Depends(get_db)):
-    return get_all(db)
+    return ApiResponse(success=True, data=get_all(db))
 
 
-# Create photo
-@router.post("/photo/")
+@router.get("/photo/{photo_id}", response_model=ApiResponse[PhotoResponse])
+async def get_photo(photo_id: int, db: Session = Depends(get_db)):
+    return ApiResponse(success=True, data=get(db, photo_id))
+
+
+@router.post("/photo/", response_model=ApiResponse[PhotoResponse])
 async def create_photo(photo: PhotoCreate, db: Session = Depends(get_db)):
-    return create(db, photo)
+    return ApiResponse(success=True, data=create(db, photo))
 
 
-# Update photo
-@router.put("/photo/{photo_id}")
+@router.put("/photo/{photo_id}", response_model=ApiResponse[PhotoResponse])
 async def update_photo(
     photo_id: int, photo: PhotoCreate, db: Session = Depends(get_db)
 ):
-    return update(db, photo_id, photo)
+    return ApiResponse(success=True, data=update(db, photo_id, photo))
 
 
-# Delete photo
 @router.delete("/photo/{photo_id}")
 async def delete_photo(photo_id: int, db: Session = Depends(get_db)):
-    return delete(db, photo_id)
+    result = delete(db, photo_id)
+    return ApiResponse(success=True, data=None, message=result["message"])

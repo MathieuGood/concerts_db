@@ -1,37 +1,37 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
 from crud.venue import get, get_all, create, update, delete
 from database.database import get_db
-from schemas.venue import VenueCreate
+from schemas.venue import VenueCreate, VenueResponse
+from schemas.response import ApiResponse
 
 router = APIRouter()
 
 
-@router.get("/venue/{venue_id}")
-async def get_venue(venue_id: int, db: Session = Depends(get_db)):
-    return get(db, venue_id)
-
-
-@router.get("/venue/")
+@router.get("/venue/", response_model=ApiResponse[List[VenueResponse]])
 async def get_all_venues(db: Session = Depends(get_db)):
-    return get_all(db)
+    return ApiResponse(success=True, data=get_all(db))
 
 
-# Create venue
-@router.post("/venue/")
+@router.get("/venue/{venue_id}", response_model=ApiResponse[VenueResponse])
+async def get_venue(venue_id: int, db: Session = Depends(get_db)):
+    return ApiResponse(success=True, data=get(db, venue_id))
+
+
+@router.post("/venue/", response_model=ApiResponse[VenueResponse])
 async def create_venue(venue: VenueCreate, db: Session = Depends(get_db)):
-    return create(db, venue)
+    return ApiResponse(success=True, data=create(db, venue))
 
 
-# Update venue
-@router.put("/venue/{venue_id}")
+@router.put("/venue/{venue_id}", response_model=ApiResponse[VenueResponse])
 async def update_venue(
     venue_id: int, venue: VenueCreate, db: Session = Depends(get_db)
 ):
-    return update(db, venue_id, venue)
+    return ApiResponse(success=True, data=update(db, venue_id, venue))
 
 
-# Delete venue
 @router.delete("/venue/{venue_id}")
 async def delete_venue(venue_id: int, db: Session = Depends(get_db)):
-    return delete(db, venue_id)
+    result = delete(db, venue_id)
+    return ApiResponse(success=True, data=None, message=result["message"])

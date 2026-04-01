@@ -1,10 +1,11 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Optional
+from typing import Optional
+from schemas.city import CityResponse
 
 
 class VenueBase(BaseModel):
     name: str
-    address_id: int
+    city_id: int
 
 
 class VenueCreate(VenueBase):
@@ -13,13 +14,8 @@ class VenueCreate(VenueBase):
 
 class VenueResponse(BaseModel):
     id: int
-    # name: str
-    # address_id: int
-    address: Optional["AddressResponse"] = None
-    events: Optional[List["EventResponse"]] = None
+    name: str
+    city_id: int
+    city: Optional[CityResponse] = None
 
     model_config = ConfigDict(from_attributes=True)
-
-
-from schemas.address import AddressResponse
-from schemas.event import EventResponse

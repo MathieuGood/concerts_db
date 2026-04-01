@@ -31,7 +31,7 @@ def create(db: Session, attendee: AttendeeCreate) -> Attendee:
         db.rollback()
         raise HTTPException(
             status_code=400,
-            detail=f"Attendee '{new_attendee.firstname} {new_attendee.lastname}' already exists.",
+            detail=f"Attendee '{attendee.firstname} {attendee.lastname}' already exists.",
         )
 
 

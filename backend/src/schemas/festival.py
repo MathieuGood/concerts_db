@@ -1,5 +1,4 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Optional
 
 
 class FestivalBase(BaseModel):
@@ -12,9 +11,5 @@ class FestivalCreate(FestivalBase):
 
 class FestivalResponse(FestivalBase):
     id: int
-    events: Optional[List["EventResponse"]] = None
 
     model_config = ConfigDict(from_attributes=True)
-
-
-from schemas.event import EventResponse

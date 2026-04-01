@@ -6,16 +6,16 @@ from models.base import Base
 
 class Venue(Base):
     __tablename__ = "venues"
-    __table_args__ = (UniqueConstraint("name", "address_id", name="_name_address_uc"),)
+    __table_args__ = (UniqueConstraint("name", "city_id", name="_name_city_uc"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
 
-    address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
-    address: Mapped["Address"] = relationship(back_populates="venues")
+    city_id: Mapped[int] = mapped_column(ForeignKey("cities.id"))
+    city: Mapped["City"] = relationship(back_populates="venues")
 
     events: Mapped[List["Event"]] = relationship("Event", back_populates="venue")
 
 
-from models.address import Address
+from models.city import City
 from models.event import Event

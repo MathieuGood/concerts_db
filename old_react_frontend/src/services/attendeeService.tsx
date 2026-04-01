@@ -6,10 +6,10 @@ const route = "attendee"
 
 export const getAttendees = async (): Promise<Attendee[]> => {
 	const response = await axios.get(`${API_URL}${route}`)
-	return response.data
+	return response.data.data
 }
 
 export const getAttendee = async (id: number): Promise<Attendee> => {
 	const response = await axios.get(`${API_URL}${route}/${id}`)
-	return response.data
+	return response.data.data
 }

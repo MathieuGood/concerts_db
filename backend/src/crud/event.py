@@ -1,5 +1,6 @@
 from typing import List
 from models.artist import Artist
+from models.city import City
 from models.concert import Concert
 from models.festival import Festival
 from models.attendee import Attendee
@@ -17,10 +18,10 @@ def get(db: Session, event_id: int) -> Event:
     event = (
         db.query(Event)
         .options(
-            joinedload(Event.venue).joinedload(Venue.address),
+            joinedload(Event.venue).joinedload(Venue.city).joinedload(City.country),
             joinedload(Event.attendees),
             joinedload(Event.festival),
-            joinedload(Event.concerts).joinedload(Concert.artist),
+            joinedload(Event.concerts).joinedload(Concert.artist).joinedload(Artist.country),
             joinedload(Event.concerts).joinedload(Concert.photos),
             joinedload(Event.concerts).joinedload(Concert.videos),
         )
@@ -39,10 +40,10 @@ def get_all(db: Session) -> List[Event]:
     events = (
         db.query(Event)
         .options(
-            joinedload(Event.venue).joinedload(Venue.address),
+            joinedload(Event.venue).joinedload(Venue.city).joinedload(City.country),
             joinedload(Event.attendees),
             joinedload(Event.festival),
-            joinedload(Event.concerts).joinedload(Concert.artist),
+            joinedload(Event.concerts).joinedload(Concert.artist).joinedload(Artist.country),
             joinedload(Event.concerts).joinedload(Concert.photos),
             joinedload(Event.concerts).joinedload(Concert.videos),
         )
@@ -60,12 +61,13 @@ def create(db: Session, event: EventCreate) -> Event:
                 status_code=404, detail=f"Venue with ID {event.venue_id} not found."
             )
 
-        festival = db.query(Festival).filter(Festival.id == event.festival_id).first()
-        if event.festival_id and not festival:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Festival with ID {event.festival_id} not found.",
-            )
+        if event.festival_id:
+            festival = db.query(Festival).filter(Festival.id == event.festival_id).first()
+            if not festival:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Festival with ID {event.festival_id} not found.",
+                )
 
         new_event = Event(
             name=event.name,
@@ -96,13 +98,8 @@ def create(db: Session, event: EventCreate) -> Event:
             db.commit()
             db.refresh(new_concert)
 
-            for photo_url in concert.photos:
-                new_photo = Photo(path=photo_url, concert_id=new_concert.id)
-                db.add(new_photo)
-
-            for video_url in concert.videos:
-                new_video = Video(path=video_url, concert_id=new_concert.id)
-                db.add(new_video)
+            update_concert_photos(db, concert, new_concert)
+            update_concert_videos(db, concert, new_concert)
 
         db.commit()
         db.refresh(new_event)

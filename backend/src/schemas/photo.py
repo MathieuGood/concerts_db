@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 
@@ -12,9 +11,6 @@ class PhotoCreate(PhotoBase):
 
 class PhotoResponse(PhotoBase):
     id: int
-    concert: Optional["ConcertResponse"] = None
+    concert_id: int
 
     model_config = ConfigDict(from_attributes=True)
-
-
-from schemas.concert import ConcertResponse

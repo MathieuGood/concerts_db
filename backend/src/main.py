@@ -1,12 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
-from sqlalchemy.orm import Session, sessionmaker
-from database.database import drop_and_recreate_all_tables, seed_data
+from sqlalchemy.orm import Session
+from database.database import drop_and_recreate_all_tables, seed_data, SessionLocal
 from config import Config
 
 from routes.root import router as root_router
-from routes.address import router as address_router
+from routes.country import router as country_router
+from routes.city import router as city_router
 from routes.artist import router as artist_router
 from routes.concert import router as concert_router
 from routes.festival import router as festival_router
@@ -22,7 +24,6 @@ async def lifespan(app: FastAPI):
     from database.database import engine, Base
     if Config.DEMO_MODE:
         print("Running in demo mode")
-        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         db: Session = SessionLocal()
         drop_and_recreate_all_tables(engine=engine)
         seed_data(db)
@@ -35,15 +36,26 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"success": False, "data": None, "message": exc.detail},
+    )
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 app.include_router(root_router)
-app.include_router(address_router)
+app.include_router(country_router)
+app.include_router(city_router)
 app.include_router(artist_router)
 app.include_router(concert_router)
 app.include_router(festival_router)

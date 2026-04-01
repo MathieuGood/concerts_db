@@ -1,10 +1,11 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Optional
+from typing import Optional
+from schemas.country import CountryResponse
 
 
 class ArtistBase(BaseModel):
     name: str
-    address_id: int
+    country_id: Optional[int] = None
 
 
 class ArtistCreate(ArtistBase):
@@ -13,11 +14,6 @@ class ArtistCreate(ArtistBase):
 
 class ArtistResponse(ArtistBase):
     id: int
-    name: str
-    address_id: int
-    concerts: Optional[List["ConcertResponse"]] = None
+    country: Optional[CountryResponse] = None
 
     model_config = ConfigDict(from_attributes=True)
-
-
-from schemas.concert import ConcertResponse

@@ -1,4 +1,5 @@
 from models.venue import Venue
+from models.city import City
 from fastapi import HTTPException
 from schemas.venue import VenueCreate
 from sqlalchemy.exc import IntegrityError
@@ -8,68 +9,57 @@ from sqlalchemy.orm import Session, joinedload
 def get(db: Session, venue_id: int):
     venue = (
         db.query(Venue)
-        .options(joinedload(Venue.address))
+        .options(joinedload(Venue.city).joinedload(City.country))
         .filter(Venue.id == venue_id)
         .first()
     )
-
     if not venue:
-        raise HTTPException(
-            status_code=404, detail=f"Venue with ID {venue_id} not found."
-        )
+        raise HTTPException(status_code=404, detail=f"Venue with ID {venue_id} not found.")
     return venue
 
 
 def get_all(db: Session):
-    venues = db.query(Venue).options(joinedload(Venue.address)).all()
-    return venues
+    return db.query(Venue).options(joinedload(Venue.city).joinedload(City.country)).all()
 
 
 def create(db: Session, venue: VenueCreate) -> Venue:
     try:
-        new_venue = Venue(name=venue.name, address_id=venue.address_id)
+        new_venue = Venue(name=venue.name, city_id=venue.city_id)
         db.add(new_venue)
         db.commit()
-        db.refresh(new_venue)
-        return new_venue
+        return get(db, new_venue.id)
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Venue '{new_venue.name}' already exists."
+            status_code=400, detail=f"Venue '{venue.name}' already exists in this city."
         )
 
 
 def update(db: Session, venue_id: int, venue: VenueCreate) -> Venue:
     try:
-        updated_venue: Venue = db.query(Venue).filter(Venue.id == venue_id).first()
+        updated_venue = db.query(Venue).filter(Venue.id == venue_id).first()
         if updated_venue is None:
-            raise HTTPException(
-                status_code=404, detail=f"Venue with ID {venue_id} not found."
-            )
+            raise HTTPException(status_code=404, detail=f"Venue with ID {venue_id} not found.")
         updated_venue.name = venue.name
-        updated_venue.address_id = venue.address_id
+        updated_venue.city_id = venue.city_id
         db.commit()
-        db.refresh(updated_venue)
-        return updated_venue
-    except IntegrityError as e:
-        print("IntegrityError", e)
+        return get(db, venue_id)
+    except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Venue '{venue.name}' already exists."
+            status_code=400, detail=f"Venue '{venue.name}' already exists in this city."
         )
 
 
 def delete(db: Session, venue_id: int):
-    deleted_venue: Venue = db.query(Venue).filter(Venue.id == venue_id).first()
+    deleted_venue = db.query(Venue).filter(Venue.id == venue_id).first()
     if not deleted_venue:
         return {"message": f"Venue #{venue_id} does not exist."}
-
     if deleted_venue.events:
         raise HTTPException(
             status_code=400,
-            detail=f"Venue '{deleted_venue.name}, {deleted_venue.address.city}' cannot be deleted because it has events associated with it.",
+            detail=f"Venue '{deleted_venue.name}' cannot be deleted because it has events associated with it.",
         )
-
     try:
         db.delete(deleted_venue)
         db.commit()
@@ -77,6 +67,5 @@ def delete(db: Session, venue_id: int):
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400,
-            detail=f"Venue '{deleted_venue.name}' could not be deleted.",
+            status_code=400, detail=f"Venue '{deleted_venue.name}' could not be deleted."
         )

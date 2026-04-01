@@ -1,14 +1,17 @@
-from models.address import Address
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models.artist import Artist
 from schemas.artist import ArtistCreate
-from repositories.artist import ArtistRepository
 
 
 def get(db: Session, artist_id: int) -> Artist:
-    artist = db.query(Artist).filter(Artist.id == artist_id).first()
+    artist = (
+        db.query(Artist)
+        .options(joinedload(Artist.country))
+        .filter(Artist.id == artist_id)
+        .first()
+    )
     if not artist:
         raise HTTPException(
             status_code=404, detail=f"Artist with ID {artist_id} not found."
@@ -17,26 +20,15 @@ def get(db: Session, artist_id: int) -> Artist:
 
 
 def get_all(db: Session) -> list[Artist]:
-    return db.query(Artist).all()
+    return db.query(Artist).options(joinedload(Artist.country)).all()
 
 
 def create(db: Session, artist: ArtistCreate) -> Artist:
     try:
-        address: Address | None = (
-            db.query(Address).filter(Address.id == artist.address_id).first()
-        )
-
-        if not address:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Address with ID {artist.address_id} not found.",
-            )
-
-        new_artist = Artist(name=artist.name, address=address)
+        new_artist = Artist(name=artist.name, country_id=artist.country_id)
         db.add(new_artist)
         db.commit()
-        db.refresh(new_artist)
-        return new_artist
+        return get(db, new_artist.id)
     except IntegrityError:
         db.rollback()
         raise HTTPException(
@@ -44,19 +36,17 @@ def create(db: Session, artist: ArtistCreate) -> Artist:
         )
 
 
-def update(db: Session, artist_id: int, artist: ArtistCreate) -> Artist | HTTPException:
+def update(db: Session, artist_id: int, artist: ArtistCreate) -> Artist:
     try:
-        updated_artist: Artist | None = (
-            db.query(Artist).filter(Artist.id == artist_id).first()
-        )
+        updated_artist = db.query(Artist).filter(Artist.id == artist_id).first()
         if updated_artist is None:
             raise HTTPException(
                 status_code=404, detail=f"Artist with ID {artist_id} not found."
             )
         updated_artist.name = artist.name
+        updated_artist.country_id = artist.country_id
         db.commit()
-        db.refresh(updated_artist)
-        return updated_artist
+        return get(db, artist_id)
     except IntegrityError:
         db.rollback()
         raise HTTPException(
@@ -64,14 +54,11 @@ def update(db: Session, artist_id: int, artist: ArtistCreate) -> Artist | HTTPEx
         )
 
 
-def delete(db: Session, artist_id: int) -> dict[str, str] | HTTPException:
-    deleted_artist: Artist | None = (
-        db.query(Artist).filter(Artist.id == artist_id).first()
-    )
+def delete(db: Session, artist_id: int) -> dict:
+    deleted_artist = db.query(Artist).filter(Artist.id == artist_id).first()
     if not deleted_artist:
         return {"message": f"Artist #{artist_id} does not exist."}
     artist_name = deleted_artist.name
-
     try:
         db.delete(deleted_artist)
         db.commit()
