@@ -289,6 +289,72 @@ For event updates, concerts that already exist pass their `id`; new concerts pas
 
 ---
 
+## Importing data from concert tickets (CSV workflow)
+
+### Overview
+Concert tickets are photographed and stored in `~/Desktop/concert_tickets/`. Claude reads them with vision and produces a CSV to import later when the app is stable.
+
+### CSV format
+File: `concerts_db/data/concerts_import.csv`
+
+**One row = one event.** Multiple artists and attendees are semicolon-separated within their column.
+
+```
+event_date,venue,city,country,artists,attendees,festival,comments
+2003-05-27,Salle des Fêtes,Schiltigheim,France,Jean-Louis Aubert,,,
+2011-04-15,Zénith Europe,Strasbourg,France,NOFX;Dropkick Murphys;Sick of It All,,,
+2008-11-06,Boston College,Boston,USA,RJD2,Saskia Stephens,,"Dining hall show on campus"
+2009-06-27,Val de Ville,Neuve-Église,France,Asian Dub Foundation;Cold War Kids,,Festival Décibulles,
+```
+
+Column rules:
+- `event_date`: ISO 8601 (YYYY-MM-DD)
+- `venue`: name only, no street address
+- `artists`: semicolon-separated list, proper casing (no ALL CAPS). Maps to one Concert per artist in the DB.
+- `attendees`: semicolon-separated `Firstname Lastname`. Creates Attendee records and links them to the event.
+- `festival`: festival name if the event is part of one. Will be find-or-created in the festivals table.
+- `comments`: free text, quoted if it contains commas.
+
+Import logic (to implement):
+1. For each row: `find_or_create` country → city → venue
+2. `find_or_create` festival if set
+3. Create event (date, venue, festival)
+4. For each artist in `artists`: `find_or_create` artist → create Concert linked to event
+5. For each attendee in `attendees`: `find_or_create` attendee (split on space: firstname + lastname) → link to event
+
+Non-concerts (sports, cinema, clubbing passes, etc.) are excluded from the CSV.
+
+### Festival tickets — special workflow (TODO, resume later)
+
+Festival day/weekend passes don't list individual artists. The workflow to handle them:
+
+1. **Identify the festival** — name, year, location (from the ticket or memory)
+2. **Look up the full lineup** — ask Claude: *"Quel était le lineup complet du [Festival] [année] ? Liste tous les artistes avec leur date et heure de passage si possible."*
+3. **User selects** — from the full lineup, choose which artists/sets were actually attended
+4. **Add to CSV** — one row per selected artist with correct date
+
+Festivals identified from tickets but not yet processed (lineup lookup pending):
+- **Punk Rock Holiday 2018** — Tolmin, Slovenia (ticket: `312FBDA0`, `2018-08-07`)
+- **Au Grès du Jazz 2009** — La Petite Pierre, France (`073B92A8`, `2009-08-16`)
+- **Festival Cabaret Vert** — Charleville-Mézières, France (`0853FCD9`, dates: 21-23 Aug 2015)
+- **Rock Am Ring 2008** — Germany (`0C5BE033`)
+- **Lez'Arts Scéniques 2006** — Neuve-Église, France (`2FF92A16`, 04-06 Aug 2006)
+- **Lez'Arts Scéniques 2010** — Sélestat, France (tickets `7B23635B`, `76A62B58`, 30 Jul – 01 Aug 2010)
+- **Hellfest 2006** — Clisson, France (`63748B53`, `2006-06-23`)
+- **Dour Festival 2011** — Dour, Belgium (`4CEB4F69`, `2011-07-14`)
+- **Rock am See 2007** — Konstanz, Germany (`8192F447`, `2007-09-01`)
+- **Les Eurockéennes de Belfort 2012** — Belfort, France (`825F3D51`, `2012-07-01`)
+- **Festival Décibulles 2015** — Neuve-Église, France (`AD12408C`)
+- **Rock en Seine 2014** — Paris, France (`F04AA405`)
+- **Dour Festival** — Dour, Belgium (`CD3F8F7E`)
+- **Balelec 2013** — Lausanne, Switzerland (`4513115B`, `2013-05-03`) — partial lineup extracted
+- **Earthquake Fest** — Molodoi, date incomplete (`C4CDC69B`)
+- **Festival Interférences** — date/year incomplete (`C61C82D0`)
+- **Festival Décibulles 2009** — Neuve-Église (`29082F7E`, `2009-06-27`) — some artists extracted, verify full attendance
+- **Hard Rock Session 2016** — Colmar, France (`4823EADA`, `2016-08-10`) — some artists extracted, verify
+
+---
+
 ## Known issues / TODO
 
 - **CORS origins for production** — `allow_origins` in `main.py` is currently `["http://localhost:5173"]`. Must be updated to include the production frontend URL before deploying. ⚠️ TODO on deploy.

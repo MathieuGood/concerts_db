@@ -2,6 +2,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import DataTable from 'primevue/datatable'
@@ -34,21 +36,34 @@ function formatDate(dateStr: string): string {
   })
 }
 
+function fuzzy(query: string, target: string): boolean {
+  let ti = 0
+  for (let qi = 0; qi < query.length; qi++) {
+    while (ti < target.length && target[ti] !== query[qi]) ti++
+    if (ti === target.length) return false
+    ti++
+  }
+  return true
+}
+
+function fuzzyMatch(q: string, e: Event): boolean {
+  const artists = e.concerts.map((c) => c.artist?.name ?? '').join(' ')
+  const fields = [
+    e.name ?? '',
+    e.event_date,
+    e.venue?.name ?? '',
+    e.venue?.city?.name ?? '',
+    e.venue?.city?.country?.name ?? '',
+    e.festival?.name ?? '',
+    artists,
+  ]
+  return fields.some((f) => fuzzy(q, f.toLowerCase()))
+}
+
 const filtered = computed(() => {
   const q = search.value.trim().toLowerCase()
   if (!q) return events.value
-  return events.value.filter((e) => {
-    const artists = e.concerts.map((c) => c.artist?.name ?? '').join(' ')
-    return (
-      e.name?.toLowerCase().includes(q) ||
-      e.event_date.includes(q) ||
-      e.venue?.name.toLowerCase().includes(q) ||
-      e.venue?.city?.name.toLowerCase().includes(q) ||
-      e.venue?.city?.country?.name.toLowerCase().includes(q) ||
-      e.festival?.name.toLowerCase().includes(q) ||
-      artists.toLowerCase().includes(q)
-    )
-  })
+  return events.value.filter((e) => fuzzyMatch(q, e))
 })
 
 function goToEvent(id: number) {
@@ -60,14 +75,14 @@ function goToEvent(id: number) {
   <div class="space-y-4">
     <!-- Header row -->
     <div class="flex items-center gap-3">
-      <div class="relative flex-1">
-        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+      <IconField class="flex-1">
+        <InputIcon class="pi pi-search" />
         <InputText
           v-model="search"
           placeholder="Search by artist, venue, festival, date…"
-          class="w-full pl-9"
+          class="w-full"
         />
-      </div>
+      </IconField>
       <Button
         icon="pi pi-plus"
         label="New"
