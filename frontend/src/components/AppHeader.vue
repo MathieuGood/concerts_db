@@ -58,6 +58,15 @@ onMounted(() => {
         />
 
         <Button
+          icon="pi pi-star"
+          size="small"
+          rounded
+          text
+          @click="router.push('/artists')"
+          aria-label="Artists"
+        />
+
+        <Button
           icon="pi pi-book"
           size="small"
           rounded

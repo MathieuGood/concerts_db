@@ -62,8 +62,8 @@ function fuzzyMatch(q: string, e: Event): boolean {
 
 const filtered = computed(() => {
   const q = search.value.trim().toLowerCase()
-  if (!q) return events.value
-  return events.value.filter((e) => fuzzyMatch(q, e))
+  const result = q ? events.value.filter((e) => fuzzyMatch(q, e)) : [...events.value]
+  return result.sort((a, b) => a.event_date.localeCompare(b.event_date))
 })
 
 function goToEvent(id: number) {
@@ -140,31 +140,33 @@ function goToEvent(id: number) {
         <DataTable
           :value="filtered"
           row-hover
+          sortField="event_date"
+          :sortOrder="1"
           class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700"
           @row-click="(e) => goToEvent(e.data.id)"
           style="cursor: pointer"
         >
-          <Column field="event_date" header="Date" style="width: 120px">
+          <Column field="event_date" header="Date" sortable style="width: 120px">
             <template #body="{ data }">
               {{ formatDate(data.event_date) }}
             </template>
           </Column>
-          <Column header="Artists">
+          <Column header="Artists" sortable sort-field="event_date">
             <template #body="{ data }">
               {{ artistNames(data) || data.name || '—' }}
             </template>
           </Column>
-          <Column header="Venue">
+          <Column header="Venue" sortable sort-field="venue.name">
             <template #body="{ data }">
               {{ data.venue?.name }}
             </template>
           </Column>
-          <Column header="City">
+          <Column header="City" sortable sort-field="venue.city.name">
             <template #body="{ data }">
               {{ data.venue?.city?.name }}
             </template>
           </Column>
-          <Column header="Festival">
+          <Column header="Festival" sortable sort-field="festival.name">
             <template #body="{ data }">
               <span
                 v-if="data.festival"

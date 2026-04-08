@@ -16,14 +16,12 @@ import InputIcon from 'primevue/inputicon'
 
 import { countryService } from '@/services/countryService'
 import { cityService } from '@/services/cityService'
-import { artistService } from '@/services/artistService'
 import { venueService } from '@/services/venueService'
 import { attendeeService } from '@/services/attendeeService'
 import { festivalService } from '@/services/festivalService'
 
 import type { Country } from '@/models/Country'
 import type { City } from '@/models/City'
-import type { Artist } from '@/models/Artist'
 import type { Venue } from '@/models/Venue'
 import type { Attendee } from '@/models/Attendee'
 import type { Festival } from '@/models/Festival'
@@ -33,7 +31,6 @@ const confirm = useConfirm()
 // ── Data ──────────────────────────────────────────────────────────────
 const countries = ref<Country[]>([])
 const cities = ref<City[]>([])
-const artists = ref<Artist[]>([])
 const venues = ref<Venue[]>([])
 const attendees = ref<Attendee[]>([])
 const festivals = ref<Festival[]>([])
@@ -42,7 +39,6 @@ const loading = ref(true)
 // ── Search ────────────────────────────────────────────────────────────
 const countryQ = ref('')
 const cityQ = ref('')
-const artistQ = ref('')
 const venueQ = ref('')
 const attendeeQ = ref('')
 const festivalQ = ref('')
@@ -50,7 +46,6 @@ const festivalQ = ref('')
 // ── Editing rows ──────────────────────────────────────────────────────
 const countryEditing = ref<any[]>([])
 const cityEditing = ref<any[]>([])
-const artistEditing = ref<any[]>([])
 const venueEditing = ref<any[]>([])
 const attendeeEditing = ref<any[]>([])
 const festivalEditing = ref<any[]>([])
@@ -58,14 +53,12 @@ const festivalEditing = ref<any[]>([])
 // ── New item forms ────────────────────────────────────────────────────
 const addingCountry = ref(false)
 const addingCity = ref(false)
-const addingArtist = ref(false)
 const addingVenue = ref(false)
 const addingAttendee = ref(false)
 const addingFestival = ref(false)
 
 const newCountry = ref({ name: '' })
 const newCity = ref({ name: '', country_id: null as number | null })
-const newArtist = ref({ name: '', country_id: null as number | null })
 const newVenue = ref({ name: '', city_id: null as number | null })
 const newAttendee = ref({ firstname: '', lastname: '' })
 const newFestival = ref({ name: '' })
@@ -80,12 +73,6 @@ const filteredCities = computed(() => {
   return q ? cities.value.filter(c =>
     c.name.toLowerCase().includes(q) || c.country?.name.toLowerCase().includes(q)
   ) : cities.value
-})
-const filteredArtists = computed(() => {
-  const q = artistQ.value.toLowerCase()
-  return q ? artists.value.filter(a =>
-    a.name.toLowerCase().includes(q) || (a.country?.name ?? '').toLowerCase().includes(q)
-  ) : artists.value
 })
 const filteredVenues = computed(() => {
   const q = venueQ.value.toLowerCase()
@@ -109,17 +96,15 @@ const filteredFestivals = computed(() => {
 // ── Load ──────────────────────────────────────────────────────────────
 onMounted(async () => {
   try {
-    const [c, ci, a, v, at, f] = await Promise.all([
+    const [c, ci, v, at, f] = await Promise.all([
       countryService.getAll(),
       cityService.getAll(),
-      artistService.getAll(),
       venueService.getAll(),
       attendeeService.getAll(),
       festivalService.getAll(),
     ])
     countries.value = c
     cities.value = ci
-    artists.value = a
     venues.value = v
     attendees.value = at
     festivals.value = f
@@ -179,26 +164,6 @@ async function createCity() {
   cities.value = await cityService.getAll()
   newCity.value = { name: '', country_id: null }
   addingCity.value = false
-}
-
-// ── Artists ───────────────────────────────────────────────────────────
-async function onArtistSave(event: any) {
-  const { newData } = event
-  await artistService.update(newData.id, newData.name, newData.country_id)
-  artists.value = await artistService.getAll()
-}
-function onArtistDelete(row: Artist) {
-  confirmDelete(row.name, async () => {
-    await artistService.delete(row.id)
-    artists.value = artists.value.filter(a => a.id !== row.id)
-  })
-}
-async function createArtist() {
-  if (!newArtist.value.name.trim()) return
-  await artistService.create(newArtist.value.name.trim(), newArtist.value.country_id)
-  artists.value = await artistService.getAll()
-  newArtist.value = { name: '', country_id: null }
-  addingArtist.value = false
 }
 
 // ── Venues ────────────────────────────────────────────────────────────
@@ -273,9 +238,8 @@ async function createFestival() {
 
     <div v-if="loading" class="text-gray-400 text-sm py-8 text-center">Loading…</div>
 
-    <Tabs v-else value="artists">
+    <Tabs v-else value="venues">
       <TabList>
-        <Tab value="artists">Artists ({{ artists.length }})</Tab>
         <Tab value="venues">Venues ({{ venues.length }})</Tab>
         <Tab value="cities">Cities ({{ cities.length }})</Tab>
         <Tab value="countries">Countries ({{ countries.length }})</Tab>
@@ -284,48 +248,6 @@ async function createFestival() {
       </TabList>
 
       <TabPanels>
-
-        <!-- ── ARTISTS ── -->
-        <TabPanel value="artists">
-          <div class="flex gap-2 mb-3 mt-4">
-            <IconField class="flex-1">
-              <InputIcon class="pi pi-search" />
-              <InputText v-model="artistQ" placeholder="Search artists…" class="w-full" />
-            </IconField>
-            <Button icon="pi pi-plus" label="Add" size="small" @click="addingArtist = !addingArtist" />
-          </div>
-
-          <div v-if="addingArtist" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <InputText v-model="newArtist.name" placeholder="Name *" class="flex-1" @keyup.enter="createArtist" />
-            <Select v-model="newArtist.country_id" :options="countries" optionLabel="name" optionValue="id"
-              showClear placeholder="Country" class="w-40" />
-            <Button icon="pi pi-check" size="small" @click="createArtist" :disabled="!newArtist.name.trim()" />
-            <Button icon="pi pi-times" size="small" severity="secondary" text @click="addingArtist = false" />
-          </div>
-
-          <DataTable :value="filteredArtists" dataKey="id" editMode="row"
-            v-model:editingRows="artistEditing" @row-edit-save="onArtistSave"
-            class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-            <Column field="name" header="Name">
-              <template #editor="{ data, field }">
-                <InputText v-model="data[field]" class="w-full" />
-              </template>
-            </Column>
-            <Column header="Country" style="width: 180px">
-              <template #body="{ data }">{{ data.country?.name ?? '—' }}</template>
-              <template #editor="{ data }">
-                <Select v-model="data.country_id" :options="countries" optionLabel="name" optionValue="id"
-                  showClear placeholder="None" class="w-full" />
-              </template>
-            </Column>
-            <Column :rowEditor="true" style="width: 6rem" />
-            <Column style="width: 3rem">
-              <template #body="{ data }">
-                <Button icon="pi pi-trash" text rounded severity="danger" size="small" @click="onArtistDelete(data)" />
-              </template>
-            </Column>
-          </DataTable>
-        </TabPanel>
 
         <!-- ── VENUES ── -->
         <TabPanel value="venues">
@@ -340,8 +262,7 @@ async function createFestival() {
           <div v-if="addingVenue" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <InputText v-model="newVenue.name" placeholder="Name *" class="flex-1" @keyup.enter="createVenue" />
             <Select v-model="newVenue.city_id" :options="cities" optionLabel="name" optionValue="id"
-              showClear placeholder="City *" filter class="w-48"
-              :optionGroupLabel="undefined">
+              showClear placeholder="City *" filter class="w-48">
               <template #option="{ option }">
                 {{ option.name }}<span class="text-gray-400 text-xs ml-1">({{ option.country?.name }})</span>
               </template>
@@ -353,19 +274,19 @@ async function createFestival() {
           <DataTable :value="filteredVenues" dataKey="id" editMode="row"
             v-model:editingRows="venueEditing" @row-edit-save="onVenueSave"
             class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-            <Column field="name" header="Name">
+            <Column field="name" header="Name" sortable>
               <template #editor="{ data, field }">
                 <InputText v-model="data[field]" class="w-full" />
               </template>
             </Column>
-            <Column header="City" style="width: 160px">
+            <Column header="City" style="width: 160px" sortable sort-field="city.name">
               <template #body="{ data }">{{ data.city?.name ?? '—' }}</template>
               <template #editor="{ data }">
                 <Select v-model="data.city_id" :options="cities" optionLabel="name" optionValue="id"
                   filter placeholder="City" class="w-full" />
               </template>
             </Column>
-            <Column header="Country" style="width: 140px">
+            <Column header="Country" style="width: 140px" sortable sort-field="city.country.name">
               <template #body="{ data }">{{ data.city?.country?.name ?? '—' }}</template>
             </Column>
             <Column :rowEditor="true" style="width: 6rem" />
@@ -398,12 +319,12 @@ async function createFestival() {
           <DataTable :value="filteredCities" dataKey="id" editMode="row"
             v-model:editingRows="cityEditing" @row-edit-save="onCitySave"
             class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-            <Column field="name" header="Name">
+            <Column field="name" header="Name" sortable>
               <template #editor="{ data, field }">
                 <InputText v-model="data[field]" class="w-full" />
               </template>
             </Column>
-            <Column header="Country" style="width: 180px">
+            <Column header="Country" style="width: 180px" sortable sort-field="country.name">
               <template #body="{ data }">{{ data.country?.name ?? '—' }}</template>
               <template #editor="{ data }">
                 <Select v-model="data.country_id" :options="countries" optionLabel="name" optionValue="id"
@@ -438,7 +359,7 @@ async function createFestival() {
           <DataTable :value="filteredCountries" dataKey="id" editMode="row"
             v-model:editingRows="countryEditing" @row-edit-save="onCountrySave"
             class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-            <Column field="name" header="Name">
+            <Column field="name" header="Name" sortable>
               <template #editor="{ data, field }">
                 <InputText v-model="data[field]" class="w-full" />
               </template>
@@ -472,12 +393,12 @@ async function createFestival() {
           <DataTable :value="filteredAttendees" dataKey="id" editMode="row"
             v-model:editingRows="attendeeEditing" @row-edit-save="onAttendeeSave"
             class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-            <Column field="firstname" header="First name">
+            <Column field="firstname" header="First name" sortable>
               <template #editor="{ data, field }">
                 <InputText v-model="data[field]" class="w-full" />
               </template>
             </Column>
-            <Column field="lastname" header="Last name">
+            <Column field="lastname" header="Last name" sortable>
               <template #body="{ data }">{{ data.lastname ?? '—' }}</template>
               <template #editor="{ data, field }">
                 <InputText v-model="data[field]" class="w-full" />
@@ -511,7 +432,7 @@ async function createFestival() {
           <DataTable :value="filteredFestivals" dataKey="id" editMode="row"
             v-model:editingRows="festivalEditing" @row-edit-save="onFestivalSave"
             class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-            <Column field="name" header="Name">
+            <Column field="name" header="Name" sortable>
               <template #editor="{ data, field }">
                 <InputText v-model="data[field]" class="w-full" />
               </template>
