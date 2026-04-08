@@ -116,12 +116,6 @@ async function createAttendee() {
           <template #body="{ data }">{{ data.lastname ?? '—' }}</template>
           <template #editor="{ data, field }"><InputText v-model="data[field]" class="w-full" /></template>
         </Column>
-        <Column field="events" header="Events" sortable style="width:90px">
-          <template #body="{ data }"><span class="font-semibold" :class="data.events > 0 ? 'text-violet-600 dark:text-violet-400' : 'text-gray-400'">{{ data.events }}</span></template>
-        </Column>
-        <Column field="artists" header="Artists" sortable style="width:85px">
-          <template #body="{ data }"><span :class="data.artists > 0 ? '' : 'text-gray-400'">{{ data.artists || '—' }}</span></template>
-        </Column>
         <Column field="firstEvent" header="First event" sortable style="width:115px">
           <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.firstEvent) }}</span></template>
         </Column>
@@ -130,10 +124,20 @@ async function createAttendee() {
         </Column>
         <Column :rowEditor="true" style="width:6rem" />
         <Column style="width:3rem">
-          <template #body="{ data }"><Button icon="pi pi-trash" text rounded severity="danger" size="small" @click="onDelete(data)" /></template>
+          <template #body="{ data }">
+            <Button v-if="editingRows.find(r => r.id === data.id)" icon="pi pi-trash" text rounded severity="danger" size="small" @click="onDelete(data)" />
+          </template>
         </Column>
         <template #expansion="{ data }">
-          <div class="px-4 py-3">
+          <div class="px-4 py-4">
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
+                <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.events }}</span><span class="text-gray-500">events</span>
+              </span>
+              <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
+                <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.artists }}</span><span class="text-gray-500">artists</span>
+              </span>
+            </div>
             <p v-if="data.eventList.length === 0" class="text-sm text-gray-400">No shared events recorded.</p>
             <table v-else class="w-full text-sm">
               <thead><tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 dark:border-gray-800">
