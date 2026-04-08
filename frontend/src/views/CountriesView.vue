@@ -68,6 +68,10 @@ const filtered = computed(() => {
   return q ? countryRows.value.filter(c => c.name.toLowerCase().includes(q)) : countryRows.value
 })
 
+function startEdit(row: CountryRow) { editingRows.value = [...editingRows.value, row] }
+function cancelEdit(row: CountryRow) { editingRows.value = editingRows.value.filter(r => r.id !== row.id) }
+async function saveRow(data: CountryRow) { await onSave({ newData: data }); editingRows.value = editingRows.value.filter(r => r.id !== data.id) }
+
 async function onSave(event: any) {
   const { newData } = event
   await countryService.update(newData.id, newData.name)
@@ -92,23 +96,20 @@ async function createCountry() {
 
 <template>
   <div>
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Countries</h2>
-      <Button icon="pi pi-plus" label="Add country" size="small" @click="addingCountry = !addingCountry" />
-    </div>
     <div v-if="loading" class="flex justify-center py-16"><ProgressSpinner style="width:40px;height:40px" /></div>
     <template v-else>
       <div class="flex gap-2 mb-3">
         <IconField class="flex-1"><InputIcon class="pi pi-search" /><InputText v-model="search" placeholder="Search countries…" class="w-full" /></IconField>
         <span class="text-xs text-gray-400 self-center whitespace-nowrap">{{ filtered.length }} countr{{ filtered.length !== 1 ? 'ies' : 'y' }}</span>
+        <Button icon="pi pi-plus" label="Add" size="small" @click="addingCountry = !addingCountry" />
       </div>
       <div v-if="addingCountry" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <InputText v-model="newCountryName" placeholder="Name *" class="flex-1" @keyup.enter="createCountry" />
         <Button icon="pi pi-check" size="small" @click="createCountry" :disabled="!newCountryName.trim()" />
         <Button icon="pi pi-times" size="small" severity="secondary" text @click="addingCountry = false" />
       </div>
-      <DataTable :value="filtered" dataKey="id" sortField="events" :sortOrder="-1"
-        v-model:expandedRows="expandedRows" editMode="row" v-model:editingRows="editingRows" @row-edit-save="onSave"
+      <DataTable :value="filtered" dataKey="id" sortField="events" :sortOrder="-1" size="small"
+        v-model:expandedRows="expandedRows" editMode="row" v-model:editingRows="editingRows"
         class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
         <Column expander style="width:3rem" />
         <Column field="name" header="Country" sortable>
@@ -120,10 +121,16 @@ async function createCountry() {
         <Column field="lastVisit" header="Last visit" sortable style="width:115px">
           <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.lastVisit) }}</span></template>
         </Column>
-        <Column :rowEditor="true" style="width:6rem" />
-        <Column style="width:3rem">
+        <Column style="width:5.5rem">
           <template #body="{ data }">
-            <Button v-if="editingRows.find(r => r.id === data.id)" icon="pi pi-trash" text rounded severity="danger" size="small" @click="onDelete(data)" />
+            <Button icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
+          </template>
+          <template #editor="{ data }">
+            <div class="flex gap-0.5">
+              <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
+              <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
+              <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onDelete(data)" />
+            </div>
           </template>
         </Column>
         <template #expansion="{ data }">

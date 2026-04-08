@@ -86,6 +86,10 @@ const filtered = computed(() => {
   return q ? venueRows.value.filter(v => v.name.toLowerCase().includes(q) || v.cityName.toLowerCase().includes(q) || v.countryName.toLowerCase().includes(q)) : venueRows.value
 })
 
+function startEdit(row: VenueRow) { editingRows.value = [...editingRows.value, row] }
+function cancelEdit(row: VenueRow) { editingRows.value = editingRows.value.filter(r => r.id !== row.id) }
+async function saveRow(data: VenueRow) { await onSave({ newData: data }); editingRows.value = editingRows.value.filter(r => r.id !== data.id) }
+
 async function onSave(event: any) {
   const { newData } = event
   await venueService.update(newData.id, newData.name, newData.city_id)
@@ -111,15 +115,12 @@ async function createVenue() {
 
 <template>
   <div>
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Venues</h2>
-      <Button icon="pi pi-plus" label="Add venue" size="small" @click="addingVenue = !addingVenue" />
-    </div>
     <div v-if="loading" class="flex justify-center py-16"><ProgressSpinner style="width:40px;height:40px" /></div>
     <template v-else>
       <div class="flex gap-2 mb-3">
         <IconField class="flex-1"><InputIcon class="pi pi-search" /><InputText v-model="search" placeholder="Search venues…" class="w-full" /></IconField>
         <span class="text-xs text-gray-400 self-center whitespace-nowrap">{{ filtered.length }} venue{{ filtered.length !== 1 ? 's' : '' }}</span>
+        <Button icon="pi pi-plus" label="Add" size="small" @click="addingVenue = !addingVenue" />
       </div>
       <div v-if="addingVenue" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <InputText v-model="newVenue.name" placeholder="Name *" class="flex-1" @keyup.enter="createVenue" />
@@ -129,8 +130,8 @@ async function createVenue() {
         <Button icon="pi pi-check" size="small" @click="createVenue" :disabled="!newVenue.name.trim() || !newVenue.city_id" />
         <Button icon="pi pi-times" size="small" severity="secondary" text @click="addingVenue = false" />
       </div>
-      <DataTable :value="filtered" dataKey="id" sortField="events" :sortOrder="-1"
-        v-model:expandedRows="expandedRows" editMode="row" v-model:editingRows="editingRows" @row-edit-save="onSave"
+      <DataTable :value="filtered" dataKey="id" sortField="events" :sortOrder="-1" size="small"
+        v-model:expandedRows="expandedRows" editMode="row" v-model:editingRows="editingRows"
         class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
         <Column expander style="width:3rem" />
         <Column field="name" header="Venue" sortable>
@@ -151,10 +152,16 @@ async function createVenue() {
         <Column field="lastVisit" header="Last visit" sortable style="width:115px">
           <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.lastVisit) }}</span></template>
         </Column>
-        <Column :rowEditor="true" style="width:6rem" />
-        <Column style="width:3rem">
+        <Column style="width:5.5rem">
           <template #body="{ data }">
-            <Button v-if="editingRows.find(r => r.id === data.id)" icon="pi pi-trash" text rounded severity="danger" size="small" @click="onDelete(data)" />
+            <Button icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
+          </template>
+          <template #editor="{ data }">
+            <div class="flex gap-0.5">
+              <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
+              <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
+              <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onDelete(data)" />
+            </div>
           </template>
         </Column>
         <template #expansion="{ data }">

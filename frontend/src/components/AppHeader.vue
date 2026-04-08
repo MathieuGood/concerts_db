@@ -1,12 +1,22 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import Button from 'primevue/button'
 import { useConfirm } from 'primevue/useconfirm'
 import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const route = useRoute()
 const confirm = useConfirm()
+
+const libraryLinks = [
+  { icon: 'pi-star', path: '/artists', label: 'Artists' },
+  { icon: 'pi-building', path: '/venues', label: 'Venues' },
+  { icon: 'pi-map-marker', path: '/cities', label: 'Cities' },
+  { icon: 'pi-globe', path: '/countries', label: 'Countries' },
+  { icon: 'pi-users', path: '/attendees', label: 'People' },
+  { icon: 'pi-ticket', path: '/festivals', label: 'Festivals' },
+]
 const { user, isAdmin, logout } = useAuth()
 
 function confirmLogout() {
@@ -33,9 +43,15 @@ function toggleTheme() {
 
 onMounted(() => {
   const saved = localStorage.getItem('theme')
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  isDark.value = saved ? saved === 'dark' : prefersDark
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  isDark.value = saved ? saved === 'dark' : mediaQuery.matches
   if (isDark.value) document.documentElement.classList.add('dark')
+  mediaQuery.addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      isDark.value = e.matches
+      document.documentElement.classList.toggle('dark', e.matches)
+    }
+  })
 })
 </script>
 
@@ -58,21 +74,15 @@ onMounted(() => {
         />
 
         <Button
-          icon="pi pi-star"
+          v-for="link in libraryLinks"
+          :key="link.path"
+          :icon="`pi ${link.icon}`"
           size="small"
           rounded
-          text
-          @click="router.push('/artists')"
-          aria-label="Artists"
-        />
-
-        <Button
-          icon="pi pi-book"
-          size="small"
-          rounded
-          text
-          @click="router.push('/library')"
-          aria-label="Library"
+          :text="route.path !== link.path"
+          :severity="route.path === link.path ? undefined : 'secondary'"
+          @click="router.push(link.path)"
+          :aria-label="link.label"
         />
 
         <Button
