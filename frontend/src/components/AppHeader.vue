@@ -76,8 +76,8 @@ onMounted(() => {
           aria-label="Admin panel"
         />
 
-        <span class="hidden sm:block text-xs text-gray-500 dark:text-gray-400 max-w-[120px] truncate">
-          {{ user?.name ?? user?.email }}
+        <span v-if="user?.name" class="hidden sm:block text-xs text-gray-500 dark:text-gray-400 max-w-[120px] truncate">
+          {{ user.name }}
         </span>
 
         <Button
