@@ -324,6 +324,8 @@ Import logic (to implement):
 
 Non-concerts (sports, cinema, clubbing passes, etc.) are excluded from the CSV.
 
+⚠️ **TODO — Review des billets à faire** : les données du CSV ont été extraites automatiquement par vision IA depuis les photos. Une review manuelle billet par billet a été commencée (2/144 validés) mais n'est pas terminée. Avant d'importer ce CSV en production, reprendre la review avec : *"on reprend la review des billets"* — Claude affichera chaque billet dans le browser avec les données importées côte à côte.
+
 ### Festival tickets — special workflow (TODO, resume later)
 
 Festival day/weekend passes don't list individual artists. The workflow to handle them:

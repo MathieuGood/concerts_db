@@ -48,7 +48,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "https://concerts.mathieubon.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

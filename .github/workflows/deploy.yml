@@ -1,0 +1,33 @@
+name: 🚀 Deploy to VPS
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy via SSH
+              uses: appleboy/ssh-action@v1.2.0
+              with:
+                  host: ${{ secrets.VPS_HOST }}
+                  username: ${{ secrets.VPS_USER }}
+                  key: ${{ secrets.VPS_SSH_KEY }}
+                  script: |
+                      if [ ! -d ~/apps/concerts_db ]; then
+                          git clone https://github.com/MathieuGood/concerts_db ~/apps/concerts_db
+                      fi
+                      cd ~/apps/concerts_db
+                      git pull origin main
+                      if [ ! -f backend/.env ]; then
+                          cat > backend/.env << 'EOF'
+DATABASE_URI=sqlite+pysqlite:////data/concerts_db.sqlite
+TEST_DATABASE_URI=sqlite:///:memory:
+DEMO_MODE=FALSE
+PYTHONPATH=src
+EOF
+                      fi
+                      mkdir -p data backups
+                      docker compose -f docker-compose.prod.yml up -d --build
