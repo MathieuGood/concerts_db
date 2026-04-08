@@ -54,7 +54,7 @@ def migrate():
         if not existing:
             hashed = hash_password(ADMIN_PASSWORD)
             conn.execute(text(
-                "INSERT INTO users (email, hashed_password, is_admin) VALUES (:e, :h, 1)"
+                "INSERT INTO users (email, hashed_password, is_admin, created_at) VALUES (:e, :h, 1, CURRENT_TIMESTAMP)"
             ), {"e": ADMIN_EMAIL, "h": hashed})
             print(f"Created admin user: {ADMIN_EMAIL}")
         else:
