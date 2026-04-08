@@ -329,4 +329,4 @@ Pending festivals to process (see previous CLAUDE.md version for full list).
 - **Photos/videos** — backend supports them, frontend does not yet.
 - **No pagination** on list endpoints — fine for personal use.
 - **`models/address.py`** — unused, safe to delete.
-- **Admin password change UI** — no dedicated "change my password" UI yet; only admin can reset via delete+recreate.
+- **Admin password change UI** — implemented: "Change my password" section in `/admin` (requires current password); admin can also force-reset any user's password via the key icon per user row.

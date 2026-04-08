@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from database.database import get_db
-from schemas.user import UserCreate, UserResponse
+from schemas.user import UserCreate, UserResponse, ResetPasswordRequest
 from schemas.response import ApiResponse
 from crud import user as user_crud
+from crud.user import reset_password
 from auth.dependencies import require_admin
 from models.user import User
 
@@ -19,6 +20,12 @@ def list_users(_: User = Depends(require_admin), db: Session = Depends(get_db)):
 @router.post("/users", response_model=ApiResponse[UserResponse])
 def create_user(user_in: UserCreate, _: User = Depends(require_admin), db: Session = Depends(get_db)):
     return ApiResponse(success=True, data=user_crud.create(db, user_in))
+
+
+@router.put("/users/{user_id}/password", response_model=ApiResponse[UserResponse])
+def reset_user_password(user_id: int, body: ResetPasswordRequest, _: User = Depends(require_admin), db: Session = Depends(get_db)):
+    updated = reset_password(db, user_id, body.new_password)
+    return ApiResponse(success=True, data=UserResponse.model_validate(updated))
 
 
 @router.delete("/users/{user_id}")
