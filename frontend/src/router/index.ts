@@ -5,6 +5,11 @@ import LoginView from '@/views/LoginView.vue'
 import AdminView from '@/views/AdminView.vue'
 import LibraryView from '@/views/LibraryView.vue'
 import ArtistsView from '@/views/ArtistsView.vue'
+import VenuesView from '@/views/VenuesView.vue'
+import CitiesView from '@/views/CitiesView.vue'
+import CountriesView from '@/views/CountriesView.vue'
+import AttendeesView from '@/views/AttendeesView.vue'
+import FestivalsView from '@/views/FestivalsView.vue'
 import { isLoggedIn, getStoredUser } from '@/services/authService'
 
 const router = createRouter({
@@ -16,6 +21,11 @@ const router = createRouter({
     { path: '/event/:id', component: EventForm },
     { path: '/library', component: LibraryView },
     { path: '/artists', component: ArtistsView },
+    { path: '/venues', component: VenuesView },
+    { path: '/cities', component: CitiesView },
+    { path: '/countries', component: CountriesView },
+    { path: '/attendees', component: AttendeesView },
+    { path: '/festivals', component: FestivalsView },
     { path: '/admin', component: AdminView },
   ],
 })

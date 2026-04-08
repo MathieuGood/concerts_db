@@ -120,7 +120,7 @@ onMounted(async () => {
         countries: s?.countryIds.size ?? 0,
         firstSeen: s?.firstSeen ?? null,
         lastSeen: s?.lastSeen ?? null,
-        events: s?.events.sort((a, b) => a.date.localeCompare(b.date)) ?? [],
+        events: s?.events.sort((a, b) => b.date.localeCompare(a.date)) ?? [],
       }
     })
   } finally {
