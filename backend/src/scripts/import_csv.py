@@ -9,6 +9,7 @@ Already-existing events (same date + venue) are skipped safely.
 """
 import csv
 import sys
+from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -122,7 +123,7 @@ def import_csv():
                         festival_id = find_or_create_festival(db, festival_name).id
 
                     event = Event(
-                        event_date=event_date,
+                        event_date=date.fromisoformat(event_date),
                         comments=comments,
                         venue_id=venue.id,
                         festival_id=festival_id,
