@@ -136,7 +136,6 @@ function confirmDelete(label: string, onAccept: () => Promise<void>) {
     icon: 'pi pi-exclamation-triangle',
     acceptLabel: 'Delete',
     rejectLabel: 'Cancel',
-    acceptSeverity: 'danger',
     accept: onAccept,
   })
 }
@@ -146,7 +145,7 @@ async function onCountrySave(event: any) {
   const { newData } = event
   await countryService.update(newData.id, newData.name)
   const idx = countries.value.findIndex(c => c.id === newData.id)
-  if (idx !== -1) countries.value[idx] = { ...countries.value[idx], name: newData.name }
+  if (idx !== -1) countries.value[idx] = { id: countries.value[idx].id, name: String(newData.name) }
 }
 function onCountryDelete(row: Country) {
   confirmDelete(row.name, async () => {
@@ -251,7 +250,7 @@ async function onFestivalSave(event: any) {
   const { newData } = event
   await festivalService.update(newData.id, newData.name)
   const idx = festivals.value.findIndex(f => f.id === newData.id)
-  if (idx !== -1) festivals.value[idx] = { ...festivals.value[idx], name: newData.name }
+  if (idx !== -1) festivals.value[idx] = { id: festivals.value[idx].id, name: String(newData.name) }
 }
 function onFestivalDelete(row: Festival) {
   confirmDelete(row.name, async () => {

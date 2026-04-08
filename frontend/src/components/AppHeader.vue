@@ -16,7 +16,6 @@ function confirmLogout() {
     icon: 'pi pi-sign-out',
     rejectLabel: 'Cancel',
     acceptLabel: 'Sign out',
-    acceptSeverity: 'danger',
     accept: logout,
   })
 }
