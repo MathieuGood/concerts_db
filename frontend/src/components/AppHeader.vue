@@ -2,10 +2,24 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
+import { useConfirm } from 'primevue/useconfirm'
 import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const confirm = useConfirm()
 const { user, isAdmin, logout } = useAuth()
+
+function confirmLogout() {
+  confirm.require({
+    message: 'Are you sure you want to sign out?',
+    header: 'Sign out',
+    icon: 'pi pi-sign-out',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Sign out',
+    acceptSeverity: 'danger',
+    accept: logout,
+  })
+}
 const isDark = ref(false)
 
 function toggleTheme() {
@@ -42,15 +56,6 @@ onMounted(() => {
           icon="pi pi-plus"
           size="small"
           @click="router.push('/event/new')"
-          class="hidden sm:flex"
-        />
-        <Button
-          icon="pi pi-plus"
-          size="small"
-          rounded
-          @click="router.push('/event/new')"
-          class="sm:hidden"
-          aria-label="New event"
         />
 
         <Button
@@ -73,7 +78,7 @@ onMounted(() => {
           rounded
           text
           severity="secondary"
-          @click="logout"
+          @click="confirmLogout"
           aria-label="Sign out"
         />
 
