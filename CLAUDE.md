@@ -223,7 +223,7 @@ User ──── Event ──── Festival (optional)
 
 | Table | Key columns | Notes |
 |-------|-------------|-------|
-| `users` | `id`, `email`, `hashed_password`, `is_admin`, `created_at` | `email` unique |
+| `users` | `id`, `email`, `hashed_password`, `name`, `is_admin`, `created_at` | `email` unique; `name` nullable |
 | `countries` | `id`, `name` | `name` unique; shared across users |
 | `cities` | `id`, `name`, `country_id` | Unique: (name, country_id); shared |
 | `artists` | `id`, `name`, `country_id` | `name` unique; `country_id` nullable; shared |

@@ -4,6 +4,7 @@ import type { User } from './authService'
 export interface CreateUserPayload {
   email: string
   password: string
+  name?: string
   is_admin: boolean
 }
 

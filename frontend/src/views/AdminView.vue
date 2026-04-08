@@ -15,7 +15,7 @@ const loading = ref(false)
 const error = ref('')
 const success = ref('')
 
-const form = ref<CreateUserPayload>({ email: '', password: '', is_admin: false })
+const form = ref<CreateUserPayload>({ email: '', password: '', name: '', is_admin: false })
 const creating = ref(false)
 
 // Reset password state per user
@@ -47,7 +47,7 @@ async function createUser() {
   creating.value = true
   try {
     await adminService.createUser(form.value)
-    form.value = { email: '', password: '', is_admin: false }
+    form.value = { email: '', password: '', name: '', is_admin: false }
     success.value = 'User created.'
     await fetchUsers()
   } catch (e: unknown) {
@@ -133,7 +133,8 @@ onMounted(fetchUsers)
       >
         <div class="flex items-center justify-between">
           <div>
-            <span class="font-medium text-gray-800 dark:text-gray-200">{{ u.email }}</span>
+            <span class="font-medium text-gray-800 dark:text-gray-200">{{ u.name ?? u.email }}</span>
+          <span v-if="u.name" class="ml-2 text-xs text-gray-400">{{ u.email }}</span>
             <span v-if="u.is_admin" class="ml-2 text-xs bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full">admin</span>
             <div class="text-xs text-gray-400">{{ new Date(u.created_at).toLocaleDateString() }}</div>
           </div>
@@ -177,6 +178,7 @@ onMounted(fetchUsers)
     <div class="bg-white dark:bg-gray-900 rounded-xl shadow p-6 mb-6">
       <h3 class="text-base font-semibold mb-4 text-gray-800 dark:text-gray-200">Invite a user</h3>
       <form @submit.prevent="createUser" class="flex flex-col gap-3">
+        <InputText v-model="form.name" placeholder="Name" class="w-full" />
         <InputText v-model="form.email" type="email" placeholder="Email" required class="w-full" />
         <Password v-model="form.password" :feedback="false" toggleMask placeholder="Password" required class="w-full" inputClass="w-full" />
         <div class="flex items-center gap-2">

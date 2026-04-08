@@ -3,6 +3,7 @@ const BASE_URL = '/api'
 export interface User {
   id: number
   email: string
+  name: string | null
   is_admin: boolean
   created_at: string
 }

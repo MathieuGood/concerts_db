@@ -1,16 +1,19 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 from datetime import datetime
+from typing import Optional
 
 
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
+    name: Optional[str] = None
     is_admin: bool = False
 
 
 class UserResponse(BaseModel):
     id: int
     email: str
+    name: Optional[str] = None
     is_admin: bool
     created_at: datetime
 
