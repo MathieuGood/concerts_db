@@ -101,6 +101,7 @@ async function createCountry() {
       <div class="flex gap-2 mb-3">
         <IconField class="flex-1"><InputIcon class="pi pi-search" /><InputText v-model="search" placeholder="Search countries…" class="w-full" /></IconField>
         <span class="text-xs text-gray-400 self-center whitespace-nowrap">{{ filtered.length }} countr{{ filtered.length !== 1 ? 'ies' : 'y' }}</span>
+        <div class="w-px h-5 self-center bg-gray-200 dark:bg-gray-700" />
         <Button icon="pi pi-plus" label="Add" size="small" @click="addingCountry = !addingCountry" />
       </div>
       <div v-if="addingCountry" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -114,6 +115,9 @@ async function createCountry() {
         <Column expander style="width:3rem" />
         <Column field="name" header="Country" sortable>
           <template #editor="{ data, field }"><InputText v-model="data[field]" class="w-full" /></template>
+        </Column>
+        <Column field="events" header="Shows" sortable style="width:75px">
+          <template #body="{ data }"><span class="font-semibold" :class="data.events > 0 ? 'text-violet-600 dark:text-violet-400' : 'text-gray-400'">{{ data.events || '—' }}</span></template>
         </Column>
         <Column field="firstVisit" header="First visit" sortable style="width:115px">
           <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.firstVisit) }}</span></template>

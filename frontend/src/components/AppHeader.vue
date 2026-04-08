@@ -74,6 +74,16 @@ onMounted(() => {
         />
 
         <Button
+          icon="pi pi-calendar"
+          size="small"
+          rounded
+          :text="route.path !== '/'"
+          :severity="route.path === '/' ? undefined : 'secondary'"
+          @click="router.push('/')"
+          aria-label="Shows"
+        />
+
+        <Button
           v-for="link in libraryLinks"
           :key="link.path"
           :icon="`pi ${link.icon}`"
@@ -87,7 +97,7 @@ onMounted(() => {
 
         <Button
           v-if="isAdmin"
-          icon="pi pi-users"
+          icon="pi pi-shield"
           size="small"
           rounded
           text

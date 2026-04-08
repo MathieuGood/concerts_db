@@ -123,6 +123,7 @@ async function createArtist() {
       <div class="flex gap-2 mb-3">
         <IconField class="flex-1"><InputIcon class="pi pi-search" /><InputText v-model="search" placeholder="Search artists…" class="w-full" /></IconField>
         <span class="text-xs text-gray-400 self-center whitespace-nowrap">{{ filtered.length }} artist{{ filtered.length !== 1 ? 's' : '' }}</span>
+        <div class="w-px h-5 self-center bg-gray-200 dark:bg-gray-700" />
         <Button icon="pi pi-plus" label="Add" size="small" @click="addingArtist = !addingArtist" />
       </div>
       <div v-if="addingArtist" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">

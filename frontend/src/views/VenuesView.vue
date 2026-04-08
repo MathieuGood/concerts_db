@@ -120,6 +120,7 @@ async function createVenue() {
       <div class="flex gap-2 mb-3">
         <IconField class="flex-1"><InputIcon class="pi pi-search" /><InputText v-model="search" placeholder="Search venues…" class="w-full" /></IconField>
         <span class="text-xs text-gray-400 self-center whitespace-nowrap">{{ filtered.length }} venue{{ filtered.length !== 1 ? 's' : '' }}</span>
+        <div class="w-px h-5 self-center bg-gray-200 dark:bg-gray-700" />
         <Button icon="pi pi-plus" label="Add" size="small" @click="addingVenue = !addingVenue" />
       </div>
       <div v-if="addingVenue" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -145,6 +146,9 @@ async function createVenue() {
         </Column>
         <Column field="countryName" header="Country" sortable style="width:130px">
           <template #body="{ data }">{{ data.city?.country?.name ?? '—' }}</template>
+        </Column>
+        <Column field="events" header="Shows" sortable style="width:75px">
+          <template #body="{ data }"><span class="font-semibold" :class="data.events > 0 ? 'text-violet-600 dark:text-violet-400' : 'text-gray-400'">{{ data.events || '—' }}</span></template>
         </Column>
         <Column field="firstVisit" header="First visit" sortable style="width:115px">
           <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.firstVisit) }}</span></template>
