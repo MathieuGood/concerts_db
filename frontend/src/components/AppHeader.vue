@@ -59,6 +59,15 @@ onMounted(() => {
         />
 
         <Button
+          icon="pi pi-book"
+          size="small"
+          rounded
+          text
+          @click="router.push('/library')"
+          aria-label="Library"
+        />
+
+        <Button
           v-if="isAdmin"
           icon="pi pi-users"
           size="small"

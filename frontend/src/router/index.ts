@@ -3,6 +3,7 @@ import EventList from '@/views/EventList.vue'
 import EventForm from '@/views/EventForm.vue'
 import LoginView from '@/views/LoginView.vue'
 import AdminView from '@/views/AdminView.vue'
+import LibraryView from '@/views/LibraryView.vue'
 import { isLoggedIn, getStoredUser } from '@/services/authService'
 
 const router = createRouter({
@@ -12,6 +13,7 @@ const router = createRouter({
     { path: '/', component: EventList },
     { path: '/event/new', component: EventForm },
     { path: '/event/:id', component: EventForm },
+    { path: '/library', component: LibraryView },
     { path: '/admin', component: AdminView },
   ],
 })

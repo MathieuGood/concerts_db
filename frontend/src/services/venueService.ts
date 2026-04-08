@@ -5,4 +5,7 @@ export const venueService = {
   getAll: () => api.get<Venue[]>('/venue/'),
   create: (name: string, city_id: number) =>
     api.post<Venue>('/venue/', { name, city_id }),
+  update: (id: number, name: string, city_id: number) =>
+    api.put<Venue>(`/venue/${id}`, { name, city_id }),
+  delete: (id: number) => api.delete(`/venue/${id}`),
 }
