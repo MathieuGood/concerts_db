@@ -20,11 +20,14 @@ For full deployment procedures and VPS infrastructure details, see:
 | `VPS_USER` | `ubuntu` |
 | `SECRET_KEY` | random string for JWT signing (e.g. `openssl rand -hex 32`) |
 
-### After deploying auth for the first time (one-time migration)
+### Migration history (one-time scripts, safe to re-run)
 
 ```bash
-# Run migration on VPS to add users table + user_id columns + create admin
+# 1. Add users table + user_id columns + create admin user
 docker exec concerts_db-backend-1 uv run python src/scripts/migrate_add_users.py
+
+# 2. Add name column to users, set admin name = 'Mathieu'
+docker exec concerts_db-backend-1 uv run python src/scripts/migrate_add_user_name.py
 ```
 
 Default admin credentials after migration:
@@ -40,14 +43,11 @@ Default admin credentials after migration:
 ### Useful one-off commands
 
 ```bash
-# Import CSV data (run after first deploy or migration)
+# Import CSV data
 docker exec concerts_db-backend-1 uv run python src/scripts/import_csv.py
 
 # Export DB to CSV (backup)
 docker exec concerts_db-backend-1 uv run python src/scripts/export_csv.py
-
-# Run migration (adds users, user_id columns — safe to run multiple times)
-docker exec concerts_db-backend-1 uv run python src/scripts/migrate_add_users.py
 ```
 
 ---
@@ -101,13 +101,12 @@ concerts_db/
 │       ├── database/
 │       │   └── database.py            # engine, SessionLocal, get_db(), seed_data()
 │       ├── auth/
-│       │   ├── __init__.py
 │       │   ├── jwt.py                 # create_access_token(user_id), decode_token(token) — HS256, 7 days
 │       │   ├── password.py            # hash_password / verify_password using bcrypt directly
 │       │   └── dependencies.py        # get_current_user (Bearer token → User), require_admin
 │       ├── models/                    # SQLAlchemy ORM models
 │       │   ├── base.py
-│       │   ├── user.py                # id, email (unique), hashed_password, is_admin, created_at
+│       │   ├── user.py                # id, email (unique), hashed_password, name (nullable), is_admin, created_at
 │       │   ├── address.py             # UNUSED — kept but no relationships
 │       │   ├── artist.py              # country_id (nullable FK → countries)
 │       │   ├── attendee.py            # user_id FK → users; Unique: (firstname, lastname, user_id)
@@ -121,12 +120,14 @@ concerts_db/
 │       │   ├── venue.py               # city_id FK → cities; UniqueConstraint(name, city_id)
 │       │   └── video.py
 │       ├── schemas/                   # Pydantic request/response schemas
-│       │   ├── user.py                # UserCreate, UserResponse, LoginRequest, TokenResponse
+│       │   ├── user.py                # UserCreate (name?), UserResponse, LoginRequest, TokenResponse,
+│       │   │                          # ChangePasswordRequest, ResetPasswordRequest
 │       │   ├── artist.py / attendee.py / city.py / concert.py / country.py
 │       │   ├── event.py / festival.py / photo.py / venue.py / video.py
 │       │   └── response.py            # Generic ApiResponse[T] envelope
-│       ├── crud/                      # Business logic / DB operations
-│       │   ├── user.py                # get_all, get_by_email, create, authenticate, delete
+│       ├── crud/
+│       │   ├── user.py                # get_all, get_by_email, create, authenticate, delete,
+│       │   │                          # change_password, reset_password
 │       │   ├── artist.py              # joinedload(Artist.country)
 │       │   ├── attendee.py            # all ops scoped by user_id
 │       │   ├── city.py                # find_or_create(name, country_id)
@@ -134,46 +135,123 @@ concerts_db/
 │       │   ├── country.py             # find_or_create(name) — case-insensitive ilike
 │       │   ├── event.py               # all ops scoped by user_id
 │       │   ├── festival.py
-│       │   ├── photo.py
-│       │   ├── venue.py
-│       │   └── video.py
-│       ├── routes/                    # FastAPI routers
-│       │   ├── auth.py                # POST /auth/login, GET /auth/me
-│       │   ├── admin.py               # GET/POST/DELETE /admin/users (admin only)
+│       │   ├── photo.py / venue.py / video.py
+│       ├── routes/
+│       │   ├── auth.py                # POST /auth/login, GET /auth/me, PUT /auth/change-password
+│       │   ├── admin.py               # GET/POST/DELETE /admin/users, PUT /admin/users/{id}/password
 │       │   ├── root.py
 │       │   ├── artist.py / attendee.py / city.py / concert.py / country.py
-│       │   ├── event.py / festival.py / photo.py / venue.py / video.py
-│       │   └── address.py
+│       │   ├── event.py / festival.py / photo.py / venue.py / video.py / address.py
 │       ├── repositories/              # Thin repository wrappers over BaseRepository
 │       └── scripts/
 │           ├── import_csv.py          # Import data/concerts_import.csv into DB
 │           ├── export_csv.py          # Export DB to CSV (backup format)
-│           └── migrate_add_users.py   # One-time migration: add users table + user_id columns
+│           ├── migrate_add_users.py   # Migration 1: users table + user_id columns
+│           └── migrate_add_user_name.py  # Migration 2: name column on users
 ├── frontend/
 │   └── src/
-│       ├── main.ts                    # App entry, PrimeVue + ToastService setup
-│       ├── App.vue                    # Root layout: AppHeader + router-view + Toast
+│       ├── main.ts                    # App entry, PrimeVue + ToastService + ConfirmationService
+│       ├── App.vue                    # Root layout: AppHeader + ConfirmDialog + router-view + Toast
 │       ├── composables/
 │       │   └── useAuth.ts             # Shared auth state (user ref, isAdmin, setUser, logout)
-│       ├── router/index.ts            # Routes + guards: /login (public), /, /event/new, /event/:id, /admin
+│       ├── router/index.ts            # All routes + guards (see Routes section below)
 │       ├── models/                    # TypeScript interfaces matching backend schemas
 │       ├── services/
 │       │   ├── api.ts                 # Base fetch wrapper — injects Bearer token, redirects to /login on 401
-│       │   ├── authService.ts         # login(), saveSession(), clearSession(), getStoredUser(), isLoggedIn()
-│       │   ├── adminService.ts        # getUsers(), createUser(), deleteUser() — calls /admin/* endpoints
-│       │   ├── eventService.ts / attendeeService.ts / venueService.ts / artistService.ts / etc.
+│       │   ├── authService.ts         # login, saveSession, clearSession, getStoredUser, isLoggedIn, changePassword
+│       │   ├── adminService.ts        # getUsers, createUser, deleteUser, resetUserPassword
+│       │   ├── artistService.ts       # getAll, create, update, delete
+│       │   ├── attendeeService.ts     # getAll, create, update, delete
+│       │   ├── cityService.ts         # getAll, create, update, delete, findOrCreate
+│       │   ├── countryService.ts      # getAll, create, update, delete, findOrCreate
+│       │   ├── eventService.ts        # getAll, getOne, create, update, delete, buildPayload
+│       │   ├── festivalService.ts     # getAll, create, update, delete
+│       │   └── venueService.ts        # getAll, create, update, delete
 │       ├── components/
-│       │   ├── AppHeader.vue          # Nav + user email + sign-out + admin icon + dark/light toggle
+│       │   ├── AppHeader.vue          # Full nav bar (see Header section below)
 │       │   ├── ConcertRow.vue
 │       │   ├── VenueSelectOrCreate.vue / ArtistSelectOrCreate.vue / FestivalSelectOrCreate.vue
 │       │   └── AttendeeMultiSelect.vue
 │       └── views/
 │           ├── LoginView.vue          # Email + password form → POST /auth/login → stores token
-│           ├── AdminView.vue          # List users, create user, delete user (admin only, /admin)
-│           ├── EventList.vue
-│           └── EventForm.vue
+│           ├── AdminView.vue          # User list, create, delete, reset password, change own password
+│           ├── EventList.vue          # Homepage — sortable DataTable of all events (ASC by date default)
+│           ├── EventForm.vue          # Create / edit event (concerts, venue, festival, attendees)
+│           ├── LibraryView.vue        # Hub grid linking to all 6 entity pages
+│           ├── ArtistsView.vue        # Artists DataTable + stats + expandable event list
+│           ├── VenuesView.vue         # Venues DataTable + stats + expandable event list
+│           ├── CitiesView.vue         # Cities DataTable + stats + expandable event list
+│           ├── CountriesView.vue      # Countries DataTable + stats + expandable event list
+│           ├── AttendeesView.vue      # Attendees DataTable + stats + expandable event list
+│           └── FestivalsView.vue      # Festivals DataTable + stats + expandable event list
 └── old_react_frontend/                # Archived React app (reference only)
 ```
+
+---
+
+## Routes
+
+| Path | Component | Auth | Notes |
+|------|-----------|------|-------|
+| `/login` | LoginView | Public | |
+| `/` | EventList | Yes | Default sort: date ASC |
+| `/event/new` | EventForm | Yes | |
+| `/event/:id` | EventForm | Yes | |
+| `/library` | LibraryView | Yes | Hub grid of entity links |
+| `/artists` | ArtistsView | Yes | |
+| `/venues` | VenuesView | Yes | |
+| `/cities` | CitiesView | Yes | |
+| `/countries` | CountriesView | Yes | |
+| `/attendees` | AttendeesView | Yes | |
+| `/festivals` | FestivalsView | Yes | |
+| `/admin` | AdminView | Admin only | |
+
+---
+
+## AppHeader nav
+
+Left: `🎸 Concerts` logo (→ `/`)
+
+Right (in order):
+1. **New Event** button (pi-plus, filled violet)
+2. **Shows** icon (pi-calendar) → `/` — highlighted when active
+3. **Artists** icon (pi-star) → `/artists` — highlighted when active
+4. **Venues** icon (pi-building) → `/venues`
+5. **Cities** icon (pi-map-marker) → `/cities`
+6. **Countries** icon (pi-globe) → `/countries`
+7. **People** icon (pi-users) → `/attendees`
+8. **Festivals** icon (pi-ticket) → `/festivals`
+9. **Admin** icon (pi-shield) → `/admin` — only if `isAdmin`
+10. User name (hidden on mobile)
+11. **Sign out** icon (pi-sign-out) — triggers ConfirmDialog
+12. **Theme toggle** (pi-moon / pi-sun)
+
+Active icon state: `:text="route.path !== link.path"` — filled when active, ghost otherwise.
+Theme: auto-follows system `prefers-color-scheme` if no manual preference saved; otherwise reads `localStorage('theme')`. Listens for OS-level changes.
+
+---
+
+## Entity pages — shared pattern
+
+All 6 entity views (Artists, Venues, Cities, Countries, Attendees, Festivals) follow the same pattern:
+
+**Layout:**
+- Search bar + count badge + Add button (with `ml-3` gap before button)
+- Inline add form (shown on toggle, hidden by default)
+- `size="small"` DataTable with `editMode="row"`, `v-model:editingRows`, expandable rows
+
+**Table columns:** Entity-specific data columns + date columns (first/last) + merged action column
+
+**Merged action column (`width:5.5rem`):**
+- Normal mode: pencil icon → calls `startEdit(row)`
+- Edit mode: ✓ (success) + ✕ (secondary) + 🗑 (danger) — calls `saveRow(data)`, `cancelEdit(row)`, `onDelete(row)`
+- Manual `editingRows` management: `startEdit` pushes row, `cancelEdit`/`saveRow` filter it out
+
+**Expansion panel:** Stat pills (violet count + gray label, rounded-full) then full event list table (clicking any row navigates to `/event/:id`)
+
+**Stats computed client-side** from the full events payload: Sets for unique venue/city/country counts, min/max date for first/last seen.
+
+**Shows column** present on: Venues, Cities, Countries, Attendees (violet count, sortable, `width:75px`)
 
 ---
 
@@ -190,17 +268,18 @@ concerts_db/
 **Multi-user data isolation:**
 - `events.user_id` and `attendees.user_id` — data scoped per user
 - Shared tables (artists, venues, cities, countries, festivals) — no user scoping
-- Admin can manage users at `/admin`
 
-**Auth endpoints:**
+**Auth & admin endpoints:**
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | POST | `/auth/login` | No | Returns JWT + user info |
 | GET | `/auth/me` | Yes | Returns current user |
+| PUT | `/auth/change-password` | Yes | Change own password (requires current password) |
 | GET | `/admin/users` | Admin | List all users |
 | POST | `/admin/users` | Admin | Create user |
-| DELETE | `/admin/users/{id}` | Admin | Delete user |
+| PUT | `/admin/users/{id}/password` | Admin | Force-reset any user's password |
+| DELETE | `/admin/users/{id}` | Admin | Delete user (cannot delete self) |
 
 ---
 
@@ -257,7 +336,8 @@ All endpoints return a consistent `ApiResponse` envelope (`schemas/response.py`)
 | GET | `/` | Health check |
 | POST | `/auth/login` | Login → JWT |
 | GET | `/auth/me` | Current user |
-| GET/POST/DELETE | `/admin/users`, `/admin/users/{id}` | User management (admin) |
+| PUT | `/auth/change-password` | Change own password |
+| GET/POST/PUT/DELETE | `/admin/users`, `/admin/users/{id}` | User management (admin) |
 | GET/POST/PUT/DELETE | `/country/`, `/country/{id}` | Country CRUD (shared) |
 | GET/POST/PUT/DELETE | `/city/`, `/city/{id}` | City CRUD; GET supports `?country_id=` filter |
 | GET/POST/PUT/DELETE | `/artist/`, `/artist/{id}` | Artist CRUD (shared) |
@@ -293,11 +373,18 @@ All endpoints return a consistent `ApiResponse` envelope (`schemas/response.py`)
 
 ### Dark / light theme
 - Toggle button in `AppHeader.vue` adds/removes `.dark` class on `<html>`
-- Preference saved in `localStorage`
+- Preference saved in `localStorage`; auto-follows system `prefers-color-scheme` if no manual preference set
+- Live OS-level change detection via `matchMedia.addEventListener('change', ...)`
 
 ### Inline creation (venues, artists, festivals, attendees)
 - `SelectOrCreate` components: dropdown + `+` button → inline mini-form
 - Venue: `countryService.findOrCreate` → `cityService.findOrCreate` → `venueService.create`
+
+### Row editing (entity pages)
+- `editMode="row"` on DataTable; `editingRows` managed manually (no `:rowEditor="true"` column)
+- `startEdit(row)` pushes to `editingRows`; `cancelEdit` / `saveRow` filter it out
+- `saveRow(data)` calls the entity's `onSave({ newData: data })` then removes from `editingRows`
+- Delete only accessible in edit mode (shown in merged action column's `#editor` slot)
 
 ---
 
@@ -314,13 +401,7 @@ event_date,venue,city,country,artists,attendees,festival,comments
 2011-04-15,Zénith Europe,Strasbourg,France,NOFX;Dropkick Murphys;Sick of It All,,,
 ```
 
-**98 events already imported** into the deployed database (as of 2026-04-06), assigned to admin user.
-
-### Festival tickets — pending (resume later)
-
-Festival day passes don't list individual artists. Workflow: look up full lineup → user selects attended sets → add to CSV.
-
-Pending festivals to process (see previous CLAUDE.md version for full list).
+**~98 events imported** into the deployed database (as of 2026-04-06), assigned to admin user.
 
 ---
 
@@ -329,4 +410,5 @@ Pending festivals to process (see previous CLAUDE.md version for full list).
 - **Photos/videos** — backend supports them, frontend does not yet.
 - **No pagination** on list endpoints — fine for personal use.
 - **`models/address.py`** — unused, safe to delete.
-- **Admin password change UI** — implemented: "Change my password" section in `/admin` (requires current password); admin can also force-reset any user's password via the key icon per user row.
+- **World map / city heatmap** — planned feature: add `latitude`/`longitude` to `cities` table, geocode via Nominatim, render bubble map with Leaflet.
+- **Automated backups** — daily CSV export cron exists on VPS; delivery to Synology NAS or email not yet implemented.
