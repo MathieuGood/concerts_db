@@ -2,8 +2,10 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const { user, isAdmin, logout } = useAuth()
 const isDark = ref(false)
 
 function toggleTheme() {
@@ -50,6 +52,31 @@ onMounted(() => {
           class="sm:hidden"
           aria-label="New event"
         />
+
+        <Button
+          v-if="isAdmin"
+          icon="pi pi-users"
+          size="small"
+          rounded
+          text
+          @click="router.push('/admin')"
+          aria-label="Admin panel"
+        />
+
+        <span class="hidden sm:block text-xs text-gray-500 dark:text-gray-400 max-w-[120px] truncate">
+          {{ user?.email }}
+        </span>
+
+        <Button
+          icon="pi pi-sign-out"
+          size="small"
+          rounded
+          text
+          severity="secondary"
+          @click="logout"
+          aria-label="Sign out"
+        />
+
         <Button
           :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'"
           size="small"

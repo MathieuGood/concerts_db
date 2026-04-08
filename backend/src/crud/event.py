@@ -14,20 +14,19 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 
 
-def get(db: Session, event_id: int) -> Event:
-    event = (
-        db.query(Event)
-        .options(
-            joinedload(Event.venue).joinedload(Venue.city).joinedload(City.country),
-            joinedload(Event.attendees),
-            joinedload(Event.festival),
-            joinedload(Event.concerts).joinedload(Concert.artist).joinedload(Artist.country),
-            joinedload(Event.concerts).joinedload(Concert.photos),
-            joinedload(Event.concerts).joinedload(Concert.videos),
-        )
-        .filter(Event.id == event_id)
-        .first()
+def _base_query(db: Session):
+    return db.query(Event).options(
+        joinedload(Event.venue).joinedload(Venue.city).joinedload(City.country),
+        joinedload(Event.attendees),
+        joinedload(Event.festival),
+        joinedload(Event.concerts).joinedload(Concert.artist).joinedload(Artist.country),
+        joinedload(Event.concerts).joinedload(Concert.photos),
+        joinedload(Event.concerts).joinedload(Concert.videos),
     )
+
+
+def get(db: Session, event_id: int, user_id: int) -> Event:
+    event = _base_query(db).filter(Event.id == event_id, Event.user_id == user_id).first()
     if not event:
         raise HTTPException(
             status_code=404, detail=f"Event with ID {event_id} not found."
@@ -36,24 +35,16 @@ def get(db: Session, event_id: int) -> Event:
     return event
 
 
-def get_all(db: Session) -> List[Event]:
-    events = (
-        db.query(Event)
-        .options(
-            joinedload(Event.venue).joinedload(Venue.city).joinedload(City.country),
-            joinedload(Event.attendees),
-            joinedload(Event.festival),
-            joinedload(Event.concerts).joinedload(Concert.artist).joinedload(Artist.country),
-            joinedload(Event.concerts).joinedload(Concert.photos),
-            joinedload(Event.concerts).joinedload(Concert.videos),
-        )
+def get_all(db: Session, user_id: int) -> List[Event]:
+    return (
+        _base_query(db)
+        .filter(Event.user_id == user_id)
         .order_by(Event.event_date.desc())
         .all()
     )
-    return events
 
 
-def create(db: Session, event: EventCreate) -> Event:
+def create(db: Session, event: EventCreate, user_id: int) -> Event:
     try:
         venue = db.query(Venue).filter(Venue.id == event.venue_id).first()
         if not venue:
@@ -75,6 +66,7 @@ def create(db: Session, event: EventCreate) -> Event:
             comments=event.comments,
             venue_id=event.venue_id,
             festival_id=event.festival_id,
+            user_id=user_id,
         )
         db.add(new_event)
         db.commit()
@@ -121,9 +113,9 @@ def create(db: Session, event: EventCreate) -> Event:
         )
 
 
-def update(db: Session, event_id: int, event: EventCreate) -> Event:
+def update(db: Session, event_id: int, event: EventCreate, user_id: int) -> Event:
     try:
-        updated_event: Event = db.query(Event).filter(Event.id == event_id).first()
+        updated_event: Event = db.query(Event).filter(Event.id == event_id, Event.user_id == user_id).first()
         if updated_event is None:
             raise HTTPException(
                 status_code=404, detail=f"Event with ID {event_id} not found."
@@ -224,8 +216,8 @@ def update_concert_videos(
             concert_to_update.videos.append(video)
 
 
-def delete(db: Session, event_id: int) -> dict:
-    deleted_event: Event = db.query(Event).filter(Event.id == event_id).first()
+def delete(db: Session, event_id: int, user_id: int) -> dict:
+    deleted_event: Event = db.query(Event).filter(Event.id == event_id, Event.user_id == user_id).first()
     if not deleted_event:
         return {"message": f"Event #{event_id} does not exist."}
     event_desc = (

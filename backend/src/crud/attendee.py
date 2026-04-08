@@ -5,8 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 
-def get(db: Session, attendee_id: int):
-    attendee = db.query(Attendee).filter(Attendee.id == attendee_id).first()
+def get(db: Session, attendee_id: int, user_id: int):
+    attendee = db.query(Attendee).filter(Attendee.id == attendee_id, Attendee.user_id == user_id).first()
     if not attendee:
         raise HTTPException(
             status_code=404, detail=f"Attendee with ID {attendee_id} not found."
@@ -14,14 +14,14 @@ def get(db: Session, attendee_id: int):
     return attendee
 
 
-def get_all(db: Session):
-    return db.query(Attendee).all()
+def get_all(db: Session, user_id: int):
+    return db.query(Attendee).filter(Attendee.user_id == user_id).all()
 
 
-def create(db: Session, attendee: AttendeeCreate) -> Attendee:
+def create(db: Session, attendee: AttendeeCreate, user_id: int) -> Attendee:
     try:
         new_attendee = Attendee(
-            firstname=attendee.firstname, lastname=attendee.lastname
+            firstname=attendee.firstname, lastname=attendee.lastname, user_id=user_id
         )
         db.add(new_attendee)
         db.commit()
@@ -35,10 +35,10 @@ def create(db: Session, attendee: AttendeeCreate) -> Attendee:
         )
 
 
-def update(db: Session, attendee_id: int, attendee: AttendeeCreate) -> Attendee:
+def update(db: Session, attendee_id: int, attendee: AttendeeCreate, user_id: int) -> Attendee:
     try:
         updated_attendee: Attendee = (
-            db.query(Attendee).filter(Attendee.id == attendee_id).first()
+            db.query(Attendee).filter(Attendee.id == attendee_id, Attendee.user_id == user_id).first()
         )
         if updated_attendee is None:
             raise HTTPException(
@@ -57,9 +57,9 @@ def update(db: Session, attendee_id: int, attendee: AttendeeCreate) -> Attendee:
         )
 
 
-def delete(db: Session, attendee_id: int) -> dict[str, str] | HTTPException:
+def delete(db: Session, attendee_id: int, user_id: int) -> dict[str, str] | HTTPException:
     deleted_attendee: Attendee = (
-        db.query(Attendee).filter(Attendee.id == attendee_id).first()
+        db.query(Attendee).filter(Attendee.id == attendee_id, Attendee.user_id == user_id).first()
     )
     if not deleted_attendee:
         return {"message": f"Attendee #{attendee_id} does not exist."}

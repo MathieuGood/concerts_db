@@ -7,7 +7,7 @@ from models.base import Base
 
 class Event(Base):
     __tablename__ = "events"
-    __table_args__ = (UniqueConstraint("event_date", "venue_id", name="_date_venue_uc"),)
+    __table_args__ = (UniqueConstraint("event_date", "venue_id", "user_id", name="_date_venue_user_uc"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=True)
@@ -16,6 +16,7 @@ class Event(Base):
 
     venue_id: Mapped[int] = mapped_column(ForeignKey("venues.id"), nullable=False)
     festival_id: Mapped[int] = mapped_column(ForeignKey("festivals.id"), nullable=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
 
     venue: Mapped["Venue"] = relationship("Venue", back_populates="events")
     festival: Mapped["Festival"] = relationship("Festival", back_populates="events")

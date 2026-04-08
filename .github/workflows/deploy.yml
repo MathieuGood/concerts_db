@@ -26,6 +26,8 @@ jobs:
                           echo 'TEST_DATABASE_URI=sqlite:///:memory:' >> backend/.env
                           echo 'DEMO_MODE=FALSE' >> backend/.env
                           echo 'PYTHONPATH=src' >> backend/.env
+                          echo 'SECRET_KEY=${{ secrets.SECRET_KEY }}' >> backend/.env
                       fi
+                      grep -q SECRET_KEY backend/.env || echo 'SECRET_KEY=${{ secrets.SECRET_KEY }}' >> backend/.env
                       mkdir -p data backups
                       docker compose -f docker-compose.prod.yml up -d --build
