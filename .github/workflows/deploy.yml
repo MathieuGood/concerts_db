@@ -22,12 +22,10 @@ jobs:
                       cd ~/apps/concerts_db
                       git pull origin main
                       if [ ! -f backend/.env ]; then
-                          cat > backend/.env << 'EOF'
-DATABASE_URI=sqlite+pysqlite:////data/concerts_db.sqlite
-TEST_DATABASE_URI=sqlite:///:memory:
-DEMO_MODE=FALSE
-PYTHONPATH=src
-EOF
+                          echo 'DATABASE_URI=sqlite+pysqlite:////data/concerts_db.sqlite' > backend/.env
+                          echo 'TEST_DATABASE_URI=sqlite:///:memory:' >> backend/.env
+                          echo 'DEMO_MODE=FALSE' >> backend/.env
+                          echo 'PYTHONPATH=src' >> backend/.env
                       fi
                       mkdir -p data backups
                       docker compose -f docker-compose.prod.yml up -d --build
