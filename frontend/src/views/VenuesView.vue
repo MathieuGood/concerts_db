@@ -120,8 +120,7 @@ async function createVenue() {
       <div class="flex gap-2 mb-3">
         <IconField class="flex-1"><InputIcon class="pi pi-search" /><InputText v-model="search" placeholder="Search venues…" class="w-full" /></IconField>
         <span class="text-xs text-gray-400 self-center whitespace-nowrap">{{ filtered.length }} venue{{ filtered.length !== 1 ? 's' : '' }}</span>
-        <div class="w-px h-5 self-center bg-gray-200 dark:bg-gray-700" />
-        <Button icon="pi pi-plus" label="Add" size="small" @click="addingVenue = !addingVenue" />
+        <Button icon="pi pi-plus" label="Add" size="small" class="ml-3" @click="addingVenue = !addingVenue" />
       </div>
       <div v-if="addingVenue" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <InputText v-model="newVenue.name" placeholder="Name *" class="flex-1" @keyup.enter="createVenue" />
