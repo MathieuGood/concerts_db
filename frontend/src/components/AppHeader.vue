@@ -68,7 +68,8 @@ onMounted(() => {
   <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
     <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
       <button
-        class="text-lg font-bold text-violet-600 dark:text-violet-400 tracking-tight cursor-pointer"
+        class="text-xl text-violet-600 dark:text-violet-400 cursor-pointer"
+        style="font-family: 'DepartureMono', monospace;"
         @click="navigate('/')"
       >
         Concerts
