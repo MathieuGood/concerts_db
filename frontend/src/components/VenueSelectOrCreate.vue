@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import Select from 'primevue/select'
 import AutoComplete from 'primevue/autocomplete'
 import InputText from 'primevue/inputtext'
@@ -19,24 +19,25 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: number | null]
   'venue-created': [venue: Venue]
+  'venue-updated': [venue: Venue]
 }>()
 
+// ── Create state ──────────────────────────────────────────
 const showCreate = ref(false)
 const newName = ref('')
 const saving = ref(false)
 
-// Country autocomplete
 const allCountries = ref<Country[]>([])
 const selectedCountry = ref<Country | null>(null)
 const countrySuggestions = ref<Country[]>([])
 
-// City autocomplete
 const allCities = ref<City[]>([])
 const selectedCity = ref<City | null>(null)
 const citySuggestions = ref<City[]>([])
 
 async function onShowCreate() {
   showCreate.value = !showCreate.value
+  showEdit.value = false
   if (showCreate.value && allCountries.value.length === 0) {
     allCountries.value = await countryService.getAll()
   }
@@ -100,6 +101,89 @@ async function create() {
 function venueLabel(v: Venue): string {
   return v.city ? `${v.name} — ${v.city.name}` : v.name
 }
+
+// ── Edit state ────────────────────────────────────────────
+const showEdit = ref(false)
+const editName = ref('')
+const editSaving = ref(false)
+
+const editSelectedCountry = ref<Country | null>(null)
+const editCountrySuggestions = ref<Country[]>([])
+const editAllCities = ref<City[]>([])
+const editSelectedCity = ref<City | null>(null)
+const editCitySuggestions = ref<City[]>([])
+
+const selectedVenue = computed(() =>
+  props.venues.find((v) => v.id === props.modelValue) ?? null,
+)
+
+function searchEditCountry(event: { query: string }) {
+  const q = event.query.toLowerCase()
+  editCountrySuggestions.value = allCountries.value.filter((c) =>
+    c.name.toLowerCase().includes(q),
+  )
+}
+
+async function onEditCountrySelect(event: { value: Country }) {
+  editSelectedCity.value = null
+  editAllCities.value = await cityService.getAll(event.value.id)
+}
+
+function searchEditCity(event: { query: string }) {
+  const q = event.query.toLowerCase()
+  editCitySuggestions.value = editAllCities.value.filter((c) =>
+    c.name.toLowerCase().includes(q),
+  )
+}
+
+function editCityName(): string {
+  if (!editSelectedCity.value) return ''
+  return typeof editSelectedCity.value === 'string'
+    ? editSelectedCity.value
+    : editSelectedCity.value.name
+}
+
+function editCountryName(): string {
+  if (!editSelectedCountry.value) return ''
+  return typeof editSelectedCountry.value === 'string'
+    ? editSelectedCountry.value
+    : editSelectedCountry.value.name
+}
+
+async function openEdit() {
+  const venue = selectedVenue.value
+  if (!venue) return
+  showCreate.value = false
+  editName.value = venue.name
+  if (allCountries.value.length === 0) {
+    allCountries.value = await countryService.getAll()
+  }
+  if (venue.city) {
+    editAllCities.value = await cityService.getAll(venue.city.country_id)
+    editSelectedCountry.value = venue.city.country ?? null
+    editSelectedCity.value = venue.city
+  } else {
+    editSelectedCountry.value = null
+    editAllCities.value = []
+    editSelectedCity.value = null
+  }
+  showEdit.value = true
+}
+
+async function update() {
+  const venue = selectedVenue.value
+  if (!venue || !editName.value.trim() || !editSelectedCountry.value || !editSelectedCity.value) return
+  editSaving.value = true
+  try {
+    const country = await countryService.findOrCreate(editCountryName())
+    const city = await cityService.findOrCreate(editCityName(), country.id)
+    const updated = await venueService.update(venue.id, editName.value.trim(), city.id)
+    emit('venue-updated', updated)
+    showEdit.value = false
+  } finally {
+    editSaving.value = false
+  }
+}
 </script>
 
 <template>
@@ -117,6 +201,15 @@ function venueLabel(v: Venue): string {
         @update:model-value="emit('update:modelValue', $event)"
       />
       <Button
+        v-if="modelValue"
+        :icon="showEdit ? 'pi pi-times' : 'pi pi-pencil'"
+        size="small"
+        rounded
+        :severity="showEdit ? 'secondary' : 'secondary'"
+        @click="showEdit ? (showEdit = false) : openEdit()"
+        aria-label="Edit venue"
+      />
+      <Button
         :icon="showCreate ? 'pi pi-times' : 'pi pi-plus'"
         size="small"
         rounded
@@ -126,6 +219,7 @@ function venueLabel(v: Venue): string {
       />
     </div>
 
+    <!-- Create panel -->
     <div v-if="showCreate" class="border border-violet-200 dark:border-violet-800 rounded-lg p-3 space-y-2 bg-violet-50 dark:bg-violet-950/30">
       <p class="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-wide">New Venue</p>
       <InputText v-model="newName" placeholder="Venue name" class="w-full" />
@@ -158,6 +252,44 @@ function venueLabel(v: Venue): string {
           :loading="saving"
           :disabled="!newName.trim() || !selectedCountry || !selectedCity"
           @click="create"
+        />
+      </div>
+    </div>
+
+    <!-- Edit panel -->
+    <div v-if="showEdit" class="border border-amber-200 dark:border-amber-800 rounded-lg p-3 space-y-2 bg-amber-50 dark:bg-amber-950/30">
+      <p class="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">Edit Venue</p>
+      <InputText v-model="editName" placeholder="Venue name" class="w-full" />
+      <div class="grid grid-cols-2 gap-2">
+        <AutoComplete
+          v-model="editSelectedCountry"
+          :suggestions="editCountrySuggestions"
+          option-label="name"
+          placeholder="Country"
+          @complete="searchEditCountry"
+          @option-select="onEditCountrySelect"
+          class="w-full"
+          input-class="w-full"
+        />
+        <AutoComplete
+          v-model="editSelectedCity"
+          :suggestions="editCitySuggestions"
+          option-label="name"
+          placeholder="City"
+          :disabled="!editSelectedCountry"
+          @complete="searchEditCity"
+          class="w-full"
+          input-class="w-full"
+        />
+      </div>
+      <div class="flex justify-end gap-2">
+        <Button label="Cancel" size="small" text severity="secondary" @click="showEdit = false" />
+        <Button
+          label="Save"
+          size="small"
+          :loading="editSaving"
+          :disabled="!editName.trim() || !editSelectedCountry || !editSelectedCity"
+          @click="update"
         />
       </div>
     </div>

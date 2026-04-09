@@ -16,6 +16,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: ConcertFormData]
   'remove': []
   'artist-created': [artist: Artist]
+  'artist-updated': [artist: Artist]
 }>()
 
 const showSetlist = ref(false)
@@ -51,11 +52,12 @@ function update(field: keyof ConcertFormData, value: unknown) {
       :artists="artists"
       @update:model-value="update('artist_id', $event)"
       @artist-created="emit('artist-created', $event)"
+      @artist-updated="emit('artist-updated', $event)"
     />
 
     <Textarea
       :model-value="concert.comments"
-      placeholder="Comments (optional)"
+      placeholder="Comments"
       rows="2"
       auto-resize
       class="w-full"

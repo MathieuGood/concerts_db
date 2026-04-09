@@ -73,7 +73,7 @@ function attendeeLabel(a: Attendee): string {
       <p class="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-wide">New Attendee</p>
       <div class="grid grid-cols-2 gap-2">
         <InputText v-model="newFirstname" placeholder="First name *" />
-        <InputText v-model="newLastname" placeholder="Last name (optional)" @keyup.enter="create" />
+        <InputText v-model="newLastname" placeholder="Last name" @keyup.enter="create" />
       </div>
       <div class="flex justify-end gap-2">
         <Button label="Cancel" size="small" text severity="secondary" @click="showCreate = false" />

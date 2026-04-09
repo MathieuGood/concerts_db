@@ -181,7 +181,7 @@ function deleteFromCard(row: ArtistRow) {
       </div>
       <div v-if="addingArtist" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <InputText v-model="newArtist.name" placeholder="Name *" class="flex-1" @keyup.enter="createArtist" />
-        <AutoComplete v-model="newArtist.countryInput" :suggestions="newArtistCountrySuggestions" optionLabel="name" placeholder="Country (optional)" @complete="searchNewArtistCountry" class="w-40" inputClass="w-full" />
+        <AutoComplete v-model="newArtist.countryInput" :suggestions="newArtistCountrySuggestions" optionLabel="name" placeholder="Country" @complete="searchNewArtistCountry" class="w-40" inputClass="w-full" />
         <Button icon="pi pi-check" size="small" @click="createArtist" :disabled="!newArtist.name.trim()" />
         <Button icon="pi pi-times" size="small" severity="secondary" text @click="addingArtist = false" />
       </div>
@@ -194,7 +194,7 @@ function deleteFromCard(row: ArtistRow) {
           <!-- Edit mode -->
           <div v-if="isEditingCard(row.id)" class="p-3 space-y-2 bg-gray-50 dark:bg-gray-800/50">
             <InputText v-model="cardEditData[row.id].name" placeholder="Name *" class="w-full" />
-            <AutoComplete v-model="cardEditData[row.id].countryInput" :suggestions="cardCountrySuggestions" optionLabel="name" placeholder="Country (optional)" @complete="searchCardCountry" class="w-full" inputClass="w-full" />
+            <AutoComplete v-model="cardEditData[row.id].countryInput" :suggestions="cardCountrySuggestions" optionLabel="name" placeholder="Country" @complete="searchCardCountry" class="w-full" inputClass="w-full" />
             <div class="flex gap-2 pt-1">
               <Button icon="pi pi-check" label="Save" size="small" severity="success" @click="saveCardEdit(row)" class="flex-1" />
               <Button icon="pi pi-times" size="small" severity="secondary" text rounded @click="cancelCardEdit(row)" />

@@ -183,12 +183,12 @@ onMounted(async () => {
           />
         </div>
         <div>
-          <label class="form-label">Event Name <span class="text-gray-400">(optional)</span></label>
-          <InputText v-model="form.name" placeholder="e.g. Punk Rock Holiday 2024" class="w-full" />
+          <label class="form-label">Event Name</label>
+          <InputText v-model="form.name" class="w-full" />
         </div>
         <div>
-          <label class="form-label">Comments <span class="text-gray-400">(optional)</span></label>
-          <Textarea v-model="form.comments" placeholder="Notes about this event…" rows="2" auto-resize class="w-full" />
+          <label class="form-label">Comments</label>
+          <Textarea v-model="form.comments" rows="2" auto-resize class="w-full" />
         </div>
       </section>
 
@@ -199,16 +199,18 @@ onMounted(async () => {
           v-model="form.venue_id"
           :venues="venues"
           @venue-created="venues.push($event)"
+          @venue-updated="venues = venues.map(v => v.id === $event.id ? $event : v)"
         />
       </section>
 
       <!-- Festival -->
       <section class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-2">
-        <label class="form-label">Festival <span class="text-gray-400">(optional)</span></label>
+        <label class="form-label">Festival</label>
         <FestivalSelectOrCreate
           v-model="form.festival_id"
           :festivals="festivals"
           @festival-created="festivals.push($event)"
+          @festival-updated="festivals = festivals.map(f => f.id === $event.id ? $event : f)"
         />
       </section>
 
@@ -233,6 +235,7 @@ onMounted(async () => {
           :artists="artists"
           @remove="removeConcert(i)"
           @artist-created="artists.push($event)"
+          @artist-updated="artists = artists.map(a => a.id === $event.id ? $event : a)"
         />
       </section>
 
