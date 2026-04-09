@@ -6,6 +6,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
+import AutoComplete from 'primevue/autocomplete'
 import Button from 'primevue/button'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
@@ -36,7 +37,7 @@ const expandedRows = ref<any[]>([])
 const editingRows = ref<any[]>([])
 const search = ref('')
 const addingArtist = ref(false)
-const newArtist = ref({ name: '', country_id: null as number | null })
+const newArtist = ref({ name: '', countryInput: null as Country | null })
 
 onMounted(async () => {
   try {
@@ -106,13 +107,36 @@ function onArtistDelete(row: ArtistRow) {
     accept: async () => { await artistService.delete(row.id); artistRows.value = artistRows.value.filter(a => a.id !== row.id) } })
 }
 
+async function resolveCountry(input: Country | string | null): Promise<number | null> {
+  if (!input) return null
+  const name = typeof input === 'string' ? input.trim() : input.name
+  if (!name) return null
+  const c = await countryService.findOrCreate(name)
+  if (!countries.value.find(x => x.id === c.id)) countries.value.push(c)
+  return c.id
+}
+
 async function createArtist() {
   if (!newArtist.value.name.trim()) return
-  const created = await artistService.create(newArtist.value.name.trim(), newArtist.value.country_id)
+  const country_id = await resolveCountry(newArtist.value.countryInput)
+  const created = await artistService.create(newArtist.value.name.trim(), country_id)
   const country = countries.value.find(c => c.id === created.country_id) ?? null
   artistRows.value.push({ id: created.id, name: created.name, countryName: country?.name ?? '', country_id: created.country_id ?? null, country, concerts: 0, venues: 0, cities: 0, countries: 0, firstSeen: null, lastSeen: null, events: [] })
-  newArtist.value = { name: '', country_id: null }
+  newArtist.value = { name: '', countryInput: null }
   addingArtist.value = false
+}
+
+// AutoComplete suggestions
+const newArtistCountrySuggestions = ref<Country[]>([])
+function searchNewArtistCountry(event: { query: string }) {
+  const q = event.query.toLowerCase()
+  newArtistCountrySuggestions.value = countries.value.filter(c => c.name.toLowerCase().includes(q))
+}
+
+const cardCountrySuggestions = ref<Country[]>([])
+function searchCardCountry(event: { query: string }) {
+  const q = event.query.toLowerCase()
+  cardCountrySuggestions.value = countries.value.filter(c => c.name.toLowerCase().includes(q))
 }
 
 // Mobile card helpers
@@ -127,7 +151,7 @@ function toggleExpand(id: number) {
 }
 function isEditingCard(id: number) { return editingRows.value.some((r: any) => r.id === id) }
 function startCardEdit(row: ArtistRow) {
-  cardEditData.value[row.id] = { name: row.name, country_id: row.country_id }
+  cardEditData.value[row.id] = { name: row.name, countryInput: row.country ?? null }
   editingRows.value = [...editingRows.value, row]
 }
 function cancelCardEdit(row: ArtistRow) {
@@ -136,7 +160,8 @@ function cancelCardEdit(row: ArtistRow) {
 }
 async function saveCardEdit(row: ArtistRow) {
   const d = cardEditData.value[row.id]
-  await saveRow({ ...row, ...d })
+  const country_id = await resolveCountry(d.countryInput)
+  await saveRow({ ...row, name: d.name, country_id })
   delete cardEditData.value[row.id]
 }
 function deleteFromCard(row: ArtistRow) {
@@ -156,7 +181,7 @@ function deleteFromCard(row: ArtistRow) {
       </div>
       <div v-if="addingArtist" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <InputText v-model="newArtist.name" placeholder="Name *" class="flex-1" @keyup.enter="createArtist" />
-        <Select v-model="newArtist.country_id" :options="countries" optionLabel="name" optionValue="id" showClear placeholder="Country" class="w-40" />
+        <AutoComplete v-model="newArtist.countryInput" :suggestions="newArtistCountrySuggestions" optionLabel="name" placeholder="Country (optional)" @complete="searchNewArtistCountry" class="w-40" inputClass="w-full" />
         <Button icon="pi pi-check" size="small" @click="createArtist" :disabled="!newArtist.name.trim()" />
         <Button icon="pi pi-times" size="small" severity="secondary" text @click="addingArtist = false" />
       </div>
@@ -169,7 +194,7 @@ function deleteFromCard(row: ArtistRow) {
           <!-- Edit mode -->
           <div v-if="isEditingCard(row.id)" class="p-3 space-y-2 bg-gray-50 dark:bg-gray-800/50">
             <InputText v-model="cardEditData[row.id].name" placeholder="Name *" class="w-full" />
-            <Select v-model="cardEditData[row.id].country_id" :options="countries" optionLabel="name" optionValue="id" showClear placeholder="Country" class="w-full" />
+            <AutoComplete v-model="cardEditData[row.id].countryInput" :suggestions="cardCountrySuggestions" optionLabel="name" placeholder="Country (optional)" @complete="searchCardCountry" class="w-full" inputClass="w-full" />
             <div class="flex gap-2 pt-1">
               <Button icon="pi pi-check" label="Save" size="small" severity="success" @click="saveCardEdit(row)" class="flex-1" />
               <Button icon="pi pi-times" size="small" severity="secondary" text rounded @click="cancelCardEdit(row)" />

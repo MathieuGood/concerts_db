@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
+import AutoComplete from 'primevue/autocomplete'
 import Button from 'primevue/button'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
@@ -38,7 +39,7 @@ const expandedRows = ref<any[]>([])
 const editingRows = ref<any[]>([])
 const search = ref('')
 const addingVenue = ref(false)
-const newVenue = ref({ name: '', city_id: null as number | null })
+const newVenue = ref({ name: '', countryInput: null as Country | null, cityInput: null as City | null })
 
 onMounted(async () => {
   try {
@@ -103,18 +104,89 @@ function onDelete(row: VenueRow) {
     accept: async () => { await venueService.delete(row.id); venueRows.value = venueRows.value.filter(v => v.id !== row.id) } })
 }
 
+// resolve helpers
+async function resolveCountry(input: Country | string | null): Promise<number | null> {
+  if (!input) return null
+  const name = typeof input === 'string' ? input.trim() : input.name
+  if (!name) return null
+  const c = await countryService.findOrCreate(name)
+  if (!countries.value.find(x => x.id === c.id)) countries.value.push(c)
+  return c.id
+}
+
+async function resolveCity(cityInput: City | string | null, countryId: number | null): Promise<number | null> {
+  if (!cityInput) return null
+  if (typeof cityInput === 'object' && 'id' in cityInput) return cityInput.id
+  const name = (cityInput as string).trim()
+  if (!name || !countryId) return null
+  const c = await cityService.findOrCreate(name, countryId)
+  if (!cities.value.find(x => x.id === c.id)) cities.value.push(c)
+  return c.id
+}
+
+// Add form — country → city cascade
+const newVenueCities = ref<City[]>([])
+const newVenueCountrySuggestions = ref<Country[]>([])
+const newVenueCitySuggestions = ref<City[]>([])
+
+watch(() => newVenue.value.countryInput, async (val) => {
+  newVenue.value.cityInput = null
+  if (val && typeof val === 'object' && 'id' in val) {
+    newVenueCities.value = await cityService.getAll(val.id)
+  } else {
+    newVenueCities.value = cities.value
+  }
+})
+
+function searchNewVenueCountry(event: { query: string }) {
+  const q = event.query.toLowerCase()
+  newVenueCountrySuggestions.value = countries.value.filter(c => c.name.toLowerCase().includes(q))
+}
+
+function searchNewVenueCity(event: { query: string }) {
+  const q = event.query.toLowerCase()
+  const pool = newVenueCities.value.length ? newVenueCities.value : cities.value
+  newVenueCitySuggestions.value = pool.filter(c => c.name.toLowerCase().includes(q))
+}
+
 async function createVenue() {
-  if (!newVenue.value.name.trim() || !newVenue.value.city_id) return
-  const created = await venueService.create(newVenue.value.name.trim(), newVenue.value.city_id)
+  if (!newVenue.value.name.trim() || !newVenue.value.cityInput) return
+  const countryId = await resolveCountry(newVenue.value.countryInput)
+  const cityId = await resolveCity(newVenue.value.cityInput, countryId)
+  if (!cityId) return
+  const created = await venueService.create(newVenue.value.name.trim(), cityId)
   const city = cities.value.find(c => c.id === created.city_id) ?? null
   venueRows.value.push({ id: created.id, name: created.name, city_id: created.city_id, city, cityName: city?.name ?? '', countryName: city?.country?.name ?? '', events: 0, artists: 0, firstVisit: null, lastVisit: null, eventList: [] })
-  newVenue.value = { name: '', city_id: null }
+  newVenue.value = { name: '', countryInput: null, cityInput: null }
+  newVenueCities.value = []
   addingVenue.value = false
 }
 
 // Mobile card helpers
 const expandedCards = ref<number[]>([])
-const cardEditData = ref<Record<number, any>>({})
+
+const activeCardEdit = ref<{ id: number; name: string; countryInput: Country | null; cityInput: City | null; cities: City[] } | null>(null)
+const cardCountrySuggestions = ref<Country[]>([])
+const cardCitySuggestions = ref<City[]>([])
+
+watch(() => activeCardEdit.value?.countryInput, async (val) => {
+  if (!activeCardEdit.value) return
+  activeCardEdit.value.cityInput = null
+  activeCardEdit.value.cities = []
+  if (val && typeof val === 'object' && 'id' in val) {
+    activeCardEdit.value.cities = await cityService.getAll(val.id)
+  }
+})
+
+function searchCardCountry(event: { query: string }) {
+  const q = event.query.toLowerCase()
+  cardCountrySuggestions.value = countries.value.filter(c => c.name.toLowerCase().includes(q))
+}
+function searchCardCity(event: { query: string }) {
+  if (!activeCardEdit.value) return
+  const q = event.query.toLowerCase()
+  cardCitySuggestions.value = activeCardEdit.value.cities.filter(c => c.name.toLowerCase().includes(q))
+}
 
 function isExpanded(id: number) { return expandedCards.value.includes(id) }
 function toggleExpand(id: number) {
@@ -122,19 +194,33 @@ function toggleExpand(id: number) {
   if (idx === -1) expandedCards.value.push(id)
   else expandedCards.value.splice(idx, 1)
 }
-function isEditingCard(id: number) { return editingRows.value.some((r: any) => r.id === id) }
+function isEditingCard(id: number) { return activeCardEdit.value?.id === id }
 function startCardEdit(row: VenueRow) {
-  cardEditData.value[row.id] = { name: row.name, city_id: row.city_id }
-  editingRows.value = [...editingRows.value, row]
+  activeCardEdit.value = {
+    id: row.id, name: row.name,
+    countryInput: row.city?.country ?? null,
+    cityInput: row.city ?? null,
+    cities: []
+  }
+  // Pre-load cities for current country
+  if (row.city?.country?.id) {
+    cityService.getAll(row.city.country.id).then(cs => {
+      if (activeCardEdit.value?.id === row.id) activeCardEdit.value.cities = cs
+    })
+  }
+  editingRows.value = [...editingRows.value.filter((r: any) => r.id !== row.id), row]
 }
 function cancelCardEdit(row: VenueRow) {
-  delete cardEditData.value[row.id]
+  activeCardEdit.value = null
   editingRows.value = editingRows.value.filter((r: any) => r.id !== row.id)
 }
 async function saveCardEdit(row: VenueRow) {
-  const d = cardEditData.value[row.id]
-  await saveRow({ ...row, ...d })
-  delete cardEditData.value[row.id]
+  if (!activeCardEdit.value) return
+  const countryId = await resolveCountry(activeCardEdit.value.countryInput)
+  const cityId = await resolveCity(activeCardEdit.value.cityInput, countryId)
+  if (!cityId) return
+  await saveRow({ ...row, name: activeCardEdit.value.name, city_id: cityId })
+  activeCardEdit.value = null
 }
 function deleteFromCard(row: VenueRow) {
   cancelCardEdit(row)
@@ -151,13 +237,18 @@ function deleteFromCard(row: VenueRow) {
         <span class="text-xs text-gray-400 self-center whitespace-nowrap">{{ filtered.length }} venue{{ filtered.length !== 1 ? 's' : '' }}</span>
         <Button icon="pi pi-plus" label="Add" size="small" class="ml-3" @click="addingVenue = !addingVenue" />
       </div>
-      <div v-if="addingVenue" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <InputText v-model="newVenue.name" placeholder="Name *" class="flex-1" @keyup.enter="createVenue" />
-        <Select v-model="newVenue.city_id" :options="cities" optionLabel="name" optionValue="id" showClear placeholder="City *" filter class="w-48">
-          <template #option="{ option }">{{ option.name }}<span class="text-gray-400 text-xs ml-1">({{ option.country?.name }})</span></template>
-        </Select>
-        <Button icon="pi pi-check" size="small" @click="createVenue" :disabled="!newVenue.name.trim() || !newVenue.city_id" />
-        <Button icon="pi pi-times" size="small" severity="secondary" text @click="addingVenue = false" />
+      <div v-if="addingVenue" class="flex flex-col gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div class="flex gap-2">
+          <InputText v-model="newVenue.name" placeholder="Name *" class="flex-1" @keyup.enter="createVenue" />
+        </div>
+        <div class="flex gap-2">
+          <AutoComplete v-model="newVenue.countryInput" :suggestions="newVenueCountrySuggestions" optionLabel="name" placeholder="Country *" @complete="searchNewVenueCountry" class="flex-1" inputClass="w-full" />
+          <AutoComplete v-model="newVenue.cityInput" :suggestions="newVenueCitySuggestions" optionLabel="name" placeholder="City *" @complete="searchNewVenueCity" class="flex-1" inputClass="w-full" />
+        </div>
+        <div class="flex justify-end gap-2">
+          <Button icon="pi pi-check" size="small" @click="createVenue" :disabled="!newVenue.name.trim() || !newVenue.cityInput" />
+          <Button icon="pi pi-times" size="small" severity="secondary" text @click="addingVenue = false" />
+        </div>
       </div>
 
       <!-- Mobile card list -->
@@ -167,12 +258,11 @@ function deleteFromCard(row: VenueRow) {
 
           <!-- Edit mode -->
           <div v-if="isEditingCard(row.id)" class="p-3 space-y-2 bg-gray-50 dark:bg-gray-800/50">
-            <InputText v-model="cardEditData[row.id].name" placeholder="Name *" class="w-full" />
-            <Select v-model="cardEditData[row.id].city_id" :options="cities" optionLabel="name" optionValue="id" filter placeholder="City *" class="w-full">
-              <template #option="{ option }">{{ option.name }}<span class="text-gray-400 text-xs ml-1">({{ option.country?.name }})</span></template>
-            </Select>
+            <InputText v-model="activeCardEdit!.name" placeholder="Name *" class="w-full" />
+            <AutoComplete v-model="activeCardEdit!.countryInput" :suggestions="cardCountrySuggestions" optionLabel="name" placeholder="Country *" @complete="searchCardCountry" class="w-full" inputClass="w-full" />
+            <AutoComplete v-model="activeCardEdit!.cityInput" :suggestions="cardCitySuggestions" optionLabel="name" placeholder="City *" :disabled="!activeCardEdit?.countryInput" @complete="searchCardCity" class="w-full" inputClass="w-full" />
             <div class="flex gap-2 pt-1">
-              <Button icon="pi pi-check" label="Save" size="small" severity="success" @click="saveCardEdit(row)" class="flex-1" />
+              <Button icon="pi pi-check" label="Save" size="small" severity="success" @click="saveCardEdit(row)" class="flex-1" :disabled="!activeCardEdit?.cityInput" />
               <Button icon="pi pi-times" size="small" severity="secondary" text rounded @click="cancelCardEdit(row)" />
               <Button icon="pi pi-trash" size="small" severity="danger" text rounded @click="deleteFromCard(row)" />
             </div>
