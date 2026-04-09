@@ -11,17 +11,17 @@ import router from './router'
 const ConcertsTheme = definePreset(Aura, {
   semantic: {
     primary: {
-      50: '#f5f3ff',
-      100: '#ede9fe',
-      200: '#ddd6fe',
-      300: '#c4b5fd',
-      400: '#a78bfa',
-      500: '#8b5cf6',
-      600: '#7c3aed',
-      700: '#6d28d9',
-      800: '#5b21b6',
-      900: '#4c1d95',
-      950: '#2e1065',
+      50:  '#fff0f8',
+      100: '#ffdcf2',
+      200: '#ffbce7',
+      300: '#ff8fd5',
+      400: '#ff79c6',
+      500: '#f550ae',
+      600: '#d4308e',
+      700: '#b02073',
+      800: '#8e1b5e',
+      900: '#6e1549',
+      950: '#420b2c',
     },
   },
 })

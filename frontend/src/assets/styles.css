@@ -3,6 +3,23 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Dracula-inspired warm gray — replaces Tailwind's cold neutral grays.
+   Light mode: creamy off-white (Dracula foreground) → warm mid-grays
+   Dark mode: gray-900 = Dracula #282a36, gray-950 = near-black page bg */
+@theme {
+  --color-gray-50:  #f8f8f2;
+  --color-gray-100: #eeecea;
+  --color-gray-200: #d8d5df;
+  --color-gray-300: #b8b4c4;
+  --color-gray-400: #8b86a0;
+  --color-gray-500: #6c6880;
+  --color-gray-600: #534f64;
+  --color-gray-700: #44475a;
+  --color-gray-800: #373944;
+  --color-gray-900: #282a36;
+  --color-gray-950: #1c1e28;
+}
+
 * {
   box-sizing: border-box;
 }
