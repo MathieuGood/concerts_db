@@ -114,6 +114,35 @@ async function createArtist() {
   newArtist.value = { name: '', country_id: null }
   addingArtist.value = false
 }
+
+// Mobile card helpers
+const expandedCards = ref<number[]>([])
+const cardEditData = ref<Record<number, any>>({})
+
+function isExpanded(id: number) { return expandedCards.value.includes(id) }
+function toggleExpand(id: number) {
+  const idx = expandedCards.value.indexOf(id)
+  if (idx === -1) expandedCards.value.push(id)
+  else expandedCards.value.splice(idx, 1)
+}
+function isEditingCard(id: number) { return editingRows.value.some((r: any) => r.id === id) }
+function startCardEdit(row: ArtistRow) {
+  cardEditData.value[row.id] = { name: row.name, country_id: row.country_id }
+  editingRows.value = [...editingRows.value, row]
+}
+function cancelCardEdit(row: ArtistRow) {
+  delete cardEditData.value[row.id]
+  editingRows.value = editingRows.value.filter((r: any) => r.id !== row.id)
+}
+async function saveCardEdit(row: ArtistRow) {
+  const d = cardEditData.value[row.id]
+  await saveRow({ ...row, ...d })
+  delete cardEditData.value[row.id]
+}
+function deleteFromCard(row: ArtistRow) {
+  cancelCardEdit(row)
+  onArtistDelete(row)
+}
 </script>
 
 <template>
@@ -132,82 +161,148 @@ async function createArtist() {
         <Button icon="pi pi-times" size="small" severity="secondary" text @click="addingArtist = false" />
       </div>
 
-      <DataTable :value="filtered" dataKey="id" sortField="concerts" :sortOrder="-1" size="small"
-        v-model:expandedRows="expandedRows" editMode="row" v-model:editingRows="editingRows"
-        class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
-        <Column expander style="width:3rem" />
-        <Column field="name" header="Artist" sortable>
-          <template #editor="{ data, field }"><InputText v-model="data[field]" class="w-full" /></template>
-        </Column>
-        <Column field="countryName" header="From" sortable style="width:150px">
-          <template #body="{ data }">{{ data.country?.name ?? '—' }}</template>
-          <template #editor="{ data }">
-            <Select v-model="data.country_id" :options="countries" optionLabel="name" optionValue="id" showClear placeholder="None" class="w-full" />
-          </template>
-        </Column>
-        <Column field="firstSeen" header="First seen" sortable style="width:115px">
-          <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.firstSeen) }}</span></template>
-        </Column>
-        <Column field="lastSeen" header="Last seen" sortable style="width:115px">
-          <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.lastSeen) }}</span></template>
-        </Column>
-        <Column style="width:5.5rem">
-          <template #body="{ data }">
-            <Button icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
-          </template>
-          <template #editor="{ data }">
-            <div class="flex gap-0.5">
-              <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
-              <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
-              <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onArtistDelete(data)" />
-            </div>
-          </template>
-        </Column>
+      <!-- Mobile card list -->
+      <div class="sm:hidden space-y-2">
+        <div v-for="row in filtered" :key="row.id"
+             class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
 
-        <template #expansion="{ data }">
-          <div class="px-4 py-4">
-            <div class="flex flex-wrap gap-2 mb-4">
-              <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.concerts }}</span><span class="text-gray-500">concerts</span>
-              </span>
-              <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.venues }}</span><span class="text-gray-500">venues</span>
-              </span>
-              <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.cities }}</span><span class="text-gray-500">cities</span>
-              </span>
-              <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.countries }}</span><span class="text-gray-500">countries</span>
-              </span>
+          <!-- Edit mode -->
+          <div v-if="isEditingCard(row.id)" class="p-3 space-y-2 bg-gray-50 dark:bg-gray-800/50">
+            <InputText v-model="cardEditData[row.id].name" placeholder="Name *" class="w-full" />
+            <Select v-model="cardEditData[row.id].country_id" :options="countries" optionLabel="name" optionValue="id" showClear placeholder="Country" class="w-full" />
+            <div class="flex gap-2 pt-1">
+              <Button icon="pi pi-check" label="Save" size="small" severity="success" @click="saveCardEdit(row)" class="flex-1" />
+              <Button icon="pi pi-times" size="small" severity="secondary" text rounded @click="cancelCardEdit(row)" />
+              <Button icon="pi pi-trash" size="small" severity="danger" text rounded @click="deleteFromCard(row)" />
             </div>
-            <p v-if="data.events.length === 0" class="text-sm text-gray-400">No concerts recorded.</p>
-            <table v-else class="w-full text-sm">
-              <thead><tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 dark:border-gray-800">
-                <th class="text-left pb-2 font-medium">Date</th>
-                <th class="text-left pb-2 font-medium">Venue</th>
-                <th class="text-left pb-2 font-medium">City</th>
-                <th class="text-left pb-2 font-medium">Country</th>
-                <th class="text-left pb-2 font-medium">Festival</th>
-                <th class="pb-2"></th>
-              </tr></thead>
-              <tbody>
-                <tr v-for="e in data.events" :key="e.id"
-                  class="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 cursor-pointer"
-                  @click="router.push(`/event/${e.id}`)">
-                  <td class="py-1.5 pr-4 text-gray-500 whitespace-nowrap">{{ formatDate(e.date) }}</td>
-                  <td class="py-1.5 pr-4">{{ e.venue }}</td>
-                  <td class="py-1.5 pr-4 text-gray-500">{{ e.city }}</td>
-                  <td class="py-1.5 pr-4 text-gray-500">{{ e.country }}</td>
-                  <td class="py-1.5 pr-4">
-                    <span v-if="e.festival" class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full">{{ e.festival }}</span>
-                  </td>
-                  <td class="py-1.5"><i class="pi pi-arrow-right text-xs text-gray-300" /></td>
-                </tr>
-              </tbody>
-            </table>
           </div>
-        </template>
-      </DataTable>
+
+          <!-- Normal mode -->
+          <template v-else>
+            <div class="flex items-start p-3 gap-2">
+              <div class="flex-1 min-w-0 cursor-pointer" @click="toggleExpand(row.id)">
+                <div class="font-medium text-sm">{{ row.name }}</div>
+                <div v-if="row.country" class="text-xs text-gray-500 mt-0.5">{{ row.country.name }}</div>
+                <div class="flex flex-wrap gap-1.5 mt-2">
+                  <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-xs">
+                    <span class="font-semibold text-violet-600 dark:text-violet-400">{{ row.concerts }}</span><span class="text-gray-500">shows</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-xs">
+                    <span class="font-semibold text-violet-600 dark:text-violet-400">{{ row.venues }}</span><span class="text-gray-500">venues</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-xs">
+                    <span class="font-semibold text-violet-600 dark:text-violet-400">{{ row.cities }}</span><span class="text-gray-500">cities</span>
+                  </span>
+                </div>
+                <div v-if="row.firstSeen" class="text-xs text-gray-400 mt-1.5">
+                  {{ formatDate(row.firstSeen) }} → {{ formatDate(row.lastSeen) }}
+                </div>
+              </div>
+              <div class="flex items-center gap-0.5 shrink-0 mt-0.5">
+                <Button icon="pi pi-pencil" text rounded size="small" severity="secondary" @click.stop="startCardEdit(row)" />
+                <i class="pi text-xs text-gray-400 w-5 text-center" :class="isExpanded(row.id) ? 'pi-chevron-up' : 'pi-chevron-down'" />
+              </div>
+            </div>
+
+            <div v-if="isExpanded(row.id)" class="border-t border-gray-100 dark:border-gray-800">
+              <p v-if="row.events.length === 0" class="text-sm text-gray-400 px-4 py-3">No concerts recorded.</p>
+              <div v-for="e in row.events" :key="e.id"
+                   class="flex items-center gap-2 px-4 py-2.5 border-b border-gray-50 dark:border-gray-800/50 cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/30 last:border-0"
+                   @click="router.push(`/event/${e.id}`)">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500 whitespace-nowrap">{{ formatDate(e.date) }}</span>
+                    <span v-if="e.festival" class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 rounded-full truncate">{{ e.festival }}</span>
+                  </div>
+                  <div class="text-sm truncate">{{ e.venue }}</div>
+                  <div class="text-xs text-gray-400 truncate">{{ e.city }}, {{ e.country }}</div>
+                </div>
+                <i class="pi pi-arrow-right text-xs text-gray-300 shrink-0" />
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- Desktop table -->
+      <div class="hidden sm:block">
+        <DataTable :value="filtered" dataKey="id" sortField="concerts" :sortOrder="-1" size="small"
+          v-model:expandedRows="expandedRows" editMode="row" v-model:editingRows="editingRows"
+          class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
+          <Column expander style="width:3rem" />
+          <Column field="name" header="Artist" sortable>
+            <template #editor="{ data, field }"><InputText v-model="data[field]" class="w-full" /></template>
+          </Column>
+          <Column field="countryName" header="From" sortable style="width:150px">
+            <template #body="{ data }">{{ data.country?.name ?? '—' }}</template>
+            <template #editor="{ data }">
+              <Select v-model="data.country_id" :options="countries" optionLabel="name" optionValue="id" showClear placeholder="None" class="w-full" />
+            </template>
+          </Column>
+          <Column field="firstSeen" header="First seen" sortable style="width:115px">
+            <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.firstSeen) }}</span></template>
+          </Column>
+          <Column field="lastSeen" header="Last seen" sortable style="width:115px">
+            <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.lastSeen) }}</span></template>
+          </Column>
+          <Column style="width:5.5rem">
+            <template #body="{ data }">
+              <Button icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
+            </template>
+            <template #editor="{ data }">
+              <div class="flex gap-0.5">
+                <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
+                <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
+                <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onArtistDelete(data)" />
+              </div>
+            </template>
+          </Column>
+
+          <template #expansion="{ data }">
+            <div class="px-4 py-4">
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
+                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.concerts }}</span><span class="text-gray-500">concerts</span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
+                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.venues }}</span><span class="text-gray-500">venues</span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
+                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.cities }}</span><span class="text-gray-500">cities</span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
+                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.countries }}</span><span class="text-gray-500">countries</span>
+                </span>
+              </div>
+              <p v-if="data.events.length === 0" class="text-sm text-gray-400">No concerts recorded.</p>
+              <table v-else class="w-full text-sm">
+                <thead><tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 dark:border-gray-800">
+                  <th class="text-left pb-2 font-medium">Date</th>
+                  <th class="text-left pb-2 font-medium">Venue</th>
+                  <th class="text-left pb-2 font-medium">City</th>
+                  <th class="text-left pb-2 font-medium">Country</th>
+                  <th class="text-left pb-2 font-medium">Festival</th>
+                  <th class="pb-2"></th>
+                </tr></thead>
+                <tbody>
+                  <tr v-for="e in data.events" :key="e.id"
+                    class="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 cursor-pointer"
+                    @click="router.push(`/event/${e.id}`)">
+                    <td class="py-1.5 pr-4 text-gray-500 whitespace-nowrap">{{ formatDate(e.date) }}</td>
+                    <td class="py-1.5 pr-4">{{ e.venue }}</td>
+                    <td class="py-1.5 pr-4 text-gray-500">{{ e.city }}</td>
+                    <td class="py-1.5 pr-4 text-gray-500">{{ e.country }}</td>
+                    <td class="py-1.5 pr-4">
+                      <span v-if="e.festival" class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full">{{ e.festival }}</span>
+                    </td>
+                    <td class="py-1.5"><i class="pi pi-arrow-right text-xs text-gray-300" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
+        </DataTable>
+      </div>
     </template>
   </div>
 </template>
