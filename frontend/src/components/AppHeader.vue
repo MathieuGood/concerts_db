@@ -71,7 +71,7 @@ onMounted(() => {
         class="text-lg font-bold text-violet-600 dark:text-violet-400 tracking-tight cursor-pointer"
         @click="navigate('/')"
       >
-        🎸 Concerts
+        Concerts
       </button>
 
       <!-- Desktop nav -->
