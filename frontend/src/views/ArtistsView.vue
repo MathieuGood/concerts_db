@@ -44,7 +44,7 @@ onMounted(async () => {
     const [artists, events, ctrs] = await Promise.all([
       artistService.getAll(), eventService.getAll(), countryService.getAll(),
     ])
-    countries.value = ctrs
+    countries.value = ctrs.sort((a, b) => a.name.localeCompare(b.name))
 
     const statsMap = new Map<number, {
       concerts: number; venueIds: Set<number>; cityIds: Set<number>; countryIds: Set<number>

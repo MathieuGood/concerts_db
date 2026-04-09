@@ -49,8 +49,8 @@ onMounted(async () => {
       cityService.getAll(),
       countryService.getAll(),
     ])
-    cities.value = cs
-    countries.value = ctrs
+    cities.value = cs.sort((a, b) => a.name.localeCompare(b.name))
+    countries.value = ctrs.sort((a, b) => a.name.localeCompare(b.name))
 
     const statsMap = new Map<number, { events: number; artistIds: Set<number>; first: string; last: string; eventList: EventEntry[] }>()
     for (const event of events) {
@@ -132,7 +132,7 @@ const newVenueCitySuggestions = ref<City[]>([])
 watch(() => newVenue.value.countryInput, async (val) => {
   newVenue.value.cityInput = null
   if (val && typeof val === 'object' && 'id' in val) {
-    newVenueCities.value = await cityService.getAll(val.id)
+    newVenueCities.value = (await cityService.getAll(val.id)).sort((a, b) => a.name.localeCompare(b.name))
   } else {
     newVenueCities.value = cities.value
   }
@@ -174,7 +174,7 @@ watch(() => activeCardEdit.value?.countryInput, async (val) => {
   activeCardEdit.value.cityInput = null
   activeCardEdit.value.cities = []
   if (val && typeof val === 'object' && 'id' in val) {
-    activeCardEdit.value.cities = await cityService.getAll(val.id)
+    activeCardEdit.value.cities = (await cityService.getAll(val.id)).sort((a, b) => a.name.localeCompare(b.name))
   }
 })
 
@@ -205,7 +205,7 @@ function startCardEdit(row: VenueRow) {
   // Pre-load cities for current country
   if (row.city?.country?.id) {
     cityService.getAll(row.city.country.id).then(cs => {
-      if (activeCardEdit.value?.id === row.id) activeCardEdit.value.cities = cs
+      if (activeCardEdit.value?.id === row.id) activeCardEdit.value.cities = cs.sort((a, b) => a.name.localeCompare(b.name))
     })
   }
   editingRows.value = [...editingRows.value.filter((r: any) => r.id !== row.id), row]

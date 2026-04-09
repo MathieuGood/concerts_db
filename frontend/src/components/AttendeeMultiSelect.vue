@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import MultiSelect from 'primevue/multiselect'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
@@ -42,6 +42,10 @@ async function create() {
 function attendeeLabel(a: Attendee): string {
   return a.lastname ? `${a.firstname} ${a.lastname}` : a.firstname
 }
+
+const sortedAttendees = computed(() =>
+  [...props.attendees].sort((a, b) => attendeeLabel(a).localeCompare(attendeeLabel(b))),
+)
 </script>
 
 <template>
@@ -49,7 +53,7 @@ function attendeeLabel(a: Attendee): string {
     <div class="flex gap-2 items-center">
       <MultiSelect
         :model-value="modelValue"
-        :options="attendees"
+        :options="sortedAttendees"
         :option-label="attendeeLabel"
         option-value="id"
         filter

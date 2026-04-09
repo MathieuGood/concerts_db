@@ -41,6 +41,10 @@ const showEdit = ref(false)
 const editName = ref('')
 const editSaving = ref(false)
 
+const sortedFestivals = computed(() =>
+  [...props.festivals].sort((a, b) => a.name.localeCompare(b.name)),
+)
+
 const selectedFestival = computed(() =>
   props.festivals.find((f) => f.id === props.modelValue) ?? null,
 )
@@ -70,7 +74,7 @@ async function update() {
     <div class="flex gap-2 items-center">
       <Select
         :model-value="modelValue"
-        :options="festivals"
+        :options="sortedFestivals"
         option-label="name"
         option-value="id"
         filter

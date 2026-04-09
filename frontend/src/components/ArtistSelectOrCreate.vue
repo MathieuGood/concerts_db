@@ -33,7 +33,7 @@ async function onShowCreate() {
   showCreate.value = !showCreate.value
   showEdit.value = false
   if (showCreate.value && allCountries.value.length === 0) {
-    allCountries.value = await countryService.getAll()
+    allCountries.value = (await countryService.getAll()).sort((a, b) => a.name.localeCompare(b.name))
   }
 }
 
@@ -78,6 +78,10 @@ const editSaving = ref(false)
 const editSelectedCountry = ref<Country | null>(null)
 const editCountrySuggestions = ref<Country[]>([])
 
+const sortedArtists = computed(() =>
+  [...props.artists].sort((a, b) => a.name.localeCompare(b.name)),
+)
+
 const selectedArtist = computed(() =>
   props.artists.find((a) => a.id === props.modelValue) ?? null,
 )
@@ -102,7 +106,7 @@ async function openEdit() {
   showCreate.value = false
   editName.value = artist.name
   if (allCountries.value.length === 0) {
-    allCountries.value = await countryService.getAll()
+    allCountries.value = (await countryService.getAll()).sort((a, b) => a.name.localeCompare(b.name))
   }
   editSelectedCountry.value = artist.country ?? null
   showEdit.value = true
@@ -132,7 +136,7 @@ async function update() {
     <div class="flex gap-2 items-center">
       <Select
         :model-value="modelValue"
-        :options="artists"
+        :options="sortedArtists"
         option-label="name"
         option-value="id"
         filter

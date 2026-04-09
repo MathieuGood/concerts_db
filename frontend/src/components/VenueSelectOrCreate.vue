@@ -39,7 +39,8 @@ async function onShowCreate() {
   showCreate.value = !showCreate.value
   showEdit.value = false
   if (showCreate.value && allCountries.value.length === 0) {
-    allCountries.value = await countryService.getAll()
+    const ctrs = await countryService.getAll()
+    allCountries.value = ctrs.sort((a, b) => a.name.localeCompare(b.name))
   }
 }
 
@@ -53,7 +54,7 @@ function searchCountry(event: { query: string }) {
 watch(selectedCountry, async (country) => {
   selectedCity.value = null
   if (country && typeof country === 'object' && 'id' in country) {
-    allCities.value = await cityService.getAll((country as Country).id)
+    allCities.value = (await cityService.getAll((country as Country).id)).sort((a, b) => a.name.localeCompare(b.name))
   } else {
     allCities.value = []
   }
@@ -113,6 +114,10 @@ const editAllCities = ref<City[]>([])
 const editSelectedCity = ref<City | null>(null)
 const editCitySuggestions = ref<City[]>([])
 
+const sortedVenues = computed(() =>
+  [...props.venues].sort((a, b) => venueLabel(a).localeCompare(venueLabel(b))),
+)
+
 const selectedVenue = computed(() =>
   props.venues.find((v) => v.id === props.modelValue) ?? null,
 )
@@ -126,7 +131,7 @@ function searchEditCountry(event: { query: string }) {
 
 async function onEditCountrySelect(event: { value: Country }) {
   editSelectedCity.value = null
-  editAllCities.value = await cityService.getAll(event.value.id)
+  editAllCities.value = (await cityService.getAll(event.value.id)).sort((a, b) => a.name.localeCompare(b.name))
 }
 
 function searchEditCity(event: { query: string }) {
@@ -156,10 +161,11 @@ async function openEdit() {
   showCreate.value = false
   editName.value = venue.name
   if (allCountries.value.length === 0) {
-    allCountries.value = await countryService.getAll()
+    const ctrs = await countryService.getAll()
+    allCountries.value = ctrs.sort((a, b) => a.name.localeCompare(b.name))
   }
   if (venue.city) {
-    editAllCities.value = await cityService.getAll(venue.city.country_id)
+    editAllCities.value = (await cityService.getAll(venue.city.country_id)).sort((a, b) => a.name.localeCompare(b.name))
     editSelectedCountry.value = venue.city.country ?? null
     editSelectedCity.value = venue.city
   } else {
@@ -191,7 +197,7 @@ async function update() {
     <div class="flex gap-2 items-center">
       <Select
         :model-value="modelValue"
-        :options="venues"
+        :options="sortedVenues"
         :option-label="venueLabel"
         option-value="id"
         filter

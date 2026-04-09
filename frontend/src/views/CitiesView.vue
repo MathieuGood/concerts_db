@@ -40,7 +40,7 @@ const newCity = ref({ name: '', countryInput: null as Country | null })
 onMounted(async () => {
   try {
     const [cities, events, ctrs] = await Promise.all([cityService.getAll(), eventService.getAll(), countryService.getAll()])
-    countries.value = ctrs
+    countries.value = ctrs.sort((a, b) => a.name.localeCompare(b.name))
 
     const statsMap = new Map<number, { events: number; venueIds: Set<number>; artistIds: Set<number>; first: string; last: string; eventList: EventEntry[] }>()
     for (const event of events) {
