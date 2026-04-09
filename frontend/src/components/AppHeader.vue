@@ -10,13 +10,13 @@ const route = useRoute()
 const confirm = useConfirm()
 
 const libraryLinks = [
-  { icon: 'pi-star', path: '/artists', label: 'Artists' },
-  { icon: 'pi-building', path: '/venues', label: 'Venues' },
-  { icon: 'pi-map-marker', path: '/cities', label: 'Cities' },
-  { icon: 'pi-globe', path: '/countries', label: 'Countries' },
-  { icon: 'pi-users', path: '/attendees', label: 'People' },
-  { icon: 'pi-ticket', path: '/festivals', label: 'Festivals' },
-  { icon: 'pi-chart-bar', path: '/stats', label: 'Stats' },
+  { icon: 'pi-star',      path: '/artists',   label: 'Artists',   color: 'pink'    },
+  { icon: 'pi-building',  path: '/venues',    label: 'Venues',    color: 'cyan'    },
+  { icon: 'pi-map-marker',path: '/cities',    label: 'Cities',    color: 'green'   },
+  { icon: 'pi-globe',     path: '/countries', label: 'Countries', color: 'orange'  },
+  { icon: 'pi-users',     path: '/attendees', label: 'People',    color: 'yellow'  },
+  { icon: 'pi-ticket',    path: '/festivals', label: 'Festivals', color: 'red'     },
+  { icon: 'pi-chart-bar', path: '/stats',     label: 'Stats',     color: 'comment' },
 ]
 const { user, isAdmin, logout } = useAuth()
 
@@ -170,18 +170,18 @@ onMounted(() => {
       <button
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full text-left transition-colors"
         :class="route.path === '/event/new'
-          ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300'
+          ? 'badge-d-purple'
           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
         @click="navigate('/event/new')"
       >
-        <i class="pi pi-plus text-violet-600 dark:text-violet-400" />
+        <i class="pi pi-plus text-d-purple" />
         New Event
       </button>
 
       <button
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full text-left transition-colors"
         :class="route.path === '/'
-          ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300'
+          ? 'badge-d-purple'
           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
         @click="navigate('/')"
       >
@@ -194,7 +194,7 @@ onMounted(() => {
         :key="link.path"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full text-left transition-colors"
         :class="route.path === link.path
-          ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300'
+          ? `badge-d-${link.color}`
           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
         @click="navigate(link.path)"
       >
@@ -206,7 +206,7 @@ onMounted(() => {
         v-if="isAdmin"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full text-left transition-colors"
         :class="route.path === '/admin'
-          ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300'
+          ? 'badge-d-comment'
           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
         @click="navigate('/admin')"
       >

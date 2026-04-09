@@ -34,7 +34,7 @@ function update(field: keyof ConcertFormData, value: unknown) {
 <template>
   <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-3 bg-white dark:bg-gray-900">
     <div class="flex items-center justify-between">
-      <span class="text-sm font-semibold text-violet-600 dark:text-violet-400">
+      <span class="text-sm font-semibold text-d-purple">
         Concert {{ index + 1 }}
       </span>
       <Button

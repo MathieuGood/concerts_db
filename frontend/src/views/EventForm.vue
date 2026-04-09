@@ -89,6 +89,7 @@ async function save() {
     if (isEdit.value) {
       await eventService.update(eventId.value, payload)
       toast.add({ severity: 'success', summary: 'Saved', detail: 'Event updated.', life: 3000 })
+      router.push('/')
     } else {
       await eventService.create(payload)
       toast.add({ severity: 'success', summary: 'Created', detail: 'Event created.', life: 3000 })
@@ -247,7 +248,7 @@ onMounted(async () => {
         >
           <span class="form-label mb-0">
             Attendees
-            <span v-if="form.attendees_ids.length" class="text-violet-500 font-semibold ml-1">({{ form.attendees_ids.length }})</span>
+            <span v-if="form.attendees_ids.length" class="text-d-yellow font-semibold ml-1">({{ form.attendees_ids.length }})</span>
           </span>
           <i :class="['pi text-gray-400', showAttendees ? 'pi-chevron-up' : 'pi-chevron-down']" />
         </button>

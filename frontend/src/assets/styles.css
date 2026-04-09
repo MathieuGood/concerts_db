@@ -7,7 +7,8 @@
    Light mode: creamy off-white (Dracula foreground) → warm mid-grays
    Dark mode: gray-900 = Dracula #282a36, gray-950 = near-black page bg */
 @theme {
-  --color-gray-50:  #f8f8f2;
+  /* Warm neutral grays — light side tuned to Alucard (#F5F5F5 bg), dark side to Dracula Pro (#22212C bg) */
+  --color-gray-50:  #f5f5f5;
   --color-gray-100: #eeecea;
   --color-gray-200: #d8d5df;
   --color-gray-300: #b8b4c4;
@@ -16,9 +17,55 @@
   --color-gray-600: #534f64;
   --color-gray-700: #44475a;
   --color-gray-800: #373944;
-  --color-gray-900: #282a36;
-  --color-gray-950: #1c1e28;
+  --color-gray-900: #22212c;
+  --color-gray-950: #1a1923;
 }
+
+/* ── Dracula Pro palette ──────────────────────────────────────────────────────
+   Light mode = Alucard (inverted), Dark mode = Dracula Pro.
+   CSS vars switch automatically via .dark class on <html>.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --d-purple:  #644AC9;
+  --d-pink:    #A3144D;
+  --d-cyan:    #036A96;
+  --d-green:   #14710A;
+  --d-orange:  #A34D14;
+  --d-yellow:  #846E15;
+  --d-red:     #CB3A2A;
+  --d-comment: #635D97;
+}
+
+.dark {
+  --d-purple:  #9580FF;
+  --d-pink:    #FF80BF;
+  --d-cyan:    #80FFEA;
+  --d-green:   #8AFF80;
+  --d-orange:  #FFCA80;
+  --d-yellow:  #FFFF80;
+  --d-red:     #FF9580;
+  --d-comment: #7970A9;
+}
+
+/* Text utilities */
+.text-d-purple  { color: var(--d-purple);  }
+.text-d-pink    { color: var(--d-pink);    }
+.text-d-cyan    { color: var(--d-cyan);    }
+.text-d-green   { color: var(--d-green);   }
+.text-d-orange  { color: var(--d-orange);  }
+.text-d-yellow  { color: var(--d-yellow);  }
+.text-d-red     { color: var(--d-red);     }
+.text-d-comment { color: var(--d-comment); }
+
+/* Badge/pill: colored bg tint + matching text — used for active nav, festival tags */
+.badge-d-purple  { background: color-mix(in srgb, var(--d-purple)  15%, transparent); color: var(--d-purple);  }
+.badge-d-pink    { background: color-mix(in srgb, var(--d-pink)    15%, transparent); color: var(--d-pink);    }
+.badge-d-cyan    { background: color-mix(in srgb, var(--d-cyan)    15%, transparent); color: var(--d-cyan);    }
+.badge-d-green   { background: color-mix(in srgb, var(--d-green)   15%, transparent); color: var(--d-green);   }
+.badge-d-orange  { background: color-mix(in srgb, var(--d-orange)  15%, transparent); color: var(--d-orange);  }
+.badge-d-yellow  { background: color-mix(in srgb, var(--d-yellow)  15%, transparent); color: var(--d-yellow);  }
+.badge-d-red     { background: color-mix(in srgb, var(--d-red)     15%, transparent); color: var(--d-red);     }
+.badge-d-comment { background: color-mix(in srgb, var(--d-comment) 15%, transparent); color: var(--d-comment); }
 
 @font-face {
   font-family: 'DepartureMono';

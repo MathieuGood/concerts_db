@@ -159,13 +159,13 @@ function deleteFromCard(row: FestivalRow) {
                 <div class="font-medium text-sm">{{ row.name }}</div>
                 <div class="flex flex-wrap gap-1.5 mt-2">
                   <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-xs">
-                    <span class="font-semibold text-violet-600 dark:text-violet-400">{{ row.events }}</span><span class="text-gray-500">days</span>
+                    <span class="font-semibold text-d-red">{{ row.events }}</span><span class="text-gray-500">days</span>
                   </span>
                   <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-xs">
-                    <span class="font-semibold text-violet-600 dark:text-violet-400">{{ row.editions }}</span><span class="text-gray-500">editions</span>
+                    <span class="font-semibold text-d-red">{{ row.editions }}</span><span class="text-gray-500">editions</span>
                   </span>
                   <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-xs">
-                    <span class="font-semibold text-violet-600 dark:text-violet-400">{{ row.artists }}</span><span class="text-gray-500">artists</span>
+                    <span class="font-semibold text-d-red">{{ row.artists }}</span><span class="text-gray-500">artists</span>
                   </span>
                 </div>
                 <div v-if="row.firstEdition" class="text-xs text-gray-400 mt-1.5">
@@ -226,13 +226,13 @@ function deleteFromCard(row: FestivalRow) {
             <div class="px-4 py-4">
               <div class="flex flex-wrap gap-2 mb-4">
                 <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.events }}</span><span class="text-gray-500">days</span>
+                  <span class="font-semibold text-d-red">{{ data.events }}</span><span class="text-gray-500">days</span>
                 </span>
                 <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.editions }}</span><span class="text-gray-500">editions</span>
+                  <span class="font-semibold text-d-red">{{ data.editions }}</span><span class="text-gray-500">editions</span>
                 </span>
                 <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.artists }}</span><span class="text-gray-500">artists</span>
+                  <span class="font-semibold text-d-red">{{ data.artists }}</span><span class="text-gray-500">artists</span>
                 </span>
               </div>
               <p v-if="data.eventList.length === 0" class="text-sm text-gray-400">No events recorded.</p>

@@ -195,13 +195,13 @@ function deleteFromCard(row: CityRow) {
                 <div v-if="row.country" class="text-xs text-gray-500 mt-0.5">{{ row.country.name }}</div>
                 <div class="flex flex-wrap gap-1.5 mt-2">
                   <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-xs">
-                    <span class="font-semibold text-violet-600 dark:text-violet-400">{{ row.events }}</span><span class="text-gray-500">shows</span>
+                    <span class="font-semibold text-d-green">{{ row.events }}</span><span class="text-gray-500">shows</span>
                   </span>
                   <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-xs">
-                    <span class="font-semibold text-violet-600 dark:text-violet-400">{{ row.venues }}</span><span class="text-gray-500">venues</span>
+                    <span class="font-semibold text-d-green">{{ row.venues }}</span><span class="text-gray-500">venues</span>
                   </span>
                   <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-xs">
-                    <span class="font-semibold text-violet-600 dark:text-violet-400">{{ row.artists }}</span><span class="text-gray-500">artists</span>
+                    <span class="font-semibold text-d-green">{{ row.artists }}</span><span class="text-gray-500">artists</span>
                   </span>
                 </div>
                 <div v-if="row.firstVisit" class="text-xs text-gray-400 mt-1.5">
@@ -222,7 +222,7 @@ function deleteFromCard(row: CityRow) {
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <span class="text-xs text-gray-500 whitespace-nowrap">{{ formatDate(e.date) }}</span>
-                    <span v-if="e.festival" class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 rounded-full truncate">{{ e.festival }}</span>
+                    <span v-if="e.festival" class="text-xs badge-d-red px-1.5 py-0.5 rounded-full truncate">{{ e.festival }}</span>
                   </div>
                   <div class="text-sm truncate">{{ e.venue }}</div>
                   <div class="text-xs text-gray-400 truncate">{{ e.artists || '—' }}</div>
@@ -250,7 +250,7 @@ function deleteFromCard(row: CityRow) {
             </template>
           </Column>
           <Column field="events" header="Shows" sortable style="width:75px">
-            <template #body="{ data }"><span class="font-semibold" :class="data.events > 0 ? 'text-violet-600 dark:text-violet-400' : 'text-gray-400'">{{ data.events || '—' }}</span></template>
+            <template #body="{ data }"><span class="font-semibold" :class="data.events > 0 ? 'text-d-green' : 'text-gray-400'">{{ data.events || '—' }}</span></template>
           </Column>
           <Column field="firstVisit" header="First visit" sortable style="width:115px">
             <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.firstVisit) }}</span></template>
@@ -274,13 +274,13 @@ function deleteFromCard(row: CityRow) {
             <div class="px-4 py-4">
               <div class="flex flex-wrap gap-2 mb-4">
                 <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.events }}</span><span class="text-gray-500">events</span>
+                  <span class="font-semibold text-d-green">{{ data.events }}</span><span class="text-gray-500">events</span>
                 </span>
                 <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.venues }}</span><span class="text-gray-500">venues</span>
+                  <span class="font-semibold text-d-green">{{ data.venues }}</span><span class="text-gray-500">venues</span>
                 </span>
                 <span class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm">
-                  <span class="font-semibold text-violet-600 dark:text-violet-400">{{ data.artists }}</span><span class="text-gray-500">artists</span>
+                  <span class="font-semibold text-d-green">{{ data.artists }}</span><span class="text-gray-500">artists</span>
                 </span>
               </div>
               <p v-if="data.eventList.length === 0" class="text-sm text-gray-400">No events recorded.</p>
@@ -293,7 +293,7 @@ function deleteFromCard(row: CityRow) {
                     <td class="py-1.5 pr-4 text-gray-500 whitespace-nowrap">{{ formatDate(e.date) }}</td>
                     <td class="py-1.5 pr-4">{{ e.venue }}</td>
                     <td class="py-1.5 pr-4 text-gray-600 dark:text-gray-400">{{ e.artists || '—' }}</td>
-                    <td class="py-1.5 pr-4"><span v-if="e.festival" class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full">{{ e.festival }}</span></td>
+                    <td class="py-1.5 pr-4"><span v-if="e.festival" class="text-xs badge-d-red px-2 py-0.5 rounded-full">{{ e.festival }}</span></td>
                     <td class="py-1.5"><i class="pi pi-arrow-right text-xs text-gray-300" /></td>
                   </tr>
                 </tbody>

@@ -92,7 +92,7 @@ function dayNum(dateStr: string): string {
             <!-- Count label (only if bar is tall enough or selected) -->
             <span
               class="text-[10px] leading-none transition-colors"
-              :class="selectedYear === stat.year ? 'text-violet-600 dark:text-violet-400 font-semibold' : 'text-gray-400'"
+              :class="selectedYear === stat.year ? 'text-d-purple font-semibold' : 'text-gray-400'"
             >
               {{ stat.count }}
             </span>
@@ -100,16 +100,16 @@ function dayNum(dateStr: string): string {
             <div
               class="w-full rounded-t cursor-pointer transition-colors"
               :style="{ height: `${Math.max((stat.count / maxYearCount) * 80, 4)}px` }"
-              :class="selectedYear === stat.year
-                ? 'bg-violet-600 dark:bg-violet-500'
-                : 'bg-violet-200 dark:bg-violet-900 hover:bg-violet-400 dark:hover:bg-violet-700'"
+              :style="selectedYear === stat.year
+                ? { background: 'var(--d-purple)' }
+                : { background: 'color-mix(in srgb, var(--d-purple) 25%, transparent)' }"
               @click="selectedYear = stat.year"
             />
             <!-- Year label -->
             <span
               class="text-[10px] leading-none truncate w-full text-center transition-colors"
               :class="selectedYear === stat.year
-                ? 'font-bold text-violet-600 dark:text-violet-400'
+                ? 'font-bold text-d-purple'
                 : 'text-gray-400 dark:text-gray-500'"
             >
               {{ stat.year }}
@@ -144,7 +144,7 @@ function dayNum(dateStr: string): string {
             <!-- Month header -->
             <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
               <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">{{ month.name }}</span>
-              <span class="text-xs font-medium text-violet-600 dark:text-violet-400">
+              <span class="text-xs font-medium text-d-purple">
                 {{ month.events.length }} show{{ month.events.length !== 1 ? 's' : '' }}
               </span>
             </div>
@@ -157,7 +157,7 @@ function dayNum(dateStr: string): string {
               @click="router.push(`/event/${event.id}`)"
             >
               <!-- Day number -->
-              <span class="text-xs font-mono font-semibold text-violet-600 dark:text-violet-400 w-5 shrink-0 pt-0.5">
+              <span class="text-xs font-mono font-semibold text-d-purple w-5 shrink-0 pt-0.5">
                 {{ dayNum(event.event_date) }}
               </span>
 
@@ -171,7 +171,7 @@ function dayNum(dateStr: string): string {
                 </p>
                 <span
                   v-if="event.festival"
-                  class="inline-block mt-1 text-[10px] bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 rounded-full leading-none"
+                  class="inline-block mt-1 text-[10px] badge-d-red px-1.5 py-0.5 rounded-full leading-none"
                 >
                   {{ event.festival.name }}
                 </span>
