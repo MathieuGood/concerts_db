@@ -10,6 +10,7 @@ import CitiesView from '@/views/CitiesView.vue'
 import CountriesView from '@/views/CountriesView.vue'
 import AttendeesView from '@/views/AttendeesView.vue'
 import FestivalsView from '@/views/FestivalsView.vue'
+import StatsView from '@/views/StatsView.vue'
 import { isLoggedIn, getStoredUser } from '@/services/authService'
 
 const router = createRouter({
@@ -26,6 +27,7 @@ const router = createRouter({
     { path: '/countries', component: CountriesView },
     { path: '/attendees', component: AttendeesView },
     { path: '/festivals', component: FestivalsView },
+    { path: '/stats', component: StatsView },
     { path: '/admin', component: AdminView },
   ],
 })

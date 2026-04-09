@@ -16,6 +16,7 @@ const libraryLinks = [
   { icon: 'pi-globe', path: '/countries', label: 'Countries' },
   { icon: 'pi-users', path: '/attendees', label: 'People' },
   { icon: 'pi-ticket', path: '/festivals', label: 'Festivals' },
+  { icon: 'pi-chart-bar', path: '/stats', label: 'Stats' },
 ]
 const { user, isAdmin, logout } = useAuth()
 

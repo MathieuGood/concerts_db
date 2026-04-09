@@ -8,7 +8,6 @@ import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import CalendarView from '@/components/CalendarView.vue'
 import { eventService } from '@/services/eventService'
 import type { Event } from '@/models/Event'
 
@@ -16,7 +15,6 @@ const router = useRouter()
 const events = ref<Event[]>([])
 const loading = ref(true)
 const search = ref('')
-const viewMode = ref<'list' | 'calendar'>('list')
 
 onMounted(async () => {
   try {
@@ -76,8 +74,8 @@ function goToEvent(id: number) {
 <template>
   <div class="space-y-4">
     <!-- Header row -->
-    <div class="flex items-center gap-2">
-      <IconField v-if="viewMode === 'list'" class="flex-1">
+    <div class="flex items-center gap-3">
+      <IconField class="flex-1">
         <InputIcon class="pi pi-search" />
         <InputText
           v-model="search"
@@ -85,16 +83,6 @@ function goToEvent(id: number) {
           class="w-full"
         />
       </IconField>
-      <span v-else class="flex-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Calendar</span>
-      <Button
-        :icon="viewMode === 'list' ? 'pi pi-calendar' : 'pi pi-list'"
-        size="small"
-        rounded
-        text
-        severity="secondary"
-        :aria-label="viewMode === 'list' ? 'Calendar view' : 'List view'"
-        @click="viewMode = viewMode === 'list' ? 'calendar' : 'list'"
-      />
       <Button
         icon="pi pi-plus"
         label="New"
@@ -109,16 +97,13 @@ function goToEvent(id: number) {
       <ProgressSpinner style="width: 40px; height: 40px" />
     </div>
 
-    <!-- Calendar view -->
-    <CalendarView v-else-if="viewMode === 'calendar'" :events="events" />
-
     <!-- Empty state -->
     <div v-else-if="filtered.length === 0" class="text-center py-16 text-gray-400">
       <i class="pi pi-music text-4xl mb-3 block" />
       <p>{{ search ? 'No events match your search.' : 'No events yet. Add your first one!' }}</p>
     </div>
 
-    <template v-else-if="viewMode === 'list'">
+    <template v-else>
       <!-- Mobile cards (< md) -->
       <div class="md:hidden space-y-3">
         <div
