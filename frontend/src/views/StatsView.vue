@@ -99,10 +99,12 @@ function dayNum(dateStr: string): string {
             <!-- Bar -->
             <div
               class="w-full rounded-t cursor-pointer transition-colors"
-              :style="{ height: `${Math.max((stat.count / maxYearCount) * 80, 4)}px` }"
-              :style="selectedYear === stat.year
-                ? { background: 'var(--d-purple)' }
-                : { background: 'color-mix(in srgb, var(--d-purple) 25%, transparent)' }"
+              :style="{
+                height: `${Math.max((stat.count / maxYearCount) * 80, 4)}px`,
+                background: selectedYear === stat.year
+                  ? 'var(--d-purple)'
+                  : 'color-mix(in srgb, var(--d-purple) 25%, transparent)',
+              }"
               @click="selectedYear = stat.year"
             />
             <!-- Year label -->
