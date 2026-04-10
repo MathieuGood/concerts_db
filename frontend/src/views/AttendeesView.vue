@@ -198,7 +198,7 @@ function deleteFromCard(row: AttendeeRow) {
       <!-- Desktop table -->
       <div class="hidden sm:block">
         <DataTable :value="filtered" dataKey="id" sortField="events" :sortOrder="-1" size="small"
-          v-model:expandedRows="expandedRows" editMode="row" v-model:editingRows="editingRows"
+          v-model:expandedRows="expandedRows" editMode="row" :editing-rows="editingRows"
           class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
           <Column expander style="width:3rem" />
           <Column field="firstname" header="First name" sortable>
