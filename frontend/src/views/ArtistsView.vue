@@ -264,6 +264,11 @@ function deleteFromCard(row: ArtistRow) {
               <Select v-model="data.country_id" :options="countries" optionLabel="name" optionValue="id" showClear placeholder="None" class="w-full" />
             </template>
           </Column>
+          <Column field="concerts" header="Concerts" sortable style="width:90px">
+            <template #body="{ data }">
+              <span class="font-semibold text-d-pink">{{ data.concerts }}</span>
+            </template>
+          </Column>
           <Column field="firstSeen" header="First seen" sortable style="width:115px">
             <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.firstSeen) }}</span></template>
           </Column>
