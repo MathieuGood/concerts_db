@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import Select from 'primevue/select'
 import AutoComplete from 'primevue/autocomplete'
 import InputText from 'primevue/inputtext'
@@ -26,6 +26,11 @@ const emit = defineEmits<{
 const showCreate = ref(false)
 const newName = ref('')
 const saving = ref(false)
+const newNameInput = ref<any>(null)
+
+watch(showCreate, (val) => {
+  if (val) nextTick(() => (newNameInput.value?.$el as HTMLInputElement)?.focus())
+})
 
 const allCountries = ref<Country[]>([])
 const selectedCountry = ref<Country | null>(null)
@@ -107,6 +112,11 @@ function venueLabel(v: Venue): string {
 const showEdit = ref(false)
 const editName = ref('')
 const editSaving = ref(false)
+const editNameInput = ref<any>(null)
+
+watch(showEdit, (val) => {
+  if (val) nextTick(() => (editNameInput.value?.$el as HTMLInputElement)?.focus())
+})
 
 const editSelectedCountry = ref<Country | null>(null)
 const editCountrySuggestions = ref<Country[]>([])
@@ -201,6 +211,7 @@ async function update() {
         :option-label="venueLabel"
         option-value="id"
         filter
+        auto-filter-focus
         filter-placeholder="Search venue..."
         placeholder="Select venue"
         class="flex-1"
@@ -226,9 +237,9 @@ async function update() {
     </div>
 
     <!-- Create panel -->
-    <div v-if="showCreate" class="border border-violet-200 dark:border-violet-800 rounded-lg p-3 space-y-2 bg-violet-50 dark:bg-violet-950/30">
+    <div v-if="showCreate" class="border border-violet-200 dark:border-violet-800 rounded-lg p-3 space-y-2 bg-violet-50 dark:bg-violet-950/30" @keydown.esc="showCreate = false">
       <p class="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-wide">New Venue</p>
-      <InputText v-model="newName" placeholder="Venue name" class="w-full" />
+      <InputText ref="newNameInput" v-model="newName" placeholder="Venue name" class="w-full" @keyup.enter="create" />
       <div class="grid grid-cols-2 gap-2">
         <AutoComplete
           v-model="selectedCountry"
@@ -263,9 +274,9 @@ async function update() {
     </div>
 
     <!-- Edit panel -->
-    <div v-if="showEdit" class="border border-amber-200 dark:border-amber-800 rounded-lg p-3 space-y-2 bg-amber-50 dark:bg-amber-950/30">
+    <div v-if="showEdit" class="border border-amber-200 dark:border-amber-800 rounded-lg p-3 space-y-2 bg-amber-50 dark:bg-amber-950/30" @keydown.esc="showEdit = false">
       <p class="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">Edit Venue</p>
-      <InputText v-model="editName" placeholder="Venue name" class="w-full" />
+      <InputText ref="editNameInput" v-model="editName" placeholder="Venue name" class="w-full" @keyup.enter="update" />
       <div class="grid grid-cols-2 gap-2">
         <AutoComplete
           v-model="editSelectedCountry"

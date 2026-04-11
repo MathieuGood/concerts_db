@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import DatePicker from 'primevue/datepicker'
@@ -50,6 +50,17 @@ const loading = ref(true)
 const saving = ref(false)
 const deleting = ref(false)
 const showAttendees = ref(false)
+const datePickerRef = ref<any>(null)
+
+function onKeyDown(e: KeyboardEvent) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault()
+    save()
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', onKeyDown))
+onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
 
 function newConcert(): ConcertFormData {
   return { id: null, artist_id: null, comments: '', setlist: '' }
@@ -151,6 +162,12 @@ onMounted(async () => {
   }
 
   loading.value = false
+  if (!isEdit.value) {
+    nextTick(() => {
+      const input = datePickerRef.value?.$el?.querySelector('input') as HTMLInputElement | null
+      input?.focus()
+    })
+  }
 })
 </script>
 
@@ -175,6 +192,7 @@ onMounted(async () => {
         <div>
           <label class="form-label">Date *</label>
           <DatePicker
+            ref="datePickerRef"
             v-model="form.event_date"
             date-format="dd/mm/yy"
             :show-icon="true"

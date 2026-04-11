@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import Select from 'primevue/select'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
@@ -21,6 +21,11 @@ const emit = defineEmits<{
 const showCreate = ref(false)
 const newName = ref('')
 const saving = ref(false)
+const newNameInput = ref<any>(null)
+
+watch(showCreate, (val) => {
+  if (val) nextTick(() => (newNameInput.value?.$el as HTMLInputElement)?.focus())
+})
 
 async function create() {
   if (!newName.value.trim()) return
@@ -40,6 +45,11 @@ async function create() {
 const showEdit = ref(false)
 const editName = ref('')
 const editSaving = ref(false)
+const editNameInput = ref<any>(null)
+
+watch(showEdit, (val) => {
+  if (val) nextTick(() => (editNameInput.value?.$el as HTMLInputElement)?.focus())
+})
 
 const sortedFestivals = computed(() =>
   [...props.festivals].sort((a, b) => a.name.localeCompare(b.name)),
@@ -78,6 +88,7 @@ async function update() {
         option-label="name"
         option-value="id"
         filter
+        auto-filter-focus
         filter-placeholder="Search festival..."
         placeholder="No festival"
         show-clear
@@ -104,9 +115,9 @@ async function update() {
     </div>
 
     <!-- Create panel -->
-    <div v-if="showCreate" class="border border-violet-200 dark:border-violet-800 rounded-lg p-3 space-y-2 bg-violet-50 dark:bg-violet-950/30">
+    <div v-if="showCreate" class="border border-violet-200 dark:border-violet-800 rounded-lg p-3 space-y-2 bg-violet-50 dark:bg-violet-950/30" @keydown.esc="showCreate = false">
       <p class="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-wide">New Festival</p>
-      <InputText v-model="newName" placeholder="Festival name" class="w-full" @keyup.enter="create" />
+      <InputText ref="newNameInput" v-model="newName" placeholder="Festival name" class="w-full" @keyup.enter="create" />
       <div class="flex justify-end gap-2">
         <Button label="Cancel" size="small" text severity="secondary" @click="showCreate = false" />
         <Button label="Save" size="small" :loading="saving" :disabled="!newName.trim()" @click="create" />
@@ -114,9 +125,9 @@ async function update() {
     </div>
 
     <!-- Edit panel -->
-    <div v-if="showEdit" class="border border-amber-200 dark:border-amber-800 rounded-lg p-3 space-y-2 bg-amber-50 dark:bg-amber-950/30">
+    <div v-if="showEdit" class="border border-amber-200 dark:border-amber-800 rounded-lg p-3 space-y-2 bg-amber-50 dark:bg-amber-950/30" @keydown.esc="showEdit = false">
       <p class="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">Edit Festival</p>
-      <InputText v-model="editName" placeholder="Festival name" class="w-full" @keyup.enter="update" />
+      <InputText ref="editNameInput" v-model="editName" placeholder="Festival name" class="w-full" @keyup.enter="update" />
       <div class="flex justify-end gap-2">
         <Button label="Cancel" size="small" text severity="secondary" @click="showEdit = false" />
         <Button label="Save" size="small" :loading="editSaving" :disabled="!editName.trim()" @click="update" />
