@@ -108,6 +108,16 @@ onMounted(() => {
 
         <Button
           v-if="isAdmin"
+          icon="pi pi-database"
+          size="small"
+          rounded
+          text
+          severity="secondary"
+          @click="navigate('/import')"
+          aria-label="Import / Export"
+        />
+        <Button
+          v-if="isAdmin"
           icon="pi pi-shield"
           size="small"
           rounded
@@ -200,6 +210,18 @@ onMounted(() => {
       >
         <i :class="`pi ${link.icon}`" />
         {{ link.label }}
+      </button>
+
+      <button
+        v-if="isAdmin"
+        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full text-left transition-colors"
+        :class="route.path === '/import'
+          ? 'badge-d-comment'
+          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
+        @click="navigate('/import')"
+      >
+        <i class="pi pi-database" />
+        Import / Export
       </button>
 
       <button

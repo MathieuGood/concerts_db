@@ -19,6 +19,7 @@ from routes.venue import router as venue_router
 from routes.video import router as video_router
 from routes.auth import router as auth_router
 from routes.admin import router as admin_router
+from routes.transfer import router as transfer_router
 
 
 @asynccontextmanager
@@ -58,6 +59,7 @@ app.add_middleware(
 app.include_router(root_router)
 app.include_router(auth_router)
 app.include_router(admin_router)
+app.include_router(transfer_router)
 app.include_router(country_router)
 app.include_router(city_router)
 app.include_router(artist_router)

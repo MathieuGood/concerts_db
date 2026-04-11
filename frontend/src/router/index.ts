@@ -11,6 +11,7 @@ import CountriesView from '@/views/CountriesView.vue'
 import AttendeesView from '@/views/AttendeesView.vue'
 import FestivalsView from '@/views/FestivalsView.vue'
 import StatsView from '@/views/StatsView.vue'
+import ImportView from '@/views/ImportView.vue'
 import { isLoggedIn, getStoredUser } from '@/services/authService'
 
 const router = createRouter({
@@ -29,13 +30,14 @@ const router = createRouter({
     { path: '/festivals', component: FestivalsView },
     { path: '/stats', component: StatsView },
     { path: '/admin', component: AdminView },
+    { path: '/import', component: ImportView },
   ],
 })
 
 router.beforeEach((to) => {
   if (to.meta.public) return true
   if (!isLoggedIn()) return '/login'
-  if (to.path === '/admin') {
+  if (to.path === '/admin' || to.path === '/import') {
     const user = getStoredUser()
     if (!user?.is_admin) return '/'
   }
