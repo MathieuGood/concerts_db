@@ -104,9 +104,6 @@ function reset() {
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             Download all your shows as a CSV — full fidelity, suitable for backup or re-import.
           </p>
-          <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 font-mono">
-            curl "https://concerts.mathieubon.com/api/transfer/export?key=&lt;EXPORT_KEY&gt;" -o backup.csv
-          </p>
         </div>
         <Button
           icon="pi pi-download"

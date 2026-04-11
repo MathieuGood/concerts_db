@@ -1,27 +1,20 @@
 """
 Export and import routes for the concerts database.
 
-Export (open, key-authenticated):
-    GET /transfer/export?key=<EXPORT_KEY>           — for scripts / cron
-    GET /transfer/export  (Bearer admin token)       — for the frontend button
+Both routes require an admin Bearer token (same auth as /admin/*).
 
-Import (admin Bearer token required):
-    POST /transfer/import?dry_run=true              — preview only, no DB writes
-    POST /transfer/import?dry_run=false             — actual import
+Export:  GET  /transfer/export
+Import:  POST /transfer/import?dry_run=true|false
 """
 import csv
 import io
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi.responses import Response
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError
 from sqlalchemy.orm import Session, joinedload
 
 from auth.dependencies import require_admin
-from auth.jwt import decode_token
-from config import Config
 from crud import country as country_crud, city as city_crud
 from database.database import get_db
 from models.artist import Artist
@@ -35,32 +28,6 @@ from models.user import User
 from models.venue import Venue
 
 router = APIRouter(prefix="/transfer", tags=["transfer"])
-
-_optional_bearer = HTTPBearer(auto_error=False)
-
-# ── Auth helpers ──────────────────────────────────────────────────────────────
-
-def _resolve_admin(
-    key: str | None,
-    credentials: HTTPAuthorizationCredentials | None,
-    db: Session,
-) -> User:
-    """Accept either a valid EXPORT_KEY query param or an admin Bearer token."""
-    if key and Config.EXPORT_KEY and key == Config.EXPORT_KEY:
-        admin = db.query(User).filter(User.is_admin == True).first()
-        if admin:
-            return admin
-
-    if credentials:
-        try:
-            user_id = decode_token(credentials.credentials)
-            user = db.query(User).filter(User.id == user_id, User.is_admin == True).first()
-            if user:
-                return user
-        except JWTError:
-            pass
-
-    raise HTTPException(status_code=403, detail="Valid export key or admin token required.")
 
 # ── CSV helpers ───────────────────────────────────────────────────────────────
 
@@ -171,15 +138,12 @@ def _find_or_create_attendee(db: Session, full_name: str, user_id: int) -> Atten
 
 @router.get("/export")
 def export_csv(
-    key: str | None = None,
-    credentials: HTTPAuthorizationCredentials | None = Depends(_optional_bearer),
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    admin = _resolve_admin(key, credentials, db)
-
     events = (
         db.query(Event)
-        .filter(Event.user_id == admin.id)
+        .filter(Event.user_id == current_user.id)
         .options(
             joinedload(Event.venue).joinedload(Venue.city).joinedload(City.country),
             joinedload(Event.concerts).joinedload(Concert.artist),
@@ -216,17 +180,16 @@ async def import_csv(
     results: list[dict] = []
 
     for i, row in enumerate(reader, start=2):
-        event_date    = (row.get("event_date")    or "").strip()
-        venue_name    = (row.get("venue")         or "").strip()
-        city_name     = (row.get("city")          or "").strip()
-        country_name  = (row.get("country")       or "").strip()
-        event_name    = (row.get("event_name")    or "").strip()
-        festival_name = (row.get("festival")      or "").strip()
-        artists_raw   = (row.get("artists")       or "").strip()
-        cc_raw        = (row.get("concert_comments") or "").strip()
-        setlist_raw   = (row.get("setlist")       or "").strip()
-        attendees_raw = (row.get("attendees")     or "").strip()
-        # support old "comments" column name too
+        event_date    = (row.get("event_date")       or "").strip()
+        venue_name    = (row.get("venue")             or "").strip()
+        city_name     = (row.get("city")              or "").strip()
+        country_name  = (row.get("country")           or "").strip()
+        event_name    = (row.get("event_name")        or "").strip()
+        festival_name = (row.get("festival")          or "").strip()
+        artists_raw   = (row.get("artists")           or "").strip()
+        cc_raw        = (row.get("concert_comments")  or "").strip()
+        setlist_raw   = (row.get("setlist")           or "").strip()
+        attendees_raw = (row.get("attendees")         or "").strip()
         event_comments = (row.get("event_comments") or row.get("comments") or "").strip()
 
         entry = {
@@ -252,7 +215,6 @@ async def import_csv(
             results.append({**entry, "status": "import"})
             continue
 
-        # ── Actual import ─────────────────────────────────────────────────────
         try:
             country_obj = country_crud.find_or_create(db, country_name)
             city_obj    = city_crud.find_or_create(db, city_name, country_obj.id)
@@ -271,11 +233,11 @@ async def import_csv(
                 user_id=current_user.id,
             )
             db.add(event)
-            db.flush()  # get event.id
+            db.flush()
 
-            artists  = [a.strip() for a in artists_raw.split(";") if a.strip()]
-            cc_list  = [c.strip() for c in cc_raw.split(";")]
-            sl_list  = [s.strip() for s in setlist_raw.split(";")]
+            artists = [a.strip() for a in artists_raw.split(";") if a.strip()]
+            cc_list = [c.strip() for c in cc_raw.split(";")]
+            sl_list = [s.strip() for s in setlist_raw.split(";")]
 
             for j, artist_name in enumerate(artists):
                 artist_obj = _find_or_create_artist(db, artist_name)
