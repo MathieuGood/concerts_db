@@ -15,6 +15,8 @@ const router = useRouter()
 const events = ref<Event[]>([])
 const loading = ref(true)
 const search = ref('')
+const expandedRows = ref<any[]>([])
+const expandedCards = ref<Set<number>>(new Set())
 
 onMounted(async () => {
   try {
@@ -66,8 +68,11 @@ const filtered = computed(() => {
   return result.sort((a, b) => a.event_date.localeCompare(b.event_date))
 })
 
-function goToEvent(id: number) {
-  router.push(`/event/${id}`)
+function toggleCard(id: number) {
+  if (expandedCards.value.has(id)) expandedCards.value.delete(id)
+  else expandedCards.value.add(id)
+  // trigger reactivity
+  expandedCards.value = new Set(expandedCards.value)
 }
 </script>
 
@@ -105,32 +110,93 @@ function goToEvent(id: number) {
 
     <template v-else>
       <!-- Mobile cards (< md) -->
-      <div class="md:hidden space-y-3">
+      <div class="md:hidden space-y-2">
         <div
           v-for="event in filtered"
           :key="event.id"
-          class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 cursor-pointer active:opacity-70 transition-opacity"
-          @click="goToEvent(event.id)"
+          class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
         >
-          <div class="flex items-start justify-between gap-2">
-            <div class="min-w-0">
-              <p class="font-semibold text-gray-900 dark:text-gray-100 truncate">
-                {{ artistNames(event) || event.name || '—' }}
-              </p>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                {{ event.venue?.name }}
-                <span v-if="event.venue?.city?.name"> — {{ event.venue.city.name }}</span>
-              </p>
-              <span
-                v-if="event.festival"
-                class="inline-block mt-1 text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full"
+          <!-- Card header row -->
+          <div class="flex items-start gap-2 p-4">
+            <button
+              class="flex-1 min-w-0 text-left"
+              @click="toggleCard(event.id)"
+            >
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <p class="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                    {{ artistNames(event) || event.name || '—' }}
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                    {{ event.venue?.name }}
+                    <span v-if="event.venue?.city?.name"> — {{ event.venue.city.name }}</span>
+                  </p>
+                  <span
+                    v-if="event.festival"
+                    class="inline-block mt-1 text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full"
+                  >
+                    {{ event.festival.name }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-1 shrink-0 pt-0.5">
+                  <span class="text-xs text-gray-400 dark:text-gray-500">
+                    {{ formatDate(event.event_date) }}
+                  </span>
+                  <i :class="['pi text-gray-400 text-xs ml-1', expandedCards.has(event.id) ? 'pi-chevron-up' : 'pi-chevron-down']" />
+                </div>
+              </div>
+            </button>
+            <Button
+              icon="pi pi-pencil"
+              text
+              rounded
+              size="small"
+              severity="secondary"
+              class="shrink-0 -mr-1 -mt-1"
+              @click="router.push(`/event/${event.id}`)"
+              aria-label="Edit"
+            />
+          </div>
+
+          <!-- Card expansion -->
+          <div
+            v-if="expandedCards.has(event.id)"
+            class="border-t border-gray-100 dark:border-gray-800 px-4 py-3 space-y-3"
+          >
+            <!-- Concerts -->
+            <div v-if="event.concerts.length" class="space-y-2">
+              <div
+                v-for="concert in event.concerts"
+                :key="concert.id"
+                class="space-y-1"
               >
-                {{ event.festival.name }}
+                <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  {{ concert.artist?.name ?? '—' }}
+                </p>
+                <p v-if="concert.comments" class="text-xs text-gray-500 dark:text-gray-400 italic">
+                  {{ concert.comments }}
+                </p>
+                <div v-if="concert.setlist" class="text-xs text-gray-500 dark:text-gray-400 font-mono whitespace-pre-line bg-gray-50 dark:bg-gray-800 rounded px-2 py-1">{{ concert.setlist }}</div>
+              </div>
+            </div>
+            <!-- Venue full -->
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{ event.venue?.name }}
+              <span v-if="event.venue?.city?.name"> · {{ event.venue.city.name }}</span>
+              <span v-if="event.venue?.city?.country?.name"> · {{ event.venue.city.country.name }}</span>
+            </p>
+            <!-- Event comments -->
+            <p v-if="event.comments" class="text-xs text-gray-500 dark:text-gray-400 italic">{{ event.comments }}</p>
+            <!-- Attendees -->
+            <div v-if="event.attendees?.length" class="flex flex-wrap gap-1">
+              <span
+                v-for="a in event.attendees"
+                :key="a.id"
+                class="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2 py-0.5 rounded-full"
+              >
+                {{ a.firstname }} {{ a.lastname }}
               </span>
             </div>
-            <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0 pt-0.5">
-              {{ formatDate(event.event_date) }}
-            </span>
           </div>
         </div>
       </div>
@@ -139,35 +205,41 @@ function goToEvent(id: number) {
       <div class="hidden md:block">
         <DataTable
           :value="filtered"
+          v-model:expandedRows="expandedRows"
           row-hover
           size="small"
           sortField="event_date"
           :sortOrder="1"
           class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700"
-          @row-click="(e) => goToEvent(e.data.id)"
-          style="cursor: pointer"
+          dataKey="id"
         >
+          <Column expander style="width: 2.5rem" />
+
           <Column field="event_date" header="Date" sortable style="width: 120px">
             <template #body="{ data }">
               {{ formatDate(data.event_date) }}
             </template>
           </Column>
-          <Column header="Artists" sortable sort-field="event_date">
+
+          <Column header="Artists">
             <template #body="{ data }">
               {{ artistNames(data) || data.name || '—' }}
             </template>
           </Column>
-          <Column header="Venue" sortable sort-field="venue.name">
+
+          <Column header="Venue">
             <template #body="{ data }">
               {{ data.venue?.name }}
             </template>
           </Column>
-          <Column header="City" sortable sort-field="venue.city.name">
+
+          <Column header="City">
             <template #body="{ data }">
               {{ data.venue?.city?.name }}
             </template>
           </Column>
-          <Column header="Festival" sortable sort-field="festival.name">
+
+          <Column header="Festival">
             <template #body="{ data }">
               <span
                 v-if="data.festival"
@@ -177,6 +249,62 @@ function goToEvent(id: number) {
               </span>
             </template>
           </Column>
+
+          <Column style="width: 3rem">
+            <template #body="{ data }">
+              <Button
+                icon="pi pi-pencil"
+                text
+                rounded
+                size="small"
+                severity="secondary"
+                @click="router.push(`/event/${data.id}`)"
+                aria-label="Edit"
+              />
+            </template>
+          </Column>
+
+          <template #expansion="{ data }">
+            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 space-y-3">
+              <!-- Concerts -->
+              <div v-if="data.concerts.length" class="space-y-2">
+                <div
+                  v-for="concert in data.concerts"
+                  :key="concert.id"
+                >
+                  <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                    {{ concert.artist?.name ?? '—' }}
+                  </span>
+                  <span v-if="concert.comments" class="ml-2 text-xs text-gray-500 dark:text-gray-400 italic">{{ concert.comments }}</span>
+                  <div v-if="concert.setlist" class="mt-1 text-xs text-gray-500 dark:text-gray-400 font-mono whitespace-pre-line bg-white dark:bg-gray-900 rounded px-2 py-1 border border-gray-100 dark:border-gray-700">{{ concert.setlist }}</div>
+                </div>
+              </div>
+
+              <!-- Venue + country -->
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                <i class="pi pi-map-marker mr-1" />
+                {{ data.venue?.name }}
+                <span v-if="data.venue?.city?.name"> · {{ data.venue.city.name }}</span>
+                <span v-if="data.venue?.city?.country?.name"> · {{ data.venue.city.country.name }}</span>
+              </p>
+
+              <!-- Event comments -->
+              <p v-if="data.comments" class="text-xs text-gray-500 dark:text-gray-400 italic">
+                <i class="pi pi-comment mr-1" />{{ data.comments }}
+              </p>
+
+              <!-- Attendees -->
+              <div v-if="data.attendees?.length" class="flex flex-wrap gap-1">
+                <span
+                  v-for="a in data.attendees"
+                  :key="a.id"
+                  class="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2 py-0.5 rounded-full"
+                >
+                  {{ a.firstname }} {{ a.lastname }}
+                </span>
+              </div>
+            </div>
+          </template>
         </DataTable>
         <p class="text-xs text-gray-400 mt-2 text-right">{{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}</p>
       </div>

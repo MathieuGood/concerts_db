@@ -109,7 +109,8 @@ def create(db: Session, event: EventCreate, user_id: int) -> Event:
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Event '{new_event.name}' already exists."
+            status_code=409,
+            detail=f"You already have an event at this venue on {event.event_date}.",
         )
 
 
@@ -182,7 +183,8 @@ def update(db: Session, event_id: int, event: EventCreate, user_id: int) -> Even
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Event '{event.name}' already exists."
+            status_code=409,
+            detail=f"You already have an event at this venue on {event.event_date}.",
         )
 
 

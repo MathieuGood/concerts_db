@@ -66,7 +66,7 @@ def create(db: Session, concert: ConcertCreate) -> Concert:
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Concert for artist ID {concert.artist_id} on event ID {concert.event_id} already exists."
+            status_code=409, detail="This artist is already listed for this event."
         )
 
 
@@ -89,7 +89,7 @@ def update(db: Session, concert_id: int, concert: ConcertCreate) -> Concert:
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Concert for artist ID {concert.artist_id} on event ID {concert.event_id} already exists."
+            status_code=409, detail="This artist is already listed for this event."
         )
 
 
