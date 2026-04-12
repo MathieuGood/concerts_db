@@ -88,6 +88,9 @@ function toggleCard(id: number) {
           class="w-full"
         />
       </IconField>
+      <span v-if="!loading" class="text-xs text-gray-400 shrink-0 whitespace-nowrap">
+        {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
+      </span>
       <Button
         icon="pi pi-plus"
         label="New"
@@ -306,7 +309,6 @@ function toggleCard(id: number) {
             </div>
           </template>
         </DataTable>
-        <p class="text-xs text-gray-400 mt-2 text-right">{{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}</p>
       </div>
     </template>
   </div>
