@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
@@ -21,6 +22,7 @@ import type { Country } from '@/models/Country'
 
 const router = useRouter()
 const confirm = useConfirm()
+const toast = useToast()
 
 interface EventEntry { id: number; date: string; artists: string; festival: string | null }
 interface VenueRow {
@@ -98,8 +100,12 @@ function cancelEdit(row: VenueRow) {
   row._editing = false
 }
 async function saveRow(data: VenueRow) {
-  await onSave({ newData: { ...data, ...editData.value[data.id] } })
-  delete editData.value[data.id]
+  try {
+    await onSave({ newData: { ...data, ...editData.value[data.id] } })
+    delete editData.value[data.id]
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 async function onSave(event: any) {
@@ -112,7 +118,14 @@ async function onSave(event: any) {
 
 function onDelete(row: VenueRow) {
   confirm.require({ message: `Delete "${row.name}"?`, header: 'Confirm deletion', icon: 'pi pi-exclamation-triangle', acceptLabel: 'Delete', rejectLabel: 'Cancel',
-    accept: async () => { await venueService.delete(row.id); venueRows.value = venueRows.value.filter(v => v.id !== row.id) } })
+    accept: async () => {
+      try {
+        await venueService.delete(row.id)
+        venueRows.value = venueRows.value.filter(v => v.id !== row.id)
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+      }
+    } })
 }
 
 // resolve helpers
@@ -162,15 +175,19 @@ function searchNewVenueCity(event: { query: string }) {
 
 async function createVenue() {
   if (!newVenue.value.name.trim() || !newVenue.value.cityInput) return
-  const countryId = await resolveCountry(newVenue.value.countryInput)
-  const cityId = await resolveCity(newVenue.value.cityInput, countryId)
-  if (!cityId) return
-  const created = await venueService.create(newVenue.value.name.trim(), cityId)
-  const city = cities.value.find(c => c.id === created.city_id) ?? null
-  venueRows.value.push({ id: created.id, name: created.name, city_id: created.city_id, city, cityName: city?.name ?? '', countryName: city?.country?.name ?? '', events: 0, artists: 0, firstVisit: null, lastVisit: null, eventList: [], _editing: false })
-  newVenue.value = { name: '', countryInput: null, cityInput: null }
-  newVenueCities.value = []
-  addingVenue.value = false
+  try {
+    const countryId = await resolveCountry(newVenue.value.countryInput)
+    const cityId = await resolveCity(newVenue.value.cityInput, countryId)
+    if (!cityId) return
+    const created = await venueService.create(newVenue.value.name.trim(), cityId)
+    const city = cities.value.find(c => c.id === created.city_id) ?? null
+    venueRows.value.push({ id: created.id, name: created.name, city_id: created.city_id, city, cityName: city?.name ?? '', countryName: city?.country?.name ?? '', events: 0, artists: 0, firstVisit: null, lastVisit: null, eventList: [], _editing: false })
+    newVenue.value = { name: '', countryInput: null, cityInput: null }
+    newVenueCities.value = []
+    addingVenue.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 // Mobile card helpers

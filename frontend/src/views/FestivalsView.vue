@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
@@ -15,6 +16,7 @@ import { eventService } from '@/services/eventService'
 
 const router = useRouter()
 const confirm = useConfirm()
+const toast = useToast()
 
 interface EventEntry { id: number; date: string; venue: string; city: string; artists: string }
 interface FestivalRow {
@@ -77,8 +79,12 @@ function cancelEdit(row: FestivalRow) {
   row._editing = false
 }
 async function saveRow(data: FestivalRow) {
-  await onSave({ newData: { ...data, ...editData.value[data.id] } })
-  delete editData.value[data.id]
+  try {
+    await onSave({ newData: { ...data, ...editData.value[data.id] } })
+    delete editData.value[data.id]
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 async function onSave(event: any) {
@@ -90,16 +96,27 @@ async function onSave(event: any) {
 
 function onDelete(row: FestivalRow) {
   confirm.require({ message: `Delete "${row.name}"?`, header: 'Confirm deletion', icon: 'pi pi-exclamation-triangle', acceptLabel: 'Delete', rejectLabel: 'Cancel',
-    accept: async () => { await festivalService.delete(row.id); festivalRows.value = festivalRows.value.filter(f => f.id !== row.id) } })
+    accept: async () => {
+      try {
+        await festivalService.delete(row.id)
+        festivalRows.value = festivalRows.value.filter(f => f.id !== row.id)
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+      }
+    } })
 }
 
 async function createFestival() {
   if (!newFestivalName.value.trim()) return
-  const created = await festivalService.create(newFestivalName.value.trim())
-  festivalRows.value.push({ id: created.id, name: created.name, events: 0, artists: 0, editions: 0, firstEdition: null, lastEdition: null, eventList: [], _editing: false })
-  festivalRows.value.sort((a, b) => a.name.localeCompare(b.name))
-  newFestivalName.value = ''
-  addingFestival.value = false
+  try {
+    const created = await festivalService.create(newFestivalName.value.trim())
+    festivalRows.value.push({ id: created.id, name: created.name, events: 0, artists: 0, editions: 0, firstEdition: null, lastEdition: null, eventList: [], _editing: false })
+    festivalRows.value.sort((a, b) => a.name.localeCompare(b.name))
+    newFestivalName.value = ''
+    addingFestival.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 // Mobile card helpers

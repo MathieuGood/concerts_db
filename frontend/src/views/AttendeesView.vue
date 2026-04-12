@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
@@ -15,6 +16,7 @@ import { eventService } from '@/services/eventService'
 
 const router = useRouter()
 const confirm = useConfirm()
+const toast = useToast()
 
 interface EventEntry { id: number; date: string; venue: string; city: string; artists: string; festival: string | null }
 interface AttendeeRow {
@@ -76,8 +78,12 @@ function cancelEdit(row: AttendeeRow) {
   row._editing = false
 }
 async function saveRow(data: AttendeeRow) {
-  await onSave({ newData: { ...data, ...editData.value[data.id] } })
-  delete editData.value[data.id]
+  try {
+    await onSave({ newData: { ...data, ...editData.value[data.id] } })
+    delete editData.value[data.id]
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 async function onSave(event: any) {
@@ -89,15 +95,26 @@ async function onSave(event: any) {
 
 function onDelete(row: AttendeeRow) {
   confirm.require({ message: `Delete "${row.fullName}"?`, header: 'Confirm deletion', icon: 'pi pi-exclamation-triangle', acceptLabel: 'Delete', rejectLabel: 'Cancel',
-    accept: async () => { await attendeeService.delete(row.id); attendeeRows.value = attendeeRows.value.filter(a => a.id !== row.id) } })
+    accept: async () => {
+      try {
+        await attendeeService.delete(row.id)
+        attendeeRows.value = attendeeRows.value.filter(a => a.id !== row.id)
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+      }
+    } })
 }
 
 async function createAttendee() {
   if (!newAttendee.value.firstname.trim()) return
-  const created = await attendeeService.create(newAttendee.value.firstname.trim(), newAttendee.value.lastname.trim() || undefined)
-  attendeeRows.value.push({ id: created.id, firstname: created.firstname, lastname: created.lastname ?? null, fullName: [created.firstname, created.lastname].filter(Boolean).join(' '), events: 0, artists: 0, firstEvent: null, lastEvent: null, eventList: [], _editing: false })
-  newAttendee.value = { firstname: '', lastname: '' }
-  addingAttendee.value = false
+  try {
+    const created = await attendeeService.create(newAttendee.value.firstname.trim(), newAttendee.value.lastname.trim() || undefined)
+    attendeeRows.value.push({ id: created.id, firstname: created.firstname, lastname: created.lastname ?? null, fullName: [created.firstname, created.lastname].filter(Boolean).join(' '), events: 0, artists: 0, firstEvent: null, lastEvent: null, eventList: [], _editing: false })
+    newAttendee.value = { firstname: '', lastname: '' }
+    addingAttendee.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 // Mobile card helpers

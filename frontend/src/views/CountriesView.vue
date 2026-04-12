@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
@@ -15,6 +16,7 @@ import { eventService } from '@/services/eventService'
 
 const router = useRouter()
 const confirm = useConfirm()
+const toast = useToast()
 
 interface EventEntry { id: number; date: string; city: string; venue: string; artists: string; festival: string | null }
 interface CountryRow {
@@ -78,8 +80,12 @@ function cancelEdit(row: CountryRow) {
   row._editing = false
 }
 async function saveRow(data: CountryRow) {
-  await onSave({ newData: { ...data, ...editData.value[data.id] } })
-  delete editData.value[data.id]
+  try {
+    await onSave({ newData: { ...data, ...editData.value[data.id] } })
+    delete editData.value[data.id]
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 async function onSave(event: any) {
@@ -91,16 +97,27 @@ async function onSave(event: any) {
 
 function onDelete(row: CountryRow) {
   confirm.require({ message: `Delete "${row.name}"?`, header: 'Confirm deletion', icon: 'pi pi-exclamation-triangle', acceptLabel: 'Delete', rejectLabel: 'Cancel',
-    accept: async () => { await countryService.delete(row.id); countryRows.value = countryRows.value.filter(c => c.id !== row.id) } })
+    accept: async () => {
+      try {
+        await countryService.delete(row.id)
+        countryRows.value = countryRows.value.filter(c => c.id !== row.id)
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+      }
+    } })
 }
 
 async function createCountry() {
   if (!newCountryName.value.trim()) return
-  const created = await countryService.create(newCountryName.value.trim())
-  countryRows.value.push({ id: created.id, name: created.name, events: 0, cities: 0, venues: 0, artists: 0, firstVisit: null, lastVisit: null, eventList: [], _editing: false })
-  countryRows.value.sort((a, b) => a.name.localeCompare(b.name))
-  newCountryName.value = ''
-  addingCountry.value = false
+  try {
+    const created = await countryService.create(newCountryName.value.trim())
+    countryRows.value.push({ id: created.id, name: created.name, events: 0, cities: 0, venues: 0, artists: 0, firstVisit: null, lastVisit: null, eventList: [], _editing: false })
+    countryRows.value.sort((a, b) => a.name.localeCompare(b.name))
+    newCountryName.value = ''
+    addingCountry.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 // Mobile card helpers

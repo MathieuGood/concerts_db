@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
@@ -19,6 +20,7 @@ import type { Country } from '@/models/Country'
 
 const router = useRouter()
 const confirm = useConfirm()
+const toast = useToast()
 
 interface EventEntry {
   id: number; date: string; venue: string; city: string; country: string; festival: string | null
@@ -101,8 +103,12 @@ function cancelEdit(row: ArtistRow) {
   row._editing = false
 }
 async function saveRow(data: ArtistRow) {
-  await onArtistSave({ newData: { ...data, ...editData.value[data.id] } })
-  delete editData.value[data.id]
+  try {
+    await onArtistSave({ newData: { ...data, ...editData.value[data.id] } })
+    delete editData.value[data.id]
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 async function onArtistSave(event: any) {
@@ -115,7 +121,14 @@ async function onArtistSave(event: any) {
 
 function onArtistDelete(row: ArtistRow) {
   confirm.require({ message: `Delete "${row.name}"?`, header: 'Confirm deletion', icon: 'pi pi-exclamation-triangle', acceptLabel: 'Delete', rejectLabel: 'Cancel',
-    accept: async () => { await artistService.delete(row.id); artistRows.value = artistRows.value.filter(a => a.id !== row.id) } })
+    accept: async () => {
+      try {
+        await artistService.delete(row.id)
+        artistRows.value = artistRows.value.filter(a => a.id !== row.id)
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+      }
+    } })
 }
 
 async function resolveCountry(input: Country | string | null): Promise<number | null> {
@@ -129,12 +142,16 @@ async function resolveCountry(input: Country | string | null): Promise<number | 
 
 async function createArtist() {
   if (!newArtist.value.name.trim()) return
-  const country_id = await resolveCountry(newArtist.value.countryInput)
-  const created = await artistService.create(newArtist.value.name.trim(), country_id)
-  const country = countries.value.find(c => c.id === created.country_id) ?? null
-  artistRows.value.push({ id: created.id, name: created.name, countryName: country?.name ?? '', country_id: created.country_id ?? null, country, concerts: 0, venues: 0, cities: 0, countries: 0, firstSeen: null, lastSeen: null, events: [], _editing: false })
-  newArtist.value = { name: '', countryInput: null }
-  addingArtist.value = false
+  try {
+    const country_id = await resolveCountry(newArtist.value.countryInput)
+    const created = await artistService.create(newArtist.value.name.trim(), country_id)
+    const country = countries.value.find(c => c.id === created.country_id) ?? null
+    artistRows.value.push({ id: created.id, name: created.name, countryName: country?.name ?? '', country_id: created.country_id ?? null, country, concerts: 0, venues: 0, cities: 0, countries: 0, firstSeen: null, lastSeen: null, events: [], _editing: false })
+    newArtist.value = { name: '', countryInput: null }
+    addingArtist.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 // AutoComplete suggestions

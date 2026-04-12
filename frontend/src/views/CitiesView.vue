@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
@@ -19,6 +20,7 @@ import type { Country } from '@/models/Country'
 
 const router = useRouter()
 const confirm = useConfirm()
+const toast = useToast()
 
 interface EventEntry { id: number; date: string; venue: string; artists: string; festival: string | null }
 interface CityRow {
@@ -83,8 +85,12 @@ function cancelEdit(row: CityRow) {
   row._editing = false
 }
 async function saveRow(data: CityRow) {
-  await onSave({ newData: { ...data, ...editData.value[data.id] } })
-  delete editData.value[data.id]
+  try {
+    await onSave({ newData: { ...data, ...editData.value[data.id] } })
+    delete editData.value[data.id]
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 async function onSave(event: any) {
@@ -97,7 +103,14 @@ async function onSave(event: any) {
 
 function onDelete(row: CityRow) {
   confirm.require({ message: `Delete "${row.name}"?`, header: 'Confirm deletion', icon: 'pi pi-exclamation-triangle', acceptLabel: 'Delete', rejectLabel: 'Cancel',
-    accept: async () => { await cityService.delete(row.id); cityRows.value = cityRows.value.filter(c => c.id !== row.id) } })
+    accept: async () => {
+      try {
+        await cityService.delete(row.id)
+        cityRows.value = cityRows.value.filter(c => c.id !== row.id)
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+      }
+    } })
 }
 
 async function resolveCountry(input: Country | string | null): Promise<number | null> {
@@ -111,13 +124,17 @@ async function resolveCountry(input: Country | string | null): Promise<number | 
 
 async function createCity() {
   if (!newCity.value.name.trim() || !newCity.value.countryInput) return
-  const country_id = await resolveCountry(newCity.value.countryInput)
-  if (!country_id) return
-  const created = await cityService.create(newCity.value.name.trim(), country_id)
-  const country = countries.value.find(c => c.id === created.country_id) ?? null
-  cityRows.value.push({ id: created.id, name: created.name, country_id: created.country_id, country, countryName: country?.name ?? '', events: 0, venues: 0, artists: 0, firstVisit: null, lastVisit: null, eventList: [], _editing: false })
-  newCity.value = { name: '', countryInput: null }
-  addingCity.value = false
+  try {
+    const country_id = await resolveCountry(newCity.value.countryInput)
+    if (!country_id) return
+    const created = await cityService.create(newCity.value.name.trim(), country_id)
+    const country = countries.value.find(c => c.id === created.country_id) ?? null
+    cityRows.value.push({ id: created.id, name: created.name, country_id: created.country_id, country, countryName: country?.name ?? '', events: 0, venues: 0, artists: 0, firstVisit: null, lastVisit: null, eventList: [], _editing: false })
+    newCity.value = { name: '', countryInput: null }
+    addingCity.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e instanceof Error ? e.message : 'An error occurred.', life: 5000 })
+  }
 }
 
 // AutoComplete suggestions
