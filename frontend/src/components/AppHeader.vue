@@ -111,8 +111,8 @@ onMounted(() => {
           icon="pi pi-database"
           size="small"
           rounded
-          text
-          severity="secondary"
+          :text="route.path !== '/import'"
+          :severity="route.path === '/import' ? undefined : 'secondary'"
           @click="navigate('/import')"
           aria-label="Import / Export"
         />
@@ -121,7 +121,8 @@ onMounted(() => {
           icon="pi pi-shield"
           size="small"
           rounded
-          text
+          :text="route.path !== '/admin'"
+          :severity="route.path === '/admin' ? undefined : 'secondary'"
           @click="navigate('/admin')"
           aria-label="Admin panel"
         />
