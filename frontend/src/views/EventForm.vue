@@ -234,16 +234,15 @@ onMounted(async () => {
       </section>
 
       <!-- Concerts -->
-      <section class="space-y-3">
-        <div class="flex items-center justify-between">
+      <section class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
           <h2 class="font-semibold text-gray-900 dark:text-gray-100">
-            Concerts <span class="text-gray-400 font-normal">({{ form.concerts.length }})</span>
+            Concerts <span class="text-gray-400 font-normal text-sm">({{ form.concerts.length }})</span>
           </h2>
-          <Button icon="pi pi-plus" label="Add concert" size="small" text @click="addConcert" />
         </div>
 
-        <div v-if="form.concerts.length === 0" class="text-sm text-gray-400 text-center py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl">
-          No concerts yet. Add at least one.
+        <div v-if="form.concerts.length === 0" class="text-sm text-gray-400 text-center py-6 px-4">
+          No concerts yet — add at least one.
         </div>
 
         <ConcertRow
@@ -256,6 +255,10 @@ onMounted(async () => {
           @artist-created="artists.push($event)"
           @artist-updated="artists = artists.map(a => a.id === $event.id ? $event : a)"
         />
+
+        <div class="px-3 py-2 border-t border-gray-100 dark:border-gray-800">
+          <Button icon="pi pi-plus" label="Add concert" size="small" text @click="addConcert" />
+        </div>
       </section>
 
       <!-- Attendees (collapsible) -->
