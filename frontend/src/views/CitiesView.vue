@@ -166,15 +166,15 @@ function deleteFromCard(row: CityRow) {
 </script>
 
 <template>
-  <div>
+  <div class="space-y-4">
     <div v-if="loading" class="flex justify-center py-16"><ProgressSpinner style="width:40px;height:40px" /></div>
     <template v-else>
-      <div class="flex gap-2 mb-3">
+      <div class="flex gap-2">
         <IconField class="flex-1"><InputIcon class="pi pi-search" /><InputText v-model="search" placeholder="Search cities…" class="w-full" /></IconField>
         <span class="text-xs text-gray-400 self-center whitespace-nowrap">{{ filtered.length }} cit{{ filtered.length !== 1 ? 'ies' : 'y' }}</span>
         <Button icon="pi pi-plus" label="Add" size="small" class="ml-3" @click="addingCity = !addingCity" />
       </div>
-      <div v-if="addingCity" class="flex gap-2 mb-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+      <div v-if="addingCity" class="flex gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <InputText v-model="newCity.name" placeholder="Name *" class="flex-1" @keyup.enter="createCity" />
         <AutoComplete v-model="newCity.countryInput" :suggestions="newCityCountrySuggestions" optionLabel="name" placeholder="Country *" @complete="searchNewCityCountry" class="w-40" inputClass="w-full" />
         <Button icon="pi pi-check" size="small" @click="createCity" :disabled="!newCity.name.trim() || !newCity.countryInput" />

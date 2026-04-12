@@ -117,7 +117,7 @@ onMounted(fetchUsers)
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto space-y-6">
     <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100">User Management</h2>
 
     <div v-if="error" class="mb-4 text-sm text-red-500">{{ error }}</div>
