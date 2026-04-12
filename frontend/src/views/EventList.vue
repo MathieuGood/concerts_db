@@ -140,6 +140,7 @@ function goToEvent(id: number) {
         <DataTable
           :value="filtered"
           row-hover
+          size="small"
           sortField="event_date"
           :sortOrder="1"
           class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700"
