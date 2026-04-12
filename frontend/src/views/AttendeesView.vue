@@ -21,7 +21,7 @@ interface AttendeeRow {
   id: number; firstname: string; lastname: string | null; fullName: string
   events: number; artists: number
   firstEvent: string | null; lastEvent: string | null
-  eventList: EventEntry[]
+  eventList: EventEntry[]; _editing: boolean
 }
 
 const loading = ref(true)
@@ -29,7 +29,6 @@ const attendeeRows = ref<AttendeeRow[]>([])
 const expandedRows = ref<any[]>([])
 const editingRows = ref<any[]>([])
 const editData = ref<Record<number, any>>({})
-function isEditing(id: number) { return editingRows.value.some((r: any) => r.id === id) }
 const search = ref('')
 const addingAttendee = ref(false)
 const newAttendee = ref({ firstname: '', lastname: '' })
@@ -53,7 +52,7 @@ onMounted(async () => {
 
     attendeeRows.value = attendees.map(a => {
       const s = statsMap.get(a.id)
-      return { id: a.id, firstname: a.firstname, lastname: a.lastname ?? null, fullName: [a.firstname, a.lastname].filter(Boolean).join(' '), events: s?.events ?? 0, artists: s?.artistIds.size ?? 0, firstEvent: s?.first ?? null, lastEvent: s?.last ?? null, eventList: s?.eventList.sort((a, b) => b.date.localeCompare(a.date)) ?? [] }
+      return { id: a.id, firstname: a.firstname, lastname: a.lastname ?? null, fullName: [a.firstname, a.lastname].filter(Boolean).join(' '), events: s?.events ?? 0, artists: s?.artistIds.size ?? 0, firstEvent: s?.first ?? null, lastEvent: s?.last ?? null, eventList: s?.eventList.sort((a, b) => b.date.localeCompare(a.date)) ?? [], _editing: false }
     })
   } finally { loading.value = false }
 })
@@ -70,23 +69,22 @@ const filtered = computed(() => {
 
 function startEdit(row: AttendeeRow) {
   editData.value[row.id] = { firstname: row.firstname, lastname: row.lastname }
-  editingRows.value = [...editingRows.value, row]
+  row._editing = true
 }
 function cancelEdit(row: AttendeeRow) {
   delete editData.value[row.id]
-  editingRows.value = editingRows.value.filter(r => r.id !== row.id)
+  row._editing = false
 }
 async function saveRow(data: AttendeeRow) {
   await onSave({ newData: { ...data, ...editData.value[data.id] } })
   delete editData.value[data.id]
-  editingRows.value = editingRows.value.filter(r => r.id !== data.id)
 }
 
 async function onSave(event: any) {
   const { newData } = event
   const updated = await attendeeService.update(newData.id, newData.firstname, newData.lastname)
   const idx = attendeeRows.value.findIndex(a => a.id === updated.id)
-  if (idx !== -1) attendeeRows.value[idx] = { ...attendeeRows.value[idx]!, firstname: updated.firstname, lastname: updated.lastname ?? null, fullName: [updated.firstname, updated.lastname].filter(Boolean).join(' ') }
+  if (idx !== -1) attendeeRows.value[idx] = { ...attendeeRows.value[idx]!, firstname: updated.firstname, lastname: updated.lastname ?? null, fullName: [updated.firstname, updated.lastname].filter(Boolean).join(' '), _editing: false }
 }
 
 function onDelete(row: AttendeeRow) {
@@ -97,7 +95,7 @@ function onDelete(row: AttendeeRow) {
 async function createAttendee() {
   if (!newAttendee.value.firstname.trim()) return
   const created = await attendeeService.create(newAttendee.value.firstname.trim(), newAttendee.value.lastname.trim() || undefined)
-  attendeeRows.value.push({ id: created.id, firstname: created.firstname, lastname: created.lastname ?? null, fullName: [created.firstname, created.lastname].filter(Boolean).join(' '), events: 0, artists: 0, firstEvent: null, lastEvent: null, eventList: [] })
+  attendeeRows.value.push({ id: created.id, firstname: created.firstname, lastname: created.lastname ?? null, fullName: [created.firstname, created.lastname].filter(Boolean).join(' '), events: 0, artists: 0, firstEvent: null, lastEvent: null, eventList: [], _editing: false })
   newAttendee.value = { firstname: '', lastname: '' }
   addingAttendee.value = false
 }
@@ -215,13 +213,13 @@ function deleteFromCard(row: AttendeeRow) {
           <Column expander style="width:3rem" />
           <Column field="firstname" header="First name" sortable>
             <template #body="{ data }">
-              <InputText v-if="isEditing(data.id)" v-model="editData[data.id].firstname" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
+              <InputText v-if="data._editing" v-model="editData[data.id].firstname" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
               <span v-else>{{ data.firstname }}</span>
             </template>
           </Column>
           <Column field="lastname" header="Last name" sortable>
             <template #body="{ data }">
-              <InputText v-if="isEditing(data.id)" v-model="editData[data.id].lastname" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
+              <InputText v-if="data._editing" v-model="editData[data.id].lastname" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
               <span v-else>{{ data.lastname ?? '—' }}</span>
             </template>
           </Column>
@@ -236,7 +234,7 @@ function deleteFromCard(row: AttendeeRow) {
           </Column>
           <Column style="width:5.5rem">
             <template #body="{ data }">
-              <div v-if="isEditing(data.id)" class="flex gap-0.5">
+              <div v-if="data._editing" class="flex gap-0.5">
                 <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
                 <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
                 <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onDelete(data)" />

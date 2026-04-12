@@ -28,7 +28,7 @@ interface VenueRow {
   cityName: string; countryName: string
   events: number; artists: number
   firstVisit: string | null; lastVisit: string | null
-  eventList: EventEntry[]
+  eventList: EventEntry[]; _editing: boolean
 }
 
 const loading = ref(true)
@@ -38,7 +38,6 @@ const venueRows = ref<VenueRow[]>([])
 const expandedRows = ref<any[]>([])
 const editingRows = ref<any[]>([])
 const editData = ref<Record<number, any>>({})
-function isEditing(id: number) { return editingRows.value.some((r: any) => r.id === id) }
 const search = ref('')
 const addingVenue = ref(false)
 const newVenue = ref({ name: '', countryInput: null as Country | null, cityInput: null as City | null })
@@ -74,6 +73,7 @@ onMounted(async () => {
         events: s?.events ?? 0, artists: s?.artistIds.size ?? 0,
         firstVisit: s?.first ?? null, lastVisit: s?.last ?? null,
         eventList: s?.eventList.sort((a, b) => a.date.localeCompare(b.date)) ?? [],
+        _editing: false,
       }
     })
   } finally { loading.value = false }
@@ -91,16 +91,15 @@ const filtered = computed(() => {
 
 function startEdit(row: VenueRow) {
   editData.value[row.id] = { name: row.name, city_id: row.city_id }
-  editingRows.value = [...editingRows.value, row]
+  row._editing = true
 }
 function cancelEdit(row: VenueRow) {
   delete editData.value[row.id]
-  editingRows.value = editingRows.value.filter(r => r.id !== row.id)
+  row._editing = false
 }
 async function saveRow(data: VenueRow) {
   await onSave({ newData: { ...data, ...editData.value[data.id] } })
   delete editData.value[data.id]
-  editingRows.value = editingRows.value.filter(r => r.id !== data.id)
 }
 
 async function onSave(event: any) {
@@ -108,7 +107,7 @@ async function onSave(event: any) {
   await venueService.update(newData.id, newData.name, newData.city_id)
   const city = cities.value.find(c => c.id === newData.city_id) ?? null
   const idx = venueRows.value.findIndex(v => v.id === newData.id)
-  if (idx !== -1) venueRows.value[idx] = { ...venueRows.value[idx]!, name: newData.name, city_id: newData.city_id, city, cityName: city?.name ?? '', countryName: city?.country?.name ?? '' }
+  if (idx !== -1) venueRows.value[idx] = { ...venueRows.value[idx]!, name: newData.name, city_id: newData.city_id, city, cityName: city?.name ?? '', countryName: city?.country?.name ?? '', _editing: false }
 }
 
 function onDelete(row: VenueRow) {
@@ -168,7 +167,7 @@ async function createVenue() {
   if (!cityId) return
   const created = await venueService.create(newVenue.value.name.trim(), cityId)
   const city = cities.value.find(c => c.id === created.city_id) ?? null
-  venueRows.value.push({ id: created.id, name: created.name, city_id: created.city_id, city, cityName: city?.name ?? '', countryName: city?.country?.name ?? '', events: 0, artists: 0, firstVisit: null, lastVisit: null, eventList: [] })
+  venueRows.value.push({ id: created.id, name: created.name, city_id: created.city_id, city, cityName: city?.name ?? '', countryName: city?.country?.name ?? '', events: 0, artists: 0, firstVisit: null, lastVisit: null, eventList: [], _editing: false })
   newVenue.value = { name: '', countryInput: null, cityInput: null }
   newVenueCities.value = []
   addingVenue.value = false
@@ -331,13 +330,13 @@ function deleteFromCard(row: VenueRow) {
           <Column expander style="width:3rem" />
           <Column field="name" header="Venue" sortable>
             <template #body="{ data }">
-              <InputText v-if="isEditing(data.id)" v-model="editData[data.id].name" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
+              <InputText v-if="data._editing" v-model="editData[data.id].name" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
               <span v-else>{{ data.name }}</span>
             </template>
           </Column>
           <Column field="cityName" header="City" sortable style="width:140px">
             <template #body="{ data }">
-              <Select v-if="isEditing(data.id)" v-model="editData[data.id].city_id" :options="cities" optionLabel="name" optionValue="id" filter placeholder="City" class="w-full" />
+              <Select v-if="data._editing" v-model="editData[data.id].city_id" :options="cities" optionLabel="name" optionValue="id" filter placeholder="City" class="w-full" />
               <span v-else>{{ data.city?.name ?? '—' }}</span>
             </template>
           </Column>
@@ -355,7 +354,7 @@ function deleteFromCard(row: VenueRow) {
           </Column>
           <Column style="width:5.5rem">
             <template #body="{ data }">
-              <div v-if="isEditing(data.id)" class="flex gap-0.5">
+              <div v-if="data._editing" class="flex gap-0.5">
                 <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
                 <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
                 <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onDelete(data)" />

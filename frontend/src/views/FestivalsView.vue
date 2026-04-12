@@ -21,7 +21,7 @@ interface FestivalRow {
   id: number; name: string
   events: number; artists: number; editions: number
   firstEdition: string | null; lastEdition: string | null
-  eventList: EventEntry[]
+  eventList: EventEntry[]; _editing: boolean
 }
 
 const loading = ref(true)
@@ -29,7 +29,6 @@ const festivalRows = ref<FestivalRow[]>([])
 const expandedRows = ref<any[]>([])
 const editingRows = ref<any[]>([])
 const editData = ref<Record<number, any>>({})
-function isEditing(id: number) { return editingRows.value.some((r: any) => r.id === id) }
 const search = ref('')
 const addingFestival = ref(false)
 const newFestivalName = ref('')
@@ -54,7 +53,7 @@ onMounted(async () => {
 
     festivalRows.value = festivals.map(f => {
       const s = statsMap.get(f.id)
-      return { id: f.id, name: f.name, events: s?.events ?? 0, artists: s?.artistIds.size ?? 0, editions: s?.years.size ?? 0, firstEdition: s?.first ?? null, lastEdition: s?.last ?? null, eventList: s?.eventList.sort((a, b) => b.date.localeCompare(a.date)) ?? [] }
+      return { id: f.id, name: f.name, events: s?.events ?? 0, artists: s?.artistIds.size ?? 0, editions: s?.years.size ?? 0, firstEdition: s?.first ?? null, lastEdition: s?.last ?? null, eventList: s?.eventList.sort((a, b) => b.date.localeCompare(a.date)) ?? [], _editing: false }
     })
   } finally { loading.value = false }
 })
@@ -71,23 +70,22 @@ const filtered = computed(() => {
 
 function startEdit(row: FestivalRow) {
   editData.value[row.id] = { name: row.name }
-  editingRows.value = [...editingRows.value, row]
+  row._editing = true
 }
 function cancelEdit(row: FestivalRow) {
   delete editData.value[row.id]
-  editingRows.value = editingRows.value.filter(r => r.id !== row.id)
+  row._editing = false
 }
 async function saveRow(data: FestivalRow) {
   await onSave({ newData: { ...data, ...editData.value[data.id] } })
   delete editData.value[data.id]
-  editingRows.value = editingRows.value.filter(r => r.id !== data.id)
 }
 
 async function onSave(event: any) {
   const { newData } = event
   await festivalService.update(newData.id, newData.name)
   const idx = festivalRows.value.findIndex(f => f.id === newData.id)
-  if (idx !== -1) festivalRows.value[idx] = { ...festivalRows.value[idx]!, name: String(newData.name) }
+  if (idx !== -1) festivalRows.value[idx] = { ...festivalRows.value[idx]!, name: String(newData.name), _editing: false }
 }
 
 function onDelete(row: FestivalRow) {
@@ -98,7 +96,7 @@ function onDelete(row: FestivalRow) {
 async function createFestival() {
   if (!newFestivalName.value.trim()) return
   const created = await festivalService.create(newFestivalName.value.trim())
-  festivalRows.value.push({ id: created.id, name: created.name, events: 0, artists: 0, editions: 0, firstEdition: null, lastEdition: null, eventList: [] })
+  festivalRows.value.push({ id: created.id, name: created.name, events: 0, artists: 0, editions: 0, firstEdition: null, lastEdition: null, eventList: [], _editing: false })
   festivalRows.value.sort((a, b) => a.name.localeCompare(b.name))
   newFestivalName.value = ''
   addingFestival.value = false
@@ -215,7 +213,7 @@ function deleteFromCard(row: FestivalRow) {
           <Column expander style="width:3rem" />
           <Column field="name" header="Festival" sortable>
             <template #body="{ data }">
-              <InputText v-if="isEditing(data.id)" v-model="editData[data.id].name" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
+              <InputText v-if="data._editing" v-model="editData[data.id].name" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
               <span v-else>{{ data.name }}</span>
             </template>
           </Column>
@@ -227,7 +225,7 @@ function deleteFromCard(row: FestivalRow) {
           </Column>
           <Column style="width:5.5rem">
             <template #body="{ data }">
-              <div v-if="isEditing(data.id)" class="flex gap-0.5">
+              <div v-if="data._editing" class="flex gap-0.5">
                 <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
                 <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
                 <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onDelete(data)" />
