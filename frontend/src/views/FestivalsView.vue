@@ -28,6 +28,8 @@ const loading = ref(true)
 const festivalRows = ref<FestivalRow[]>([])
 const expandedRows = ref<any[]>([])
 const editingRows = ref<any[]>([])
+const editData = ref<Record<number, any>>({})
+function isEditing(id: number) { return editingRows.value.some((r: any) => r.id === id) }
 const search = ref('')
 const addingFestival = ref(false)
 const newFestivalName = ref('')
@@ -67,9 +69,19 @@ const filtered = computed(() => {
   return q ? festivalRows.value.filter(f => f.name.toLowerCase().includes(q)) : festivalRows.value
 })
 
-function startEdit(row: FestivalRow) { editingRows.value = [...editingRows.value, row] }
-function cancelEdit(row: FestivalRow) { editingRows.value = editingRows.value.filter(r => r.id !== row.id) }
-async function saveRow(data: FestivalRow) { await onSave({ newData: data }); editingRows.value = editingRows.value.filter(r => r.id !== data.id) }
+function startEdit(row: FestivalRow) {
+  editData.value[row.id] = { name: row.name }
+  editingRows.value = [...editingRows.value, row]
+}
+function cancelEdit(row: FestivalRow) {
+  delete editData.value[row.id]
+  editingRows.value = editingRows.value.filter(r => r.id !== row.id)
+}
+async function saveRow(data: FestivalRow) {
+  await onSave({ newData: { ...data, ...editData.value[data.id] } })
+  delete editData.value[data.id]
+  editingRows.value = editingRows.value.filter(r => r.id !== data.id)
+}
 
 async function onSave(event: any) {
   const { newData } = event
@@ -198,11 +210,14 @@ function deleteFromCard(row: FestivalRow) {
       <!-- Desktop table -->
       <div class="hidden sm:block">
         <DataTable :value="filtered" dataKey="id" sortField="events" :sortOrder="-1" size="small"
-          v-model:expandedRows="expandedRows" editMode="row" :editing-rows="editingRows"
+          v-model:expandedRows="expandedRows"
           class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
           <Column expander style="width:3rem" />
           <Column field="name" header="Festival" sortable>
-            <template #editor="{ data, field }"><InputText v-model="data[field]" class="w-full" /></template>
+            <template #body="{ data }">
+              <InputText v-if="isEditing(data.id)" v-model="editData[data.id].name" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
+              <span v-else>{{ data.name }}</span>
+            </template>
           </Column>
           <Column field="firstEdition" header="First" sortable style="width:115px">
             <template #body="{ data }"><span class="text-xs text-gray-500">{{ formatDate(data.firstEdition) }}</span></template>
@@ -212,14 +227,12 @@ function deleteFromCard(row: FestivalRow) {
           </Column>
           <Column style="width:5.5rem">
             <template #body="{ data }">
-              <Button icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
-            </template>
-            <template #editor="{ data }">
-              <div class="flex gap-0.5">
+              <div v-if="isEditing(data.id)" class="flex gap-0.5">
                 <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
                 <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
                 <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onDelete(data)" />
               </div>
+              <Button v-else icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
             </template>
           </Column>
           <template #expansion="{ data }">

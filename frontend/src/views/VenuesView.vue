@@ -37,6 +37,8 @@ const countries = ref<Country[]>([])
 const venueRows = ref<VenueRow[]>([])
 const expandedRows = ref<any[]>([])
 const editingRows = ref<any[]>([])
+const editData = ref<Record<number, any>>({})
+function isEditing(id: number) { return editingRows.value.some((r: any) => r.id === id) }
 const search = ref('')
 const addingVenue = ref(false)
 const newVenue = ref({ name: '', countryInput: null as Country | null, cityInput: null as City | null })
@@ -87,9 +89,19 @@ const filtered = computed(() => {
   return q ? venueRows.value.filter(v => v.name.toLowerCase().includes(q) || v.cityName.toLowerCase().includes(q) || v.countryName.toLowerCase().includes(q)) : venueRows.value
 })
 
-function startEdit(row: VenueRow) { editingRows.value = [...editingRows.value, row] }
-function cancelEdit(row: VenueRow) { editingRows.value = editingRows.value.filter(r => r.id !== row.id) }
-async function saveRow(data: VenueRow) { await onSave({ newData: data }); editingRows.value = editingRows.value.filter(r => r.id !== data.id) }
+function startEdit(row: VenueRow) {
+  editData.value[row.id] = { name: row.name, city_id: row.city_id }
+  editingRows.value = [...editingRows.value, row]
+}
+function cancelEdit(row: VenueRow) {
+  delete editData.value[row.id]
+  editingRows.value = editingRows.value.filter(r => r.id !== row.id)
+}
+async function saveRow(data: VenueRow) {
+  await onSave({ newData: { ...data, ...editData.value[data.id] } })
+  delete editData.value[data.id]
+  editingRows.value = editingRows.value.filter(r => r.id !== data.id)
+}
 
 async function onSave(event: any) {
   const { newData } = event
@@ -314,16 +326,19 @@ function deleteFromCard(row: VenueRow) {
       <!-- Desktop table -->
       <div class="hidden sm:block">
         <DataTable :value="filtered" dataKey="id" sortField="events" :sortOrder="-1" size="small"
-          v-model:expandedRows="expandedRows" editMode="row" :editing-rows="editingRows"
+          v-model:expandedRows="expandedRows"
           class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
           <Column expander style="width:3rem" />
           <Column field="name" header="Venue" sortable>
-            <template #editor="{ data, field }"><InputText v-model="data[field]" class="w-full" /></template>
+            <template #body="{ data }">
+              <InputText v-if="isEditing(data.id)" v-model="editData[data.id].name" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
+              <span v-else>{{ data.name }}</span>
+            </template>
           </Column>
           <Column field="cityName" header="City" sortable style="width:140px">
-            <template #body="{ data }">{{ data.city?.name ?? '—' }}</template>
-            <template #editor="{ data }">
-              <Select v-model="data.city_id" :options="cities" optionLabel="name" optionValue="id" filter placeholder="City" class="w-full" />
+            <template #body="{ data }">
+              <Select v-if="isEditing(data.id)" v-model="editData[data.id].city_id" :options="cities" optionLabel="name" optionValue="id" filter placeholder="City" class="w-full" />
+              <span v-else>{{ data.city?.name ?? '—' }}</span>
             </template>
           </Column>
           <Column field="countryName" header="Country" sortable style="width:130px">
@@ -340,14 +355,12 @@ function deleteFromCard(row: VenueRow) {
           </Column>
           <Column style="width:5.5rem">
             <template #body="{ data }">
-              <Button icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
-            </template>
-            <template #editor="{ data }">
-              <div class="flex gap-0.5">
+              <div v-if="isEditing(data.id)" class="flex gap-0.5">
                 <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
                 <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
                 <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onDelete(data)" />
               </div>
+              <Button v-else icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
             </template>
           </Column>
           <template #expansion="{ data }">

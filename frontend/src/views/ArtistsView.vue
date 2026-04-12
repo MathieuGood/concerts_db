@@ -35,6 +35,8 @@ const countries = ref<Country[]>([])
 const artistRows = ref<ArtistRow[]>([])
 const expandedRows = ref<any[]>([])
 const editingRows = ref<any[]>([])
+const editData = ref<Record<number, any>>({})
+function isEditing(id: number) { return editingRows.value.some((r: any) => r.id === id) }
 const search = ref('')
 const addingArtist = ref(false)
 const newArtist = ref({ name: '', countryInput: null as Country | null })
@@ -90,9 +92,19 @@ const filtered = computed(() => {
   return q ? artistRows.value.filter(a => a.name.toLowerCase().includes(q) || a.countryName.toLowerCase().includes(q)) : artistRows.value
 })
 
-function startEdit(row: ArtistRow) { editingRows.value = [...editingRows.value, row] }
-function cancelEdit(row: ArtistRow) { editingRows.value = editingRows.value.filter(r => r.id !== row.id) }
-async function saveRow(data: ArtistRow) { await onArtistSave({ newData: data }); editingRows.value = editingRows.value.filter(r => r.id !== data.id) }
+function startEdit(row: ArtistRow) {
+  editData.value[row.id] = { name: row.name, country_id: row.country_id }
+  editingRows.value = [...editingRows.value, row]
+}
+function cancelEdit(row: ArtistRow) {
+  delete editData.value[row.id]
+  editingRows.value = editingRows.value.filter(r => r.id !== row.id)
+}
+async function saveRow(data: ArtistRow) {
+  await onArtistSave({ newData: { ...data, ...editData.value[data.id] } })
+  delete editData.value[data.id]
+  editingRows.value = editingRows.value.filter(r => r.id !== data.id)
+}
 
 async function onArtistSave(event: any) {
   const { newData } = event
@@ -252,16 +264,19 @@ function deleteFromCard(row: ArtistRow) {
       <!-- Desktop table -->
       <div class="hidden sm:block">
         <DataTable :value="filtered" dataKey="id" sortField="concerts" :sortOrder="-1" size="small"
-          v-model:expandedRows="expandedRows" editMode="row" :editing-rows="editingRows"
+          v-model:expandedRows="expandedRows"
           class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
           <Column expander style="width:3rem" />
           <Column field="name" header="Artist" sortable>
-            <template #editor="{ data, field }"><InputText v-model="data[field]" class="w-full" /></template>
+            <template #body="{ data }">
+              <InputText v-if="isEditing(data.id)" v-model="editData[data.id].name" class="w-full" @keyup.enter="saveRow(data)" @keyup.esc="cancelEdit(data)" />
+              <span v-else>{{ data.name }}</span>
+            </template>
           </Column>
           <Column field="countryName" header="From" sortable style="width:150px">
-            <template #body="{ data }">{{ data.country?.name ?? '—' }}</template>
-            <template #editor="{ data }">
-              <Select v-model="data.country_id" :options="countries" optionLabel="name" optionValue="id" showClear placeholder="None" class="w-full" />
+            <template #body="{ data }">
+              <Select v-if="isEditing(data.id)" v-model="editData[data.id].country_id" :options="countries" optionLabel="name" optionValue="id" showClear placeholder="None" class="w-full" />
+              <span v-else>{{ data.country?.name ?? '—' }}</span>
             </template>
           </Column>
           <Column field="concerts" header="Concerts" sortable style="width:90px">
@@ -277,14 +292,12 @@ function deleteFromCard(row: ArtistRow) {
           </Column>
           <Column style="width:5.5rem">
             <template #body="{ data }">
-              <Button icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
-            </template>
-            <template #editor="{ data }">
-              <div class="flex gap-0.5">
+              <div v-if="isEditing(data.id)" class="flex gap-0.5">
                 <Button icon="pi pi-check" text rounded size="small" severity="success" @click="saveRow(data)" />
                 <Button icon="pi pi-times" text rounded size="small" severity="secondary" @click="cancelEdit(data)" />
                 <Button icon="pi pi-trash" text rounded size="small" severity="danger" @click="onArtistDelete(data)" />
               </div>
+              <Button v-else icon="pi pi-pencil" text rounded size="small" severity="secondary" @click="startEdit(data)" />
             </template>
           </Column>
 
