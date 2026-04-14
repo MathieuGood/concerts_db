@@ -279,8 +279,8 @@ function toggleExpand(id: number) {
               <!-- Edition edit mode -->
               <div v-if="edition._editing" class="p-3 space-y-2 bg-gray-50 dark:bg-gray-800/50">
                 <div class="flex gap-2">
-                  <InputText v-model="editData[edition.id].name" placeholder="Name *" class="flex-1" />
-                  <InputNumber v-model="editData[edition.id].year" placeholder="Year" :use-grouping="false" :min="1900" :max="2100" class="w-24" />
+                  <InputText v-model="editData[edition.id]!.name" placeholder="Name *" class="flex-1" />
+                  <InputNumber v-model="editData[edition.id]!.year" placeholder="Year" :use-grouping="false" :min="1900" :max="2100" class="w-24" />
                 </div>
                 <div class="flex gap-2">
                   <Button icon="pi pi-check" label="Save" size="small" severity="success" @click="saveEdition(edition)" class="flex-1" />
@@ -354,8 +354,8 @@ function toggleExpand(id: number) {
                     <tr v-if="edition._editing" class="border-b border-gray-50 dark:border-gray-800/50">
                       <td colspan="4" class="py-2 pr-4">
                         <div class="flex gap-2">
-                          <InputText v-model="editData[edition.id].name" placeholder="Name *" class="flex-1" @keyup.enter="saveEdition(edition)" @keyup.esc="cancelEdit(edition)" />
-                          <InputNumber v-model="editData[edition.id].year" placeholder="Year" :use-grouping="false" :min="1900" :max="2100" class="w-28" />
+                          <InputText v-model="editData[edition.id]!.name" placeholder="Name *" class="flex-1" @keyup.enter="saveEdition(edition)" @keyup.esc="cancelEdit(edition)" />
+                          <InputNumber v-model="editData[edition.id]!.year" placeholder="Year" :use-grouping="false" :min="1900" :max="2100" class="w-28" />
                         </div>
                       </td>
                       <td class="py-2">
