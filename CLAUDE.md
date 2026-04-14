@@ -36,8 +36,11 @@ Default admin credentials after migration:
 
 ### CSV backup cron (on VPS)
 
+Backups write to `/data/backups/` inside the container (mounted from `~/apps/concerts_db/data/backups/`).
+Filename format: `concerts_YYYYMMDD_HHMMSS.csv`
+
 ```bash
-(crontab -l 2>/dev/null; echo "0 3 * * * docker exec concerts_db-backend-1 uv run python src/scripts/export_csv.py > /home/ubuntu/apps/concerts_db/backups/backup_\$(date +\%Y\%m\%d).csv 2>/dev/null") | crontab -
+(crontab -l 2>/dev/null; echo "0 3 * * * docker exec concerts_db-backend-1 uv run python src/scripts/export_csv.py 2>/dev/null") | crontab -
 ```
 
 ### Useful one-off commands
