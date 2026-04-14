@@ -46,6 +46,15 @@ function attendeeLabel(a: Attendee): string {
 const sortedAttendees = computed(() =>
   [...props.attendees].sort((a, b) => attendeeLabel(a).localeCompare(attendeeLabel(b))),
 )
+
+function emitSorted(ids: number[]) {
+  const sorted = [...ids].sort((a, b) => {
+    const aName = attendeeLabel(props.attendees.find(att => att.id === a) ?? { id: a, firstname: '' })
+    const bName = attendeeLabel(props.attendees.find(att => att.id === b) ?? { id: b, firstname: '' })
+    return aName.localeCompare(bName)
+  })
+  emit('update:modelValue', sorted)
+}
 </script>
 
 <template>
@@ -61,7 +70,7 @@ const sortedAttendees = computed(() =>
         placeholder="Select attendees"
         display="chip"
         class="flex-1"
-        @update:model-value="emit('update:modelValue', $event)"
+        @update:model-value="emitSorted($event)"
       />
       <Button
         :icon="showCreate ? 'pi pi-times' : 'pi pi-plus'"
@@ -92,3 +101,14 @@ const sortedAttendees = computed(() =>
     </div>
   </div>
 </template>
+
+<style scoped>
+:deep(.p-multiselect-label) {
+  flex-wrap: wrap !important;
+  height: auto !important;
+}
+:deep(.p-multiselect-label-container) {
+  overflow: visible !important;
+  height: auto !important;
+}
+</style>
