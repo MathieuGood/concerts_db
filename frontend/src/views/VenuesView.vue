@@ -19,6 +19,7 @@ import { countryService } from '@/services/countryService'
 import { eventService } from '@/services/eventService'
 import type { City } from '@/models/City'
 import type { Country } from '@/models/Country'
+import { useListState } from '@/composables/useListState'
 
 const router = useRouter()
 const confirm = useConfirm()
@@ -33,14 +34,17 @@ interface VenueRow {
   eventList: EventEntry[]; _editing: boolean
 }
 
+const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
+
 const loading = ref(true)
 const cities = ref<City[]>([])
 const countries = ref<Country[]>([])
 const venueRows = ref<VenueRow[]>([])
 const expandedRows = ref<any[]>([])
+const expandedCards = ref<number[]>([])
 const editingRows = ref<any[]>([])
 const editData = ref<Record<number, any>>({})
-const search = ref('')
+const search = ref(initialSearch)
 const addingVenue = ref(false)
 const newVenue = ref({ name: '', countryInput: null as Country | null, cityInput: null as City | null })
 
@@ -78,8 +82,15 @@ onMounted(async () => {
         _editing: false,
       }
     })
+    expandedRows.value = venueRows.value.filter(r => initialExpandedIds.includes(r.id))
+    expandedCards.value = initialExpandedIds.filter(id => venueRows.value.some(r => r.id === id))
   } finally { loading.value = false }
 })
+
+watch([search, expandedRows, expandedCards], () => {
+  const ids = [...new Set([...expandedRows.value.map((r: any) => r.id), ...expandedCards.value])]
+  syncToUrl(search.value, ids)
+}, { deep: true })
 
 function formatDate(d: string | null) {
   if (!d) return '—'
@@ -191,8 +202,6 @@ async function createVenue() {
 }
 
 // Mobile card helpers
-const expandedCards = ref<number[]>([])
-
 const activeCardEdit = ref<{ id: number; name: string; countryInput: Country | null; cityInput: City | null; cities: City[] } | null>(null)
 const cardCountrySuggestions = ref<Country[]>([])
 const cardCitySuggestions = ref<City[]>([])

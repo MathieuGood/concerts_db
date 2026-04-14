@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
@@ -13,6 +13,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 
 import { festivalService } from '@/services/festivalService'
 import { eventService } from '@/services/eventService'
+import { useListState } from '@/composables/useListState'
 
 const router = useRouter()
 const confirm = useConfirm()
@@ -26,12 +27,15 @@ interface FestivalRow {
   eventList: EventEntry[]; _editing: boolean
 }
 
+const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
+
 const loading = ref(true)
 const festivalRows = ref<FestivalRow[]>([])
 const expandedRows = ref<any[]>([])
+const expandedCards = ref<number[]>([])
 const editingRows = ref<any[]>([])
 const editData = ref<Record<number, any>>({})
-const search = ref('')
+const search = ref(initialSearch)
 const addingFestival = ref(false)
 const newFestivalName = ref('')
 
@@ -57,8 +61,15 @@ onMounted(async () => {
       const s = statsMap.get(f.id)
       return { id: f.id, name: f.name, events: s?.events ?? 0, artists: s?.artistIds.size ?? 0, editions: s?.years.size ?? 0, firstEdition: s?.first ?? null, lastEdition: s?.last ?? null, eventList: s?.eventList.sort((a, b) => b.date.localeCompare(a.date)) ?? [], _editing: false }
     })
+    expandedRows.value = festivalRows.value.filter(r => initialExpandedIds.includes(r.id))
+    expandedCards.value = initialExpandedIds.filter(id => festivalRows.value.some(r => r.id === id))
   } finally { loading.value = false }
 })
+
+watch([search, expandedRows, expandedCards], () => {
+  const ids = [...new Set([...expandedRows.value.map((r: any) => r.id), ...expandedCards.value])]
+  syncToUrl(search.value, ids)
+}, { deep: true })
 
 function formatDate(d: string | null) {
   if (!d) return '—'
@@ -120,7 +131,6 @@ async function createFestival() {
 }
 
 // Mobile card helpers
-const expandedCards = ref<number[]>([])
 const cardEditData = ref<Record<number, any>>({})
 
 function isExpanded(id: number) { return expandedCards.value.includes(id) }

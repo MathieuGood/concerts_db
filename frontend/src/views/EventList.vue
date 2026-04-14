@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
@@ -10,21 +10,31 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { eventService } from '@/services/eventService'
 import type { Event } from '@/models/Event'
+import { useListState } from '@/composables/useListState'
 
 const router = useRouter()
+const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
+
 const events = ref<Event[]>([])
 const loading = ref(true)
-const search = ref('')
+const search = ref(initialSearch)
 const expandedRows = ref<any[]>([])
-const expandedCards = ref<Set<number>>(new Set())
+const expandedCards = ref<Set<number>>(new Set(initialExpandedIds))
 
 onMounted(async () => {
   try {
     events.value = await eventService.getAll()
+    expandedRows.value = events.value.filter(e => initialExpandedIds.includes(e.id))
+    expandedCards.value = new Set(initialExpandedIds.filter(id => events.value.some(e => e.id === id)))
   } finally {
     loading.value = false
   }
 })
+
+watch([search, expandedRows, expandedCards], () => {
+  const ids = [...new Set([...expandedRows.value.map((r: any) => r.id), ...expandedCards.value])]
+  syncToUrl(search.value, ids)
+}, { deep: true })
 
 function artistNames(event: Event): string {
   return event.concerts.map((c) => c.artist?.name ?? '—').join(', ')

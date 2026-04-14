@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
@@ -17,6 +17,7 @@ import { artistService } from '@/services/artistService'
 import { countryService } from '@/services/countryService'
 import { eventService } from '@/services/eventService'
 import type { Country } from '@/models/Country'
+import { useListState } from '@/composables/useListState'
 
 const router = useRouter()
 const confirm = useConfirm()
@@ -32,13 +33,16 @@ interface ArtistRow {
   events: EventEntry[]; _editing: boolean
 }
 
+const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
+
 const loading = ref(true)
 const countries = ref<Country[]>([])
 const artistRows = ref<ArtistRow[]>([])
 const expandedRows = ref<any[]>([])
+const expandedCards = ref<number[]>([])
 const editingRows = ref<any[]>([])
 const editData = ref<Record<number, any>>({})
-const search = ref('')
+const search = ref(initialSearch)
 const addingArtist = ref(false)
 const newArtist = ref({ name: '', countryInput: null as Country | null })
 
@@ -81,8 +85,15 @@ onMounted(async () => {
         _editing: false,
       }
     })
+    expandedRows.value = artistRows.value.filter(r => initialExpandedIds.includes(r.id))
+    expandedCards.value = initialExpandedIds.filter(id => artistRows.value.some(r => r.id === id))
   } finally { loading.value = false }
 })
+
+watch([search, expandedRows, expandedCards], () => {
+  const ids = [...new Set([...expandedRows.value.map((r: any) => r.id), ...expandedCards.value])]
+  syncToUrl(search.value, ids)
+}, { deep: true })
 
 function formatDate(d: string | null) {
   if (!d) return '—'
@@ -168,7 +179,6 @@ function searchCardCountry(event: { query: string }) {
 }
 
 // Mobile card helpers
-const expandedCards = ref<number[]>([])
 const cardEditData = ref<Record<number, any>>({})
 
 function isExpanded(id: number) { return expandedCards.value.includes(id) }

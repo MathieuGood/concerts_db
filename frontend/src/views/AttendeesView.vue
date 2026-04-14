@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
@@ -13,6 +13,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 
 import { attendeeService } from '@/services/attendeeService'
 import { eventService } from '@/services/eventService'
+import { useListState } from '@/composables/useListState'
 
 const router = useRouter()
 const confirm = useConfirm()
@@ -26,12 +27,15 @@ interface AttendeeRow {
   eventList: EventEntry[]; _editing: boolean
 }
 
+const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
+
 const loading = ref(true)
 const attendeeRows = ref<AttendeeRow[]>([])
 const expandedRows = ref<any[]>([])
+const expandedCards = ref<number[]>([])
 const editingRows = ref<any[]>([])
 const editData = ref<Record<number, any>>({})
-const search = ref('')
+const search = ref(initialSearch)
 const addingAttendee = ref(false)
 const newAttendee = ref({ firstname: '', lastname: '' })
 
@@ -56,8 +60,15 @@ onMounted(async () => {
       const s = statsMap.get(a.id)
       return { id: a.id, firstname: a.firstname, lastname: a.lastname ?? null, fullName: [a.firstname, a.lastname].filter(Boolean).join(' '), events: s?.events ?? 0, artists: s?.artistIds.size ?? 0, firstEvent: s?.first ?? null, lastEvent: s?.last ?? null, eventList: s?.eventList.sort((a, b) => b.date.localeCompare(a.date)) ?? [], _editing: false }
     })
+    expandedRows.value = attendeeRows.value.filter(r => initialExpandedIds.includes(r.id))
+    expandedCards.value = initialExpandedIds.filter(id => attendeeRows.value.some(r => r.id === id))
   } finally { loading.value = false }
 })
+
+watch([search, expandedRows, expandedCards], () => {
+  const ids = [...new Set([...expandedRows.value.map((r: any) => r.id), ...expandedCards.value])]
+  syncToUrl(search.value, ids)
+}, { deep: true })
 
 function formatDate(d: string | null) {
   if (!d) return '—'
@@ -118,7 +129,6 @@ async function createAttendee() {
 }
 
 // Mobile card helpers
-const expandedCards = ref<number[]>([])
 const cardEditData = ref<Record<number, any>>({})
 
 function isExpanded(id: number) { return expandedCards.value.includes(id) }

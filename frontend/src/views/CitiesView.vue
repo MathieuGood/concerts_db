@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
@@ -17,6 +17,7 @@ import { cityService } from '@/services/cityService'
 import { countryService } from '@/services/countryService'
 import { eventService } from '@/services/eventService'
 import type { Country } from '@/models/Country'
+import { useListState } from '@/composables/useListState'
 
 const router = useRouter()
 const confirm = useConfirm()
@@ -30,13 +31,16 @@ interface CityRow {
   eventList: EventEntry[]; _editing: boolean
 }
 
+const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
+
 const loading = ref(true)
 const countries = ref<Country[]>([])
 const cityRows = ref<CityRow[]>([])
 const expandedRows = ref<any[]>([])
+const expandedCards = ref<number[]>([])
 const editingRows = ref<any[]>([])
 const editData = ref<Record<number, any>>({})
-const search = ref('')
+const search = ref(initialSearch)
 const addingCity = ref(false)
 const newCity = ref({ name: '', countryInput: null as Country | null })
 
@@ -63,8 +67,15 @@ onMounted(async () => {
       const s = statsMap.get(c.id)
       return { id: c.id, name: c.name, country_id: c.country_id, country: c.country ?? null, countryName: c.country?.name ?? '', events: s?.events ?? 0, venues: s?.venueIds.size ?? 0, artists: s?.artistIds.size ?? 0, firstVisit: s?.first ?? null, lastVisit: s?.last ?? null, eventList: s?.eventList.sort((a, b) => a.date.localeCompare(b.date)) ?? [], _editing: false }
     })
+    expandedRows.value = cityRows.value.filter(r => initialExpandedIds.includes(r.id))
+    expandedCards.value = initialExpandedIds.filter(id => cityRows.value.some(r => r.id === id))
   } finally { loading.value = false }
 })
+
+watch([search, expandedRows, expandedCards], () => {
+  const ids = [...new Set([...expandedRows.value.map((r: any) => r.id), ...expandedCards.value])]
+  syncToUrl(search.value, ids)
+}, { deep: true })
 
 function formatDate(d: string | null) {
   if (!d) return '—'
@@ -151,7 +162,6 @@ function searchCardCountry(event: { query: string }) {
 }
 
 // Mobile card helpers
-const expandedCards = ref<number[]>([])
 const cardEditData = ref<Record<number, any>>({})
 
 function isExpanded(id: number) { return expandedCards.value.includes(id) }
