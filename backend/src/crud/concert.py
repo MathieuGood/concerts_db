@@ -55,6 +55,7 @@ def create(db: Session, concert: ConcertCreate) -> Concert:
         new_concert = Concert(
             comments=concert.comments,
             setlist=concert.setlist,
+            i_played=concert.i_played,
             event_id=concert.event_id,
             artist_id=concert.artist_id,
         )
@@ -81,6 +82,7 @@ def update(db: Session, concert_id: int, concert: ConcertCreate) -> Concert:
             )
         updated_concert.comments = concert.comments
         updated_concert.setlist = concert.setlist
+        updated_concert.i_played = concert.i_played
         updated_concert.event_id = concert.event_id
         updated_concert.artist_id = concert.artist_id
         db.commit()

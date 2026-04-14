@@ -7,4 +7,5 @@ export interface Concert {
   artist?: Artist
   comments: string
   setlist?: string
+  i_played?: boolean
 }

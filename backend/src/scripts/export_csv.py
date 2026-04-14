@@ -38,22 +38,26 @@ def export_csv():
         )
 
         writer = csv.writer(sys.stdout)
-        writer.writerow(["event_date", "venue", "city", "country", "artists", "attendees", "festival", "comments"])
+        writer.writerow(["event_date", "venue", "city", "country", "artists", "i_played", "attendees", "festival", "festival_year", "comments"])
 
         for event in events:
             artists = ";".join(c.artist.name for c in event.concerts)
+            i_played = ";".join(c.artist.name for c in event.concerts if c.i_played)
             attendees = ";".join(
                 f"{a.firstname} {a.lastname}".strip() for a in event.attendees
             )
             festival = event.festival.name if event.festival else ""
+            festival_year = event.festival.year if event.festival and event.festival.year else ""
             writer.writerow([
                 event.event_date,
                 event.venue.name,
                 event.venue.city.name,
                 event.venue.city.country.name,
                 artists,
+                i_played,
                 attendees,
                 festival,
+                festival_year,
                 event.comments or "",
             ])
     finally:

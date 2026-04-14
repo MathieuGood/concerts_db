@@ -63,7 +63,7 @@ onMounted(() => window.addEventListener('keydown', onKeyDown))
 onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
 
 function newConcert(): ConcertFormData {
-  return { id: null, artist_id: null, comments: '', setlist: '' }
+  return { id: null, artist_id: null, comments: '', setlist: '', i_played: false }
 }
 
 function addConcert() {
@@ -154,6 +154,7 @@ onMounted(async () => {
       artist_id: c.artist_id,
       comments: c.comments,
       setlist: c.setlist ?? '',
+      i_played: c.i_played ?? false,
     }))
     // Show attendees section if there are any
     if (form.attendees_ids.length > 0) showAttendees.value = true

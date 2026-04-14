@@ -56,6 +56,14 @@ function update(field: keyof ConcertFormData, value: unknown) {
         <i class="pi pi-list text-xs" />
       </button>
       <button
+        :title="modelValue.i_played ? 'I performed (click to unmark)' : 'I performed'"
+        :class="['w-7 h-7 flex items-center justify-center rounded transition-colors',
+          modelValue.i_played ? 'text-amber-500' : 'text-gray-300 dark:text-gray-600 hover:text-gray-500']"
+        @click="update('i_played', !modelValue.i_played)"
+      >
+        <i class="pi pi-microphone text-xs" />
+      </button>
+      <button
         title="Remove"
         class="w-7 h-7 flex items-center justify-center rounded text-gray-300 dark:text-gray-600 hover:text-red-400 transition-colors"
         @click="emit('remove')"

@@ -1,8 +1,10 @@
 from pydantic import BaseModel, ConfigDict
+from typing import Optional
 
 
 class FestivalBase(BaseModel):
     name: str
+    year: Optional[int] = None
 
 
 class FestivalCreate(FestivalBase):

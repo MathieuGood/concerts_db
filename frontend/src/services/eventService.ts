@@ -48,6 +48,7 @@ export function buildPayload(
       artist_id: c.artist_id!,
       comments: c.comments,
       setlist: c.setlist,
+      i_played: c.i_played,
       photos_ids: [],
       videos_ids: [],
     })),

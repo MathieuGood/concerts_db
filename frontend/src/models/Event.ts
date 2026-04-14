@@ -21,6 +21,7 @@ export interface ConcertFormData {
   artist_id: number | null
   comments: string
   setlist: string
+  i_played: boolean
 }
 
 export interface EventFormData {

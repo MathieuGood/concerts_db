@@ -39,11 +39,16 @@ def find_or_create_venue(db: Session, name: str, city_id: int) -> Venue:
     return venue
 
 
-def find_or_create_festival(db: Session, name: str) -> Festival:
-    festival = db.query(Festival).filter(Festival.name.ilike(name.strip())).first()
+def find_or_create_festival(db: Session, name: str, year: int | None = None) -> Festival:
+    query = db.query(Festival).filter(Festival.name.ilike(name.strip()))
+    if year is not None:
+        query = query.filter(Festival.year == year)
+    else:
+        query = query.filter(Festival.year.is_(None))
+    festival = query.first()
     if festival:
         return festival
-    festival = Festival(name=name.strip())
+    festival = Festival(name=name.strip(), year=year)
     db.add(festival)
     db.commit()
     db.refresh(festival)
@@ -99,7 +104,11 @@ def import_csv():
                 artists_raw  = row["artists"].strip()
                 attendees_raw = row["attendees"].strip()
                 festival_name = row["festival"].strip()
+                festival_year_raw = row.get("festival_year", "").strip()
+                festival_year = int(festival_year_raw) if festival_year_raw else None
                 comments    = row["comments"].strip()
+                i_played_raw = row.get("i_played", "").strip().lower()
+                i_played_artists = set(i_played_raw.split(";")) if i_played_raw else set()
 
                 if not event_date or not venue_name:
                     continue
@@ -120,7 +129,7 @@ def import_csv():
 
                     festival_id = None
                     if festival_name:
-                        festival_id = find_or_create_festival(db, festival_name).id
+                        festival_id = find_or_create_festival(db, festival_name, festival_year).id
 
                     event = Event(
                         event_date=date.fromisoformat(event_date),
@@ -135,7 +144,8 @@ def import_csv():
                     for artist_name in artists_raw.split(";"):
                         if artist_name.strip():
                             artist = find_or_create_artist(db, artist_name.strip())
-                            db.add(Concert(event_id=event.id, artist_id=artist.id))
+                            played = artist_name.strip().lower() in i_played_artists
+                            db.add(Concert(event_id=event.id, artist_id=artist.id, i_played=played))
 
                     if attendees_raw:
                         for full_name in attendees_raw.split(";"):

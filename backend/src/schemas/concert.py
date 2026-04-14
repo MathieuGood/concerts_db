@@ -8,6 +8,7 @@ from schemas.video import VideoResponse
 class ConcertBase(BaseModel):
     comments: str
     setlist: Optional[str] = None
+    i_played: bool = False
 
 
 class ConcertCreate(ConcertBase):

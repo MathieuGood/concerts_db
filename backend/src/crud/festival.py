@@ -20,7 +20,7 @@ def get_all(db: Session):
 
 def create(db: Session, festival: FestivalCreate) -> Festival:
     try:
-        new_festival = Festival(name=festival.name)
+        new_festival = Festival(name=festival.name, year=festival.year)
         db.add(new_festival)
         db.commit()
         db.refresh(new_festival)
@@ -28,7 +28,7 @@ def create(db: Session, festival: FestivalCreate) -> Festival:
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Festival '{festival.name}' already exists."
+            status_code=400, detail=f"Festival '{festival.name}' ({festival.year}) already exists."
         )
 
 
@@ -42,13 +42,14 @@ def update(db: Session, festival_id: int, festival: FestivalCreate) -> Festival:
                 status_code=404, detail=f"Festival with ID {festival_id} not found."
             )
         updated_festival.name = festival.name
+        updated_festival.year = festival.year
         db.commit()
         db.refresh(updated_festival)
         return updated_festival
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail=f"Festival '{festival.name}' already exists."
+            status_code=400, detail=f"Festival '{festival.name}' ({festival.year}) already exists."
         )
 
 
