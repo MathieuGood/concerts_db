@@ -21,7 +21,7 @@ export async function downloadExport(): Promise<void> {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[-:T]/g, (c) => c === 'T' ? '_' : '')
   a.download = `concerts_${stamp}.csv`
   document.body.appendChild(a)
   a.click()
