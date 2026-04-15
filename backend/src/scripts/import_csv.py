@@ -1,12 +1,14 @@
 """
-Import concerts from data/concerts_import.csv into the database.
+Import concerts from a CSV file into the database.
 
 Usage (on VPS):
-    docker exec concerts_db-backend-1 python src/scripts/import_csv.py
+    docker exec concerts_db-backend-1 uv run python src/scripts/import_csv.py
+    docker exec concerts_db-backend-1 uv run python src/scripts/import_csv.py --file /data/hellfest_2006.csv
 
-The CSV is volume-mounted at /data/concerts_import.csv inside the container.
+The default CSV is volume-mounted at /data/concerts_import.csv inside the container.
 Already-existing events (same date + venue) are skipped safely.
 """
+import argparse
 import csv
 import sys
 from datetime import date
@@ -25,7 +27,7 @@ from sqlalchemy.orm import Session
 from crud import country as country_crud
 from crud import city as city_crud
 
-CSV_PATH = Path("/data/concerts_import.csv")
+DEFAULT_CSV_PATH = Path("/data/concerts_import.csv")
 
 
 def find_or_create_venue(db: Session, name: str, city_id: int) -> Venue:
@@ -83,9 +85,9 @@ def find_or_create_attendee(db: Session, full_name: str) -> Attendee:
     return attendee
 
 
-def import_csv():
-    if not CSV_PATH.exists():
-        print(f"ERROR: CSV not found at {CSV_PATH}")
+def import_csv(csv_path: Path = DEFAULT_CSV_PATH):
+    if not csv_path.exists():
+        print(f"ERROR: CSV not found at {csv_path}")
         sys.exit(1)
 
     db = SessionLocal()
@@ -94,7 +96,7 @@ def import_csv():
     errors = 0
 
     try:
-        with open(CSV_PATH, newline="", encoding="utf-8") as f:
+        with open(csv_path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 event_date  = row["event_date"].strip()
@@ -171,4 +173,7 @@ def import_csv():
 
 
 if __name__ == "__main__":
-    import_csv()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", type=Path, default=DEFAULT_CSV_PATH, help="Path to CSV file inside the container")
+    args = parser.parse_args()
+    import_csv(args.file)
