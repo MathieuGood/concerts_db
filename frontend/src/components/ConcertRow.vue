@@ -28,8 +28,8 @@ function update(field: keyof ConcertFormData, value: unknown) {
 
 <template>
   <div class="border-b border-gray-100 dark:border-gray-800 last:border-0">
-    <!-- Main row -->
-    <div class="flex items-center gap-2 px-3 py-2">
+    <!-- Artist row -->
+    <div class="flex items-center gap-2 px-3 pt-2 pb-1">
       <span class="text-xs text-gray-400 w-4 shrink-0 text-center select-none">{{ index + 1 }}</span>
       <ArtistSelectOrCreate
         class="flex-1 min-w-0"
@@ -39,6 +39,9 @@ function update(field: keyof ConcertFormData, value: unknown) {
         @artist-created="emit('artist-created', $event)"
         @artist-updated="emit('artist-updated', $event)"
       />
+    </div>
+    <!-- Action row -->
+    <div class="flex items-center gap-1 px-3 pb-2 pl-9">
       <button
         :title="showComments ? 'Hide comments' : 'Comments'"
         :class="['w-7 h-7 flex items-center justify-center rounded transition-colors',
@@ -63,6 +66,7 @@ function update(field: keyof ConcertFormData, value: unknown) {
       >
         <i class="pi pi-microphone text-xs" />
       </button>
+      <div class="flex-1" />
       <button
         title="Remove"
         class="w-7 h-7 flex items-center justify-center rounded text-gray-300 dark:text-gray-600 hover:text-red-400 transition-colors"
