@@ -38,7 +38,7 @@ const allBandNames = computed(() => {
 
 function bandColor(name: string): string {
   const idx = allBandNames.value.indexOf(name)
-  return BAND_PALETTE[idx % BAND_PALETTE.length]
+  return BAND_PALETTE[idx % BAND_PALETTE.length] ?? BAND_PALETTE[0] ?? '#f59e0b'
 }
 
 // ── Year stats ────────────────────────────────────────────────────────────────
