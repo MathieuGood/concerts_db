@@ -18,19 +18,50 @@ onMounted(async () => {
       selectedYear.value = Math.max(...years)
     }
   } finally {
-    loading.value = false }
+    loading.value = false
+  }
 })
+
+// ── Band colors ───────────────────────────────────────────────────────────────
+
+const BAND_PALETTE = ['#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#ec4899']
+
+const allBandNames = computed(() => {
+  const names = new Set<string>()
+  for (const e of events.value) {
+    for (const c of e.concerts) {
+      if (c.i_played && c.artist?.name) names.add(c.artist.name)
+    }
+  }
+  return Array.from(names).sort()
+})
+
+function bandColor(name: string): string {
+  const idx = allBandNames.value.indexOf(name)
+  return BAND_PALETTE[idx % BAND_PALETTE.length]
+}
 
 // ── Year stats ────────────────────────────────────────────────────────────────
 
 const yearStats = computed(() => {
-  const map = new Map<number, number>()
+  const map = new Map<number, Map<string, number>>()
   for (const e of events.value) {
     const y = parseInt(e.event_date.slice(0, 4))
-    map.set(y, (map.get(y) ?? 0) + 1)
+    if (!map.has(y)) map.set(y, new Map())
+    const bandMap = map.get(y)!
+    const playedConcert = e.concerts.find(c => c.i_played)
+    const key = playedConcert?.artist?.name ?? '__attended__'
+    bandMap.set(key, (bandMap.get(key) ?? 0) + 1)
   }
   return Array.from(map.entries())
-    .map(([year, count]) => ({ year, count }))
+    .map(([year, bandMap]) => {
+      const count = Array.from(bandMap.values()).reduce((a, b) => a + b, 0)
+      const bands = Array.from(bandMap.entries())
+        .filter(([k]) => k !== '__attended__')
+        .map(([name, count]) => ({ name, count }))
+      const attended = bandMap.get('__attended__') ?? 0
+      return { year, count, bands, attended }
+    })
     .sort((a, b) => a.year - b.year)
 })
 
@@ -39,8 +70,8 @@ const maxYearCount = computed(() => Math.max(...yearStats.value.map(y => y.count
 // ── Month breakdown for selected year ────────────────────────────────────────
 
 const MONTHS = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December',
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
 ]
 
 const monthBoxes = computed(() => {
@@ -64,6 +95,10 @@ function artistNames(event: Event): string {
 
 function dayNum(dateStr: string): string {
   return String(parseInt(dateStr.slice(8, 10)))
+}
+
+function playedBand(event: Event): string | null {
+  return event.concerts.find(c => c.i_played)?.artist?.name ?? null
 }
 </script>
 
@@ -89,24 +124,44 @@ function dayNum(dateStr: string): string {
             :key="stat.year"
             class="flex-1 flex flex-col items-center gap-1 min-w-0"
           >
-            <!-- Count label (only if bar is tall enough or selected) -->
+            <!-- Count label -->
             <span
               class="text-[10px] leading-none transition-colors"
               :class="selectedYear === stat.year ? 'text-d-purple font-semibold' : 'text-gray-400'"
             >
               {{ stat.count }}
             </span>
-            <!-- Bar -->
+            <!-- Bar (stacked segments) -->
             <div
-              class="w-full rounded-t cursor-pointer transition-colors"
-              :style="{
-                height: `${Math.max((stat.count / maxYearCount) * 80, 4)}px`,
-                background: selectedYear === stat.year
-                  ? 'var(--d-purple)'
-                  : 'color-mix(in srgb, var(--d-purple) 25%, transparent)',
-              }"
+              class="w-full rounded-t cursor-pointer overflow-hidden"
+              :style="{ height: `${Math.max((stat.count / maxYearCount) * 80, 4)}px` }"
               @click="selectedYear = stat.year"
-            />
+            >
+              <div class="h-full flex flex-col">
+                <!-- Played segments — one per band, at the top -->
+                <div
+                  v-for="band in stat.bands"
+                  :key="band.name"
+                  class="transition-opacity"
+                  :style="{
+                    height: `${(band.count / stat.count) * 100}%`,
+                    background: bandColor(band.name),
+                    opacity: selectedYear === stat.year ? 1 : 0.65,
+                  }"
+                />
+                <!-- Attended segment — at the bottom -->
+                <div
+                  v-if="stat.attended > 0"
+                  class="transition-colors"
+                  :style="{
+                    height: `${(stat.attended / stat.count) * 100}%`,
+                    background: selectedYear === stat.year
+                      ? 'var(--d-purple)'
+                      : 'color-mix(in srgb, var(--d-purple) 25%, transparent)',
+                  }"
+                />
+              </div>
+            </div>
             <!-- Year label -->
             <span
               class="text-[10px] leading-none truncate w-full text-center transition-colors"
@@ -116,6 +171,18 @@ function dayNum(dateStr: string): string {
             >
               {{ stat.year }}
             </span>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div v-if="allBandNames.length > 0" class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+          <div v-for="name in allBandNames" :key="name" class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-sm shrink-0" :style="{ background: bandColor(name) }" />
+            <span class="text-xs text-gray-600 dark:text-gray-400">{{ name }}</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-sm shrink-0" style="background: color-mix(in srgb, var(--d-purple) 40%, transparent)" />
+            <span class="text-xs text-gray-600 dark:text-gray-400">Attending</span>
           </div>
         </div>
       </div>
@@ -171,12 +238,22 @@ function dayNum(dateStr: string): string {
                 <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                   {{ event.venue?.name }}<span v-if="event.venue?.city?.name"> · {{ event.venue.city.name }}</span>
                 </p>
-                <span
-                  v-if="event.festival"
-                  class="inline-block mt-1 text-[10px] badge-d-red px-1.5 py-0.5 rounded-full leading-none"
-                >
-                  {{ event.festival.name }}
-                </span>
+                <div class="flex flex-wrap gap-1.5 mt-1">
+                  <span
+                    v-if="event.festival"
+                    class="inline-block text-[10px] badge-d-red px-1.5 py-0.5 rounded-full leading-none"
+                  >
+                    {{ event.festival.name }}
+                  </span>
+                  <span
+                    v-if="playedBand(event)"
+                    class="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full leading-none font-medium text-white"
+                    :style="{ background: bandColor(playedBand(event)!) }"
+                  >
+                    <i class="pi pi-microphone" style="font-size: 0.55rem" />
+                    {{ playedBand(event) }}
+                  </span>
+                </div>
               </div>
 
               <i class="pi pi-arrow-right text-xs text-gray-300 shrink-0 mt-1" />
