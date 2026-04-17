@@ -133,6 +133,7 @@ onMounted(() => {
         </span>
 
         <Button
+          v-if="user"
           icon="pi pi-sign-out"
           size="small"
           rounded
@@ -243,6 +244,7 @@ onMounted(() => {
           {{ user.name }}
         </span>
         <button
+          v-if="user"
           class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ml-auto"
           @click="confirmLogout"
         >
