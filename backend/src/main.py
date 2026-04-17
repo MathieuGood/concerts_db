@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
     print("Application shutdown")
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, root_path="/api")
 
 
 @app.exception_handler(HTTPException)
