@@ -31,8 +31,8 @@ const { isAdmin } = useAuth()
 const isEdit = computed(() => !!route.params.id)
 const eventId = computed(() => Number(route.params.id))
 
-// View vs edit mode — new events always start in edit mode
-const isEditMode = ref(!route.params.id)
+// View vs edit mode — new events always start in edit mode; ?edit=true forces edit mode
+const isEditMode = ref(!route.params.id || route.query.edit === 'true')
 
 // Full event data for view mode
 const eventData = ref<Event | null>(null)

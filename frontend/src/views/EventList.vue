@@ -9,10 +9,12 @@ import ProgressSpinner from 'primevue/progressspinner'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { eventService } from '@/services/eventService'
+import { useAuth } from '@/composables/useAuth'
 import type { Event } from '@/models/Event'
 import { useListState } from '@/composables/useListState'
 
 const router = useRouter()
+const { isAdmin } = useAuth()
 const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
 
 const events = ref<Event[]>([])
@@ -159,16 +161,27 @@ function toggleCard(id: number) {
                 </div>
               </div>
             </button>
-            <Button
-              icon="pi pi-pencil"
-              text
-              rounded
-              size="small"
-              severity="secondary"
-              class="shrink-0 -mr-1 -mt-1"
-              @click="router.push(`/event/${event.id}`)"
-              aria-label="Edit"
-            />
+            <div class="flex shrink-0 -mr-1 -mt-1">
+              <Button
+                icon="pi pi-eye"
+                text
+                rounded
+                size="small"
+                severity="secondary"
+                aria-label="View"
+                @click="router.push(`/event/${event.id}`)"
+              />
+              <Button
+                v-if="isAdmin"
+                icon="pi pi-pencil"
+                text
+                rounded
+                size="small"
+                severity="secondary"
+                aria-label="Edit"
+                @click="router.push(`/event/${event.id}?edit=true`)"
+              />
+            </div>
           </div>
 
           <!-- Card expansion -->
@@ -263,17 +276,29 @@ function toggleCard(id: number) {
             </template>
           </Column>
 
-          <Column style="width: 3rem">
+          <Column style="width: 5rem">
             <template #body="{ data }">
-              <Button
-                icon="pi pi-pencil"
-                text
-                rounded
-                size="small"
-                severity="secondary"
-                @click="router.push(`/event/${data.id}`)"
-                aria-label="Edit"
-              />
+              <div class="flex">
+                <Button
+                  icon="pi pi-eye"
+                  text
+                  rounded
+                  size="small"
+                  severity="secondary"
+                  aria-label="View"
+                  @click="router.push(`/event/${data.id}`)"
+                />
+                <Button
+                  v-if="isAdmin"
+                  icon="pi pi-pencil"
+                  text
+                  rounded
+                  size="small"
+                  severity="secondary"
+                  aria-label="Edit"
+                  @click="router.push(`/event/${data.id}?edit=true`)"
+                />
+              </div>
             </template>
           </Column>
 
