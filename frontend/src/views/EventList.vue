@@ -141,27 +141,27 @@ function toggleCard(id: number) {
               class="flex-1 min-w-0 text-left"
               @click="toggleCard(event.id)"
             >
-              <div class="flex items-start justify-between gap-2">
-                <div class="min-w-0">
-                  <p class="font-semibold text-gray-900 dark:text-gray-100 truncate">
+              <div class="min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <p class="font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0">
                     {{ artistNames(event) || event.name || '—' }}
                   </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                    {{ event.venue?.name }}<span v-if="event.venue?.city?.name"> — {{ event.venue.city.name }}</span>
-                  </p>
-                  <span
-                    v-if="event.festival"
-                    class="inline-block mt-1 text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full"
-                  >
-                    {{ event.festival.name }}
-                  </span>
+                  <div class="flex items-center gap-1 shrink-0 pt-0.5">
+                    <span class="text-xs text-gray-400 dark:text-gray-500">
+                      {{ formatDate(event.event_date) }}
+                    </span>
+                    <i :class="['pi text-gray-400 text-xs ml-1', expandedCards.has(event.id) ? 'pi-chevron-up' : 'pi-chevron-down']" />
+                  </div>
                 </div>
-                <div class="flex items-center gap-1 shrink-0 pt-0.5">
-                  <span class="text-xs text-gray-400 dark:text-gray-500">
-                    {{ formatDate(event.event_date) }}
-                  </span>
-                  <i :class="['pi text-gray-400 text-xs ml-1', expandedCards.has(event.id) ? 'pi-chevron-up' : 'pi-chevron-down']" />
-                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                  {{ event.venue?.name }}<span v-if="event.venue?.city?.name"> — {{ event.venue.city.name }}</span>
+                </p>
+                <span
+                  v-if="event.festival"
+                  class="inline-block mt-1 text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full"
+                >
+                  {{ event.festival.name }}
+                </span>
               </div>
             </button>
             <div class="flex shrink-0 -mr-1 -mt-1">
