@@ -146,9 +146,8 @@ function toggleCard(id: number) {
                   <p class="font-semibold text-gray-900 dark:text-gray-100 truncate">
                     {{ artistNames(event) || event.name || '—' }}
                   </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                    {{ event.venue?.name }}
-                    <span v-if="event.venue?.city?.name"> — {{ event.venue.city.name }}</span>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                    {{ event.venue?.name }}<span v-if="event.venue?.city?.name"> — {{ event.venue.city.name }}</span>
                   </p>
                   <span
                     v-if="event.festival"
