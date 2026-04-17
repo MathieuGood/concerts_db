@@ -16,6 +16,10 @@ import { isLoggedIn, getStoredUser } from '@/services/authService'
 
 const router = createRouter({
   history: createWebHistory(),
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    return { top: 0 }
+  },
   routes: [
     { path: '/login', component: LoginView, meta: { public: true } },
     { path: '/', component: EventList },

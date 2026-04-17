@@ -108,11 +108,11 @@ async function save() {
     if (isEdit.value) {
       await eventService.update(eventId.value, payload)
       toast.add({ severity: 'success', summary: 'Saved', detail: 'Event updated.', life: 3000 })
-      router.push('/')
+      goBack()
     } else {
       await eventService.create(payload)
       toast.add({ severity: 'success', summary: 'Created', detail: 'Event created.', life: 3000 })
-      router.push('/')
+      goBack()
     }
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'An error occurred.'
@@ -128,13 +128,18 @@ async function deleteEvent() {
   try {
     await eventService.delete(eventId.value)
     toast.add({ severity: 'info', summary: 'Deleted', detail: 'Event deleted.', life: 3000 })
-    router.push('/')
+    goBack()
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'An error occurred.'
     toast.add({ severity: 'error', summary: 'Error', detail: msg, life: 5000 })
   } finally {
     deleting.value = false
   }
+}
+
+function goBack() {
+  if (window.history.length > 1) router.back()
+  else router.push('/')
 }
 
 function formatDate(dateStr: string): string {
@@ -208,7 +213,7 @@ onMounted(async () => {
 
         <!-- Header -->
         <div class="flex items-center gap-3">
-          <Button icon="pi pi-arrow-left" text size="small" @click="router.push('/')" aria-label="Back" />
+          <Button icon="pi pi-arrow-left" text size="small" aria-label="Back" @click="goBack()" />
           <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100 flex-1 truncate">
             {{ viewTitle }}
           </h1>
@@ -308,7 +313,7 @@ onMounted(async () => {
             text
             size="small"
             aria-label="Back"
-            @click="isEdit ? (isEditMode = false) : router.push('/')"
+            @click="isEdit ? (isEditMode = false) : goBack()"
           />
           <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">
             {{ isEdit ? 'Edit Event' : 'New Event' }}
