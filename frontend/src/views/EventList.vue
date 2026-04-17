@@ -14,7 +14,11 @@ import type { Event } from '@/models/Event'
 import { useListState } from '@/composables/useListState'
 
 const router = useRouter()
-const { isAdmin } = useAuth()
+const { user, isAdmin } = useAuth()
+
+function canEdit(event: Event): boolean {
+  return isAdmin.value || event.user_id === user.value?.id
+}
 const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
 
 const events = ref<Event[]>([])
@@ -172,7 +176,7 @@ function toggleCard(id: number) {
                 @click="router.push(`/event/${event.id}`)"
               />
               <Button
-                v-if="isAdmin"
+                v-if="canEdit(event)"
                 icon="pi pi-pencil"
                 text
                 rounded
@@ -289,7 +293,7 @@ function toggleCard(id: number) {
                   @click="router.push(`/event/${data.id}`)"
                 />
                 <Button
-                  v-if="isAdmin"
+                  v-if="canEdit(data)"
                   icon="pi pi-pencil"
                   text
                   rounded

@@ -26,7 +26,8 @@ import type { ConcertFormData, Event } from '@/models/Event'
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
-const { isAdmin } = useAuth()
+const { user, isAdmin } = useAuth()
+const canEdit = computed(() => isAdmin.value || (!!eventData.value && eventData.value.user_id === user.value?.id))
 
 const isEdit = computed(() => !!route.params.id)
 const eventId = computed(() => Number(route.params.id))
@@ -183,6 +184,7 @@ onMounted(async () => {
       i_played: c.i_played ?? false,
     }))
     if (form.attendees_ids.length > 0) showAttendees.value = true
+    if (!canEdit.value) isEditMode.value = false
   } else {
     addConcert()
   }
@@ -218,7 +220,7 @@ onMounted(async () => {
             {{ viewTitle }}
           </h1>
           <Button
-            v-if="isAdmin"
+            v-if="canEdit"
             icon="pi pi-pencil"
             text
             size="small"

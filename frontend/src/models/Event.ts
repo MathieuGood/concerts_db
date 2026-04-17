@@ -5,6 +5,7 @@ import type { Attendee } from './Attendee'
 
 export interface Event {
   id: number
+  user_id: number
   name?: string
   event_date: string
   comments: string

@@ -22,6 +22,7 @@ class EventCreate(EventBase):
 
 class EventResponse(EventBase):
     id: int
+    user_id: int
     venue_id: int
     festival_id: Optional[int] = None
     venue: Optional[VenueResponse] = None

@@ -128,7 +128,7 @@ async function update() {
       <p class="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-wide">New Festival</p>
       <div class="flex gap-2">
         <InputText ref="newNameInput" v-model="newName" placeholder="Festival name *" class="flex-1" @keyup.enter="create" />
-        <InputNumber v-model="newYear" placeholder="Year" :use-grouping="false" :min="1900" :max="2100" class="w-28" />
+        <InputNumber v-model="newYear" placeholder="Year" :use-grouping="false" :min="1900" :max="2100" class="w-28" input-class="!w-full" />
       </div>
       <div class="flex justify-end gap-2">
         <Button label="Cancel" size="small" text severity="secondary" @click="showCreate = false" />

@@ -1,3 +1,4 @@
+from typing import Optional
 from models.attendee import Attendee
 from fastapi import HTTPException
 from schemas.attendee import AttendeeCreate
@@ -5,8 +6,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 
-def get(db: Session, attendee_id: int, user_id: int):
-    attendee = db.query(Attendee).filter(Attendee.id == attendee_id, Attendee.user_id == user_id).first()
+def get(db: Session, attendee_id: int, user_id: Optional[int] = None):
+    q = db.query(Attendee).filter(Attendee.id == attendee_id)
+    if user_id is not None:
+        q = q.filter(Attendee.user_id == user_id)
+    attendee = q.first()
     if not attendee:
         raise HTTPException(
             status_code=404, detail=f"Attendee with ID {attendee_id} not found."
@@ -14,8 +18,11 @@ def get(db: Session, attendee_id: int, user_id: int):
     return attendee
 
 
-def get_all(db: Session, user_id: int):
-    return db.query(Attendee).filter(Attendee.user_id == user_id).all()
+def get_all(db: Session, user_id: Optional[int] = None):
+    q = db.query(Attendee)
+    if user_id is not None:
+        q = q.filter(Attendee.user_id == user_id)
+    return q.all()
 
 
 def create(db: Session, attendee: AttendeeCreate, user_id: int) -> Attendee:

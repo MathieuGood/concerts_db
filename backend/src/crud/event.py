@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from models.artist import Artist
 from models.city import City
 from models.concert import Concert
@@ -25,8 +25,11 @@ def _base_query(db: Session):
     )
 
 
-def get(db: Session, event_id: int, user_id: int) -> Event:
-    event = _base_query(db).filter(Event.id == event_id, Event.user_id == user_id).first()
+def get(db: Session, event_id: int, user_id: Optional[int] = None) -> Event:
+    q = _base_query(db).filter(Event.id == event_id)
+    if user_id is not None:
+        q = q.filter(Event.user_id == user_id)
+    event = q.first()
     if not event:
         raise HTTPException(
             status_code=404, detail=f"Event with ID {event_id} not found."
@@ -35,13 +38,11 @@ def get(db: Session, event_id: int, user_id: int) -> Event:
     return event
 
 
-def get_all(db: Session, user_id: int) -> List[Event]:
-    return (
-        _base_query(db)
-        .filter(Event.user_id == user_id)
-        .order_by(Event.event_date.desc())
-        .all()
-    )
+def get_all(db: Session, user_id: Optional[int] = None) -> List[Event]:
+    q = _base_query(db)
+    if user_id is not None:
+        q = q.filter(Event.user_id == user_id)
+    return q.order_by(Event.event_date.desc()).all()
 
 
 def create(db: Session, event: EventCreate, user_id: int) -> Event:
@@ -82,6 +83,7 @@ def create(db: Session, event: EventCreate, user_id: int) -> Event:
             new_concert = Concert(
                 comments=concert.comments,
                 setlist=concert.setlist,
+                i_played=concert.i_played,
                 event_id=new_event.id,
                 artist_id=concert.artist_id,
             )
@@ -98,8 +100,12 @@ def create(db: Session, event: EventCreate, user_id: int) -> Event:
 
         if event.attendees_ids:
             attendees = (
-                db.query(Attendee).filter(Attendee.id.in_(event.attendees_ids)).all()
+                db.query(Attendee)
+                .filter(Attendee.id.in_(event.attendees_ids), Attendee.user_id == user_id)
+                .all()
             )
+            if len(attendees) != len(event.attendees_ids):
+                raise HTTPException(status_code=403, detail="One or more attendees do not belong to you.")
             new_event.attendees.extend(attendees)
             db.commit()
             db.refresh(new_event)
@@ -130,11 +136,11 @@ def update(db: Session, event_id: int, event: EventCreate, user_id: int) -> Even
 
         updated_event.attendees.clear()
         for attendee_id in event.attendees_ids:
-            attendee = db.query(Attendee).filter(Attendee.id == attendee_id).first()
+            attendee = db.query(Attendee).filter(Attendee.id == attendee_id, Attendee.user_id == user_id).first()
             if not attendee:
                 raise HTTPException(
-                    status_code=404,
-                    detail=f"Attendee with ID {attendee_id} not found.",
+                    status_code=403,
+                    detail=f"Attendee with ID {attendee_id} not found or does not belong to you.",
                 )
             updated_event.attendees.append(attendee)
 
@@ -143,13 +149,14 @@ def update(db: Session, event_id: int, event: EventCreate, user_id: int) -> Even
 
         for concert in event.concerts:
             existing_concert = (
-                db.query(Concert).filter(Concert.id == concert.id).first()
+                db.query(Concert).filter(Concert.id == concert.id, Concert.event_id == event_id).first()
             )
 
             if existing_concert:
                 existing_concert.event_id = updated_event.id
                 existing_concert.comments = concert.comments
                 existing_concert.setlist = concert.setlist
+                existing_concert.i_played = concert.i_played
                 existing_concert.artist_id = concert.artist_id
                 existing_concert.artist = (
                     db.query(Artist).filter(Artist.id == concert.artist_id).first()
@@ -167,6 +174,7 @@ def update(db: Session, event_id: int, event: EventCreate, user_id: int) -> Even
                 new_concert = Concert(
                     comments=concert.comments,
                     setlist=concert.setlist,
+                    i_played=concert.i_played,
                     event_id=updated_event.id,
                     artist_id=concert.artist_id,
                     artist=artist,

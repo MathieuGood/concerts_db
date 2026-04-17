@@ -78,6 +78,7 @@ onMounted(() => {
       <!-- Desktop nav -->
       <div class="hidden sm:flex items-center gap-2">
         <Button
+          v-if="user"
           label="New Event"
           icon="pi pi-plus"
           size="small"
