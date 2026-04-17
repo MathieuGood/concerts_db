@@ -22,29 +22,26 @@ const router = createRouter({
   },
   routes: [
     { path: '/login', component: LoginView, meta: { public: true } },
-    { path: '/', component: EventList },
-    { path: '/event/new', component: EventForm },
-    { path: '/event/:id', component: EventForm },
-    { path: '/library', component: LibraryView },
-    { path: '/artists', component: ArtistsView },
-    { path: '/venues', component: VenuesView },
-    { path: '/cities', component: CitiesView },
-    { path: '/countries', component: CountriesView },
-    { path: '/attendees', component: AttendeesView },
-    { path: '/festivals', component: FestivalsView },
-    { path: '/stats', component: StatsView },
-    { path: '/admin', component: AdminView },
-    { path: '/import', component: ImportView },
+    { path: '/', component: EventList, meta: { public: true } },
+    { path: '/event/new', component: EventForm, meta: { requiresAuth: true } },
+    { path: '/event/:id', component: EventForm, meta: { public: true } },
+    { path: '/library', component: LibraryView, meta: { public: true } },
+    { path: '/artists', component: ArtistsView, meta: { public: true } },
+    { path: '/venues', component: VenuesView, meta: { public: true } },
+    { path: '/cities', component: CitiesView, meta: { public: true } },
+    { path: '/countries', component: CountriesView, meta: { public: true } },
+    { path: '/attendees', component: AttendeesView, meta: { requiresAuth: true } },
+    { path: '/festivals', component: FestivalsView, meta: { public: true } },
+    { path: '/stats', component: StatsView, meta: { public: true } },
+    { path: '/admin', component: AdminView, meta: { requiresAuth: true, adminOnly: true } },
+    { path: '/import', component: ImportView, meta: { requiresAuth: true, adminOnly: true } },
   ],
 })
 
 router.beforeEach((to) => {
   if (to.meta.public) return true
   if (!isLoggedIn()) return '/login'
-  if (to.path === '/admin' || to.path === '/import') {
-    const user = getStoredUser()
-    if (!user?.is_admin) return '/'
-  }
+  if (to.meta.adminOnly && !getStoredUser()?.is_admin) return '/'
   return true
 })
 

@@ -12,12 +12,12 @@ router = APIRouter()
 
 
 @router.get("/event/", response_model=ApiResponse[List[EventResponse]])
-async def get_all_events(db: Session = Depends(get_db), _: User = Depends(get_current_user)):
+async def get_all_events(db: Session = Depends(get_db)):
     return ApiResponse(success=True, data=get_all(db))
 
 
 @router.get("/event/{event_id}", response_model=ApiResponse[EventResponse])
-async def get_event(event_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
+async def get_event(event_id: int, db: Session = Depends(get_db)):
     return ApiResponse(success=True, data=get(db, event_id))
 
 

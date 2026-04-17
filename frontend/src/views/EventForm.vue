@@ -17,6 +17,7 @@ import { festivalService } from '@/services/festivalService'
 import { artistService } from '@/services/artistService'
 import { attendeeService } from '@/services/attendeeService'
 import { useAuth } from '@/composables/useAuth'
+import { isLoggedIn } from '@/services/authService'
 import type { Venue } from '@/models/Venue'
 import type { Festival } from '@/models/Festival'
 import type { Artist } from '@/models/Artist'
@@ -160,7 +161,7 @@ onMounted(async () => {
     venueService.getAll(),
     festivalService.getAll(),
     artistService.getAll(),
-    attendeeService.getAll(),
+    isLoggedIn() ? attendeeService.getAll() : Promise.resolve([]),
   ])
   venues.value = v
   festivals.value = f
