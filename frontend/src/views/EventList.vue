@@ -90,6 +90,16 @@ function toggleCard(id: number) {
   // trigger reactivity
   expandedCards.value = new Set(expandedCards.value)
 }
+
+function onRowClick(ev: { data: Event; originalEvent: Event }) {
+  // Ignore clicks originating from buttons (view/edit action column)
+  const target = (ev.originalEvent as unknown as MouseEvent).target as HTMLElement | null
+  if (target?.closest('button')) return
+  const id = ev.data.id
+  const idx = expandedRows.value.findIndex((r: any) => r.id === id)
+  if (idx >= 0) expandedRows.value = expandedRows.value.filter((r: any) => r.id !== id)
+  else expandedRows.value = [...expandedRows.value, ev.data]
+}
 </script>
 
 <template>
@@ -239,8 +249,9 @@ function toggleCard(id: number) {
           size="small"
           sortField="event_date"
           :sortOrder="1"
-          class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700"
+          class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer"
           dataKey="id"
+          @row-click="onRowClick"
         >
           <Column expander style="width: 2.5rem" />
 
