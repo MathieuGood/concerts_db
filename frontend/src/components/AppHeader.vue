@@ -81,25 +81,6 @@ onMounted(() => {
 
       <!-- Desktop nav -->
       <div class="hidden sm:flex items-center gap-2">
-        <!-- < lg: icon-only rounded to fit among the other icons; lg+: full label -->
-        <Button
-          v-if="user"
-          icon="pi pi-plus"
-          size="small"
-          class="lg:!hidden"
-          rounded
-          aria-label="New Event"
-          @click="navigate('/event/new')"
-        />
-        <Button
-          v-if="user"
-          label="New Event"
-          icon="pi pi-plus"
-          size="small"
-          class="hidden lg:!inline-flex"
-          @click="navigate('/event/new')"
-        />
-
         <Button icon="pi pi-calendar" size="small" rounded :text="route.path !== '/'"
           :severity="route.path === '/' ? undefined : 'secondary'" @click="navigate('/')" aria-label="Shows" />
 
@@ -139,16 +120,6 @@ onMounted(() => {
     <!-- Mobile dropdown menu -->
     <div v-if="menuOpen"
       class="sm:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 flex flex-col gap-1">
-      <button v-if="user"
-        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full text-left transition-colors"
-        :class="route.path === '/event/new'
-          ? 'badge-d-purple'
-          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
-        @click="navigate('/event/new')">
-        <i class="pi pi-plus text-d-purple" />
-        New Event
-      </button>
-
       <button
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full text-left transition-colors"
         :class="route.path === '/'
