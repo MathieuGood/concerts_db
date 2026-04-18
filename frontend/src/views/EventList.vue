@@ -205,16 +205,6 @@ function onRowClick(ev: DataTableRowClickEvent) {
                 aria-label="View"
                 @click="router.push(`/event/${event.id}`)"
               />
-              <Button
-                v-if="canEdit(event)"
-                icon="pi pi-pencil"
-                text
-                rounded
-                size="small"
-                severity="secondary"
-                aria-label="Edit"
-                @click="router.push(`/event/${event.id}?edit=true`)"
-              />
             </div>
           </div>
 
@@ -274,7 +264,13 @@ function onRowClick(ev: DataTableRowClickEvent) {
           dataKey="id"
           @row-click="onRowClick"
         >
-          <Column expander style="width: 2.5rem" />
+          <Column style="width: 2.5rem">
+            <template #body="{ data }">
+              <i
+                :class="['pi text-gray-400 text-xs', expandedRows.some((r: any) => r.id === data.id) ? 'pi-chevron-down' : 'pi-chevron-right']"
+              />
+            </template>
+          </Column>
 
           <Column field="event_date" header="Date" sortable style="width: 120px">
             <template #body="{ data }">
