@@ -19,7 +19,9 @@ def _base_query(db: Session):
         joinedload(Event.venue).joinedload(Venue.city).joinedload(City.country),
         joinedload(Event.attendees),
         joinedload(Event.festival),
-        joinedload(Event.concerts).joinedload(Concert.artist).joinedload(Artist.country),
+        joinedload(Event.concerts)
+        .joinedload(Concert.artist)
+        .joinedload(Artist.country),
         joinedload(Event.concerts).joinedload(Concert.photos),
         joinedload(Event.concerts).joinedload(Concert.videos),
     )
@@ -54,7 +56,9 @@ def create(db: Session, event: EventCreate, user_id: int) -> Event:
             )
 
         if event.festival_id:
-            festival = db.query(Festival).filter(Festival.id == event.festival_id).first()
+            festival = (
+                db.query(Festival).filter(Festival.id == event.festival_id).first()
+            )
             if not festival:
                 raise HTTPException(
                     status_code=404,
@@ -101,11 +105,16 @@ def create(db: Session, event: EventCreate, user_id: int) -> Event:
         if event.attendees_ids:
             attendees = (
                 db.query(Attendee)
-                .filter(Attendee.id.in_(event.attendees_ids), Attendee.user_id == user_id)
+                .filter(
+                    Attendee.id.in_(event.attendees_ids), Attendee.user_id == user_id
+                )
                 .all()
             )
             if len(attendees) != len(event.attendees_ids):
-                raise HTTPException(status_code=403, detail="One or more attendees do not belong to you.")
+                raise HTTPException(
+                    status_code=403,
+                    detail="One or more attendees do not belong to you.",
+                )
             new_event.attendees.extend(attendees)
             db.commit()
             db.refresh(new_event)
@@ -122,7 +131,11 @@ def create(db: Session, event: EventCreate, user_id: int) -> Event:
 
 def update(db: Session, event_id: int, event: EventCreate, user_id: int) -> Event:
     try:
-        updated_event: Event = db.query(Event).filter(Event.id == event_id, Event.user_id == user_id).first()
+        updated_event: Event = (
+            db.query(Event)
+            .filter(Event.id == event_id, Event.user_id == user_id)
+            .first()
+        )
         if updated_event is None:
             raise HTTPException(
                 status_code=404, detail=f"Event with ID {event_id} not found."
@@ -136,7 +149,11 @@ def update(db: Session, event_id: int, event: EventCreate, user_id: int) -> Even
 
         updated_event.attendees.clear()
         for attendee_id in event.attendees_ids:
-            attendee = db.query(Attendee).filter(Attendee.id == attendee_id, Attendee.user_id == user_id).first()
+            attendee = (
+                db.query(Attendee)
+                .filter(Attendee.id == attendee_id, Attendee.user_id == user_id)
+                .first()
+            )
             if not attendee:
                 raise HTTPException(
                     status_code=403,
@@ -149,7 +166,9 @@ def update(db: Session, event_id: int, event: EventCreate, user_id: int) -> Even
 
         for concert in event.concerts:
             existing_concert = (
-                db.query(Concert).filter(Concert.id == concert.id, Concert.event_id == event_id).first()
+                db.query(Concert)
+                .filter(Concert.id == concert.id, Concert.event_id == event_id)
+                .first()
             )
 
             if existing_concert:
@@ -227,12 +246,12 @@ def update_concert_videos(
 
 
 def delete(db: Session, event_id: int, user_id: int) -> dict:
-    deleted_event: Event = db.query(Event).filter(Event.id == event_id, Event.user_id == user_id).first()
+    deleted_event: Event = (
+        db.query(Event).filter(Event.id == event_id, Event.user_id == user_id).first()
+    )
     if not deleted_event:
         return {"message": f"Event #{event_id} does not exist."}
-    event_desc = (
-        f"{deleted_event.name} at {deleted_event.venue.name} on {deleted_event.event_date}"
-    )
+    event_desc = f"{deleted_event.name} at {deleted_event.venue.name} on {deleted_event.event_date}"
     db.delete(deleted_event)
     db.commit()
     return {"message": f"Event #{event_id} '{event_desc}' deleted."}

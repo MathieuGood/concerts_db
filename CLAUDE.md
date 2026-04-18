@@ -14,9 +14,6 @@
 # Import/export CSV
 docker exec concerts_db-backend-1 uv run python src/scripts/import_csv.py
 docker exec concerts_db-backend-1 uv run python src/scripts/export_csv.py
-# Migrations (idempotent)
-docker exec concerts_db-backend-1 uv run python src/scripts/migrate_add_users.py
-docker exec concerts_db-backend-1 uv run python src/scripts/migrate_add_user_name.py
 # Daily backup cron (installed): 03:00 export to ~/apps/concerts_db/backups/
 ```
 
@@ -27,22 +24,21 @@ cd backend && uv run uvicorn main:app --reload --app-dir src   # :8000
 cd frontend && npm run dev                                      # :5173, proxies /api/ → :8000
 ```
 
-`backend/.env`: `DATABASE_URI=sqlite+pysqlite:////tmp/concerts_db.sqlite`, `DEMO_MODE=TRUE` to seed. `SECRET_KEY=...` required.
+`backend/.env`: `DATABASE_URI=sqlite+pysqlite:////tmp/concerts_db.sqlite`, `SECRET_KEY=...` required.
 
 ## Tech stack
 
 - **Backend:** Python 3.12, FastAPI (`root_path="/api"` for Swagger behind nginx), SQLAlchemy 2.0, Pydantic v2, SQLite, uv
 - **Auth:** JWT HS256 7-day tokens (python-jose), bcrypt
 - **Frontend:** Vue 3 `<script setup>`, TypeScript, Vite 7, Vue Router 4, PrimeVue 4 (Aura/violet), Tailwind 4, fetch API
-- Old React app preserved in `old_react_frontend/`
 
 ## Project structure (essentials)
 
 ```
 backend/src/
 ├── main.py              # FastAPI + lifespan + routers + CORS (root_path="/api")
-├── config.py            # DATABASE_URI, DEMO_MODE, SECRET_KEY
-├── database/database.py # engine, SessionLocal, get_db, seed_data
+├── config.py            # DATABASE_URI, SECRET_KEY
+├── database/database.py # engine, SessionLocal, get_db
 ├── auth/
 │   ├── jwt.py           # create_access_token, decode_token
 │   ├── password.py      # bcrypt hash/verify
@@ -51,7 +47,7 @@ backend/src/
 ├── schemas/             # Pydantic; EventResponse includes user_id
 ├── crud/                # user-scoped: event.py, attendee.py; shared: others
 ├── routes/              # one per entity + auth, admin, transfer, root
-└── scripts/             # import_csv, export_csv, migrate_*
+└── scripts/             # import_csv, export_csv
 
 frontend/src/
 ├── main.ts / App.vue
@@ -163,46 +159,7 @@ event_date,venue,city,country,artists,attendees,festival,comments
 
 ## Known gaps
 
-- Photos/videos: backend-only (no frontend UI).
 - No pagination.
 - `models/address.py` unused.
 - World map / city heatmap: planned (add lat/lng, geocode Nominatim, Leaflet).
 - Automated backups: VPS cron exists; email/NAS delivery not implemented.
-
----
-
-# Textual TUI frontend (planned — `frontend-cli/`)
-
-**Goal:** keyboard-driven alternative to the Vue front for fast data entry. Reuses the existing REST API (same auth flow).
-
-## Stack
-Python 3.12 + `uv` · `textual` · `httpx` (async) · `platformdirs` (token storage at `~/.config/concerts-cli/`).
-
-## Planned structure
-```
-frontend-cli/src/
-├── main.py                # Textual App entry
-├── config.py              # API_URL via env (local vs prod)
-├── api/                   # client.py (httpx + Bearer + 401), auth, events, artists, venues, cities, countries, festivals, attendees
-├── models.py              # dataclasses mirroring backend schemas
-├── screens/               # login, events_list, event_form, artists, venues, cities, countries, festivals, attendees, stats
-└── widgets/               # select_or_create (filter + create modal), date_input (YYYY-MM-DD), nav_header
-```
-
-## Phases
-1. **Foundations (MVP read):** scaffold, API client + token, login screen, app shell with tabs, events list (DataTable + search).
-2. **Event CRUD:** event detail, create/edit form (date, venue+festival select-or-create, dynamic concerts with artist/setlist/i_played, attendees multiselect), delete with confirm.
-3. **Entities:** CRUD inline for Artists/Venues/Cities/Countries/Festivals/Attendees.
-4. **Polish:** stats, admin (optional), full keyboard shortcuts (`n`, `e`, `d`, `/`, `?`, `q`), config `CONCERTS_API_URL`.
-
-## Open questions (answer before starting)
-1. API target: prod only / local only / both via env var?
-2. Initial scope: MVP (phases 1+2) or full parity?
-3. Admin included?
-4. Packaging: `uv run` vs `pipx install`?
-
-## Constraints to remember
-- No native combobox in Textual → build `select_or_create` as Input + filtered ListView + modal.
-- No native multiselect → checkboxes in ListView.
-- No date picker → plain `Input` with `YYYY-MM-DD` validation.
-- Attendee fetch requires auth (as on Vue).

@@ -16,8 +16,8 @@ class EventBase(BaseModel):
 class EventCreate(EventBase):
     venue_id: int
     festival_id: Optional[int] = None
-    attendees_ids: Optional[List[int]] = None
-    concerts: List[ConcertCreate] = None
+    attendees_ids: Optional[List[int]] = []
+    concerts: List[ConcertCreate] = []
 
 
 class EventResponse(EventBase):

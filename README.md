@@ -1,183 +1,51 @@
-# Concerts I Have Been To (Concerts DB)
+# Concerts DB
 
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white) ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
+A personal app to log every concert I've been to — artists, venues, setlists, festivals, who I went with.
 
-A simple app to keep track of all the concerts you've been to. Made for my own personal use as a side project.
+Live at [concerts.mathieubon.com](https://concerts.mathieubon.com). Browsing is open to all, writing requires a login.
 
-Built with FastAPI and SQLAlchemy.
+## Stack
 
-## How to install and run the app
+- **Backend** — FastAPI, SQLAlchemy 2.0, SQLite, JWT auth
+- **Frontend** — Vue 3 + TypeScript, PrimeVue, Tailwind
 
-Clone this git repository.
+## Run locally
 
-```bash
-git clone https://github.com/MathieuGood/concerts_db
-```
-
-Navigate to the project folder, create a virtual environment and activate it.
+### Docker (recommended)
 
 ```bash
-cd concerts_db
-python -m venv venv
-source venv/bin/activate
+# Build and start containers (backend + frontend)
+docker compose up --build
+
+# Stop and remove containers
+docker compose down -v
 ```
 
-Install all the dependencies.
+### Manually starting up backend and frontend servers
 
-```python
-pip install -r requirements.txt
-```
-
-Run the app.
+For this option, you need to have `uv` and `npm` installed on your machine.
 
 ```bash
-cd src
-uvicorn main:app --reload
+# backend → http://localhost:8000
+cd backend && uv run uvicorn main:app --reload --app-dir src
+
+# frontend → http://localhost:5173 (proxies /api → :8000)
+cd frontend && npm install && npm run dev
 ```
 
-## Roadmap
+`backend/.env` needs at minimum:
 
--   [x] Build SQLAlchemy model
--   [x] FastAPI routes
--   [x] Test all CRUD operations
--   [x] Switch from SQLite to PostgreSQL database
--   [x] Write unit tests for API
--   [ ] Create custom Exception handlers
--   [ ] Implement logger
--   [ ] Add authentication
+```
+DATABASE_URI=sqlite+pysqlite:////tmp/concerts_db.sqlite
+SECRET_KEY=<openssl rand -hex 32>
+```
 
-### CRUD Tests
+## What's in it
 
-| Entity   | Get All | Get | Create | Update | Delete |
-| -------- | ------- | --- | ------ | ------ | ------ |
-| address  | [x]     | [x] | [x]    | [x]    | [x]    |
-| artist   | [x]     | [x] | [x]    | [x]    | [x]    |
-| attendee | [x]     | [x] | [x]    | [x]    | [x]    |
-| concert  | [x]     | [x] | [x]    | [x]    | [x]    |
-| festival | [x]     | [x] | [x]    | [x]    | [x]    |
-| photo    | [x]     | [x] | [x]    | [x]    | [x]    |
-| show     | [x]     | [x] | [x]    | [x]    | [x]    |
-| venue    | [x]     | [x] | [x]    | [x]    | [x]    |
-| video    | [x]     | [x] | [x]    | [x]    | [x]    |
-
-## Data model
-
-Show is the main entity of the model :
-
--   It represents an event held at a certain date and place (Venue).
--   A show can have multiple Concerts, each one performed by an Artist.
--   It can be part of a Festival.
--   It can have multiple Attendees associated to it.
-
-<table>
-    <tbody>
-        <tr>
-            <th>Entity</th>
-            <th>Attributes</th>
-            <th>Relationships</th>
-        </tr>
-         <tr>
-            <td>Show</td>
-            <td>
-                <ul>
-                    <li>id : autoincrementing integer</li>
-                    <li>name : varchar</li>
-                    <li>event_date : date</li>
-                    <li>comments : varchar</li>
-                    <li>ticket_path : varchar</li>
-                </ul>
-            </td>
-            <td>
-                <ul>
-                    <li>Concert : list of concerts performed at the show (one-to-many relationship)</li>
-                    <li>Venue : venue where the show took place (many-to-one relationship)</li>
-                    <li>Festival : festival where the show took place (many-to-one relationship)</li>
-                    <li>Attendees : list of people who attended the show (many-to-many relationship)</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>Concert</td>
-            <td>
-                <ul>
-                    <li>id : autoincrementing integer</li>
-                    <li>setlist : varchar</li>
-                    <li>comments : varchar</li>
-                </ul>
-            </td>
-            <td>
-                <ul>
-                    <li>Artist : artist performing the concert (one-to-many relationship)</li>
-                    <li>Photo : list of photos taken at the concert (one-to-many relationship)</li>
-                    <li>Video : list of videos taken at the concert (one-to-many relationship)</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>Artist</td>
-            <td>
-                <ul>
-                    <li>id : unique autoincrementing integer</li>
-                    <li>Address : address of the artist (many-to-one relationship)</li>
-                </ul>
-            </td>
-            <td>
-            </td>
-        </tr>
-        <tr>
-            <td>Venue</td>
-            <td>
-                <ul>
-                    <li>id : unique autoincrementing integer</li>
-                    <li>name : varchar</li>
-                </ul>
-            </td>
-            <td>
-                <ul>
-                    <li>Address : address of the venue (many-to-one relationship)</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>Address</td>
-            <td>
-                <ul>
-                    <li>id : unique autoincrementing integer</li>
-                    <li>city : varchar</li>
-                    <li>country : varchar</li>
-                </ul>
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Photo</td>
-            <td>
-                <ul>
-                    <li>id : unique autoincrementing integer</li>
-                    <li>path : varchar</li>
-                </ul>
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Video</td>
-            <td>
-                <ul>
-                    <li>id : unique autoincrementing integer</li>
-                    <li>path : varchar</li>
-                </ul>
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Attendee</td>
-            <td>
-                <ul>
-                    <li>id : unique autoincrementing integer</li>
-                    <li>firstname : varchar</li>
-                    <li>lastname : varchar</li>
-                </ul>
-            </td>
-            <td></td>
-    </tbody>
-</table>
+- Events list with search, mobile cards / desktop table
+- Event form with artist / venue / festival type-ahead + inline create
+- Library views for artists, venues, cities, countries, festivals
+- Per-user private attendees
+- Stats: histograms and counts
+- Admin panel: user management
+- CSV import / export
