@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 
 from database.database import engine
+from dev_seed import seed_if_requested
 from models.base import Base
 
 from routes.root import router as root_router
@@ -22,6 +23,7 @@ from routes.transfer import router as transfer_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(engine)
+    seed_if_requested()
     yield
     print("Application shutdown")
 
