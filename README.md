@@ -40,6 +40,16 @@ DATABASE_URI=sqlite+pysqlite:////tmp/concerts_db.sqlite
 SECRET_KEY=<openssl rand -hex 32>
 ```
 
+### Seeding dev with a prod CSV snapshot
+
+Drop exported CSVs into any directory and point the backend at it:
+
+```
+DEV_SEED_CSV_DIR=/absolute/path/to/csv_directory
+```
+
+On startup, if the `events` table is empty, the backend imports the **most recent** `*.csv` (by mtime) from that directory. Once seeded, the hook is a no-op — delete the SQLite file to re-seed.
+
 ## What's in it
 
 - Events list with search, mobile cards / desktop table
