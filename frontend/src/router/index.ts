@@ -18,6 +18,8 @@ const router = createRouter({
   history: createWebHistory(),
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) return savedPosition
+    // Same path, only query changed (list state sync on expand/search) — keep scroll
+    if (to.path === from.path) return false
     return { top: 0 }
   },
   routes: [
