@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
-import DataTable from 'primevue/datatable'
+import DataTable, { type DataTableRowClickEvent } from 'primevue/datatable'
 import Column from 'primevue/column'
+import Dialog from 'primevue/dialog'
+import EventForm from '@/views/EventForm.vue'
 import { eventService } from '@/services/eventService'
 import { useAuth } from '@/composables/useAuth'
 import type { Event } from '@/models/Event'
 import { useListState } from '@/composables/useListState'
 
+const route = useRoute()
 const router = useRouter()
 const { user, isAdmin } = useAuth()
 
@@ -27,14 +30,32 @@ const search = ref(initialSearch)
 const expandedRows = ref<any[]>([])
 const expandedCards = ref<Set<number>>(new Set(initialExpandedIds))
 
+async function fetchEvents() {
+  const list = await eventService.getAll()
+  events.value = list
+  // Reconcile expansion state with the freshly fetched list (IDs may have been added/removed).
+  expandedRows.value = list.filter(e => expandedRows.value.some((r: any) => r.id === e.id)
+    || initialExpandedIds.includes(e.id))
+}
+
 onMounted(async () => {
   try {
-    events.value = await eventService.getAll()
-    expandedRows.value = events.value.filter(e => initialExpandedIds.includes(e.id))
+    await fetchEvents()
     expandedCards.value = new Set(initialExpandedIds.filter(id => events.value.some(e => e.id === id)))
   } finally {
     loading.value = false
   }
+})
+
+// Modal open when route targets an event (/event/new or /event/:id).
+const modalOpen = computed({
+  get: () => route.path === '/event/new' || !!route.params.id,
+  set: (v: boolean) => { if (!v) router.push('/') },
+})
+
+// When closing the modal (returning to '/'), refetch to pick up any create/update/delete.
+watch(() => route.path, (to, from) => {
+  if (from && from !== '/' && to === '/') fetchEvents()
 })
 
 watch([search, expandedRows, expandedCards], () => {
@@ -91,9 +112,9 @@ function toggleCard(id: number) {
   expandedCards.value = new Set(expandedCards.value)
 }
 
-function onRowClick(ev: { data: Event; originalEvent: Event }) {
+function onRowClick(ev: DataTableRowClickEvent) {
   // Ignore clicks originating from buttons (view/edit action column)
-  const target = (ev.originalEvent as unknown as MouseEvent).target as HTMLElement | null
+  const target = ev.originalEvent.target as HTMLElement | null
   if (target?.closest('button')) return
   const id = ev.data.id
   const idx = expandedRows.value.findIndex((r: any) => r.id === id)
@@ -360,5 +381,34 @@ function onRowClick(ev: { data: Event; originalEvent: Event }) {
         </DataTable>
       </div>
     </template>
+
+    <!-- Event view/edit/create modal -->
+    <Dialog
+      v-model:visible="modalOpen"
+      modal
+      dismissable-mask
+      :draggable="false"
+      :show-header="false"
+      :style="{ width: '900px' }"
+      :breakpoints="{ '960px': '100vw' }"
+      :pt="{
+        root: { class: 'event-dialog' },
+        content: { class: 'p-4 md:p-6' },
+      }"
+    >
+      <EventForm :key="route.fullPath" />
+    </Dialog>
   </div>
 </template>
+
+<style>
+/* Full-screen on mobile (no rounded corners, full height). */
+@media (max-width: 960px) {
+  .event-dialog {
+    max-height: 100vh !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+}
+</style>

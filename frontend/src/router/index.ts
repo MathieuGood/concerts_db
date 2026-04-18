@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import EventList from '@/views/EventList.vue'
-import EventForm from '@/views/EventForm.vue'
 import LoginView from '@/views/LoginView.vue'
 import AdminView from '@/views/AdminView.vue'
 import LibraryView from '@/views/LibraryView.vue'
@@ -25,8 +24,8 @@ const router = createRouter({
   routes: [
     { path: '/login', component: LoginView, meta: { public: true } },
     { path: '/', component: EventList, meta: { public: true } },
-    { path: '/event/new', component: EventForm, meta: { requiresAuth: true } },
-    { path: '/event/:id', component: EventForm, meta: { public: true } },
+    { path: '/event/new', component: EventList, meta: { requiresAuth: true } },
+    { path: '/event/:id', component: EventList, meta: { public: true } },
     { path: '/library', component: LibraryView, meta: { public: true } },
     { path: '/artists', component: ArtistsView, meta: { public: true } },
     { path: '/venues', component: VenuesView, meta: { public: true } },
