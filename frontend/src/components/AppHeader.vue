@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Button from 'primevue/button'
 import { useConfirm } from 'primevue/useconfirm'
@@ -9,16 +9,23 @@ const router = useRouter()
 const route = useRoute()
 const confirm = useConfirm()
 
-const libraryLinks = [
-  { icon: 'pi-star', path: '/artists', label: 'Artists', color: 'pink' },
-  { icon: 'pi-building', path: '/venues', label: 'Venues', color: 'cyan' },
-  { icon: 'pi-map-marker', path: '/cities', label: 'Cities', color: 'green' },
-  { icon: 'pi-globe', path: '/countries', label: 'Countries', color: 'orange' },
-  { icon: 'pi-users', path: '/attendees', label: 'People', color: 'yellow' },
-  { icon: 'pi-ticket', path: '/festivals', label: 'Festivals', color: 'red' },
-  { icon: 'pi-chart-bar', path: '/stats', label: 'Stats', color: 'comment' },
-]
 const { user, isAdmin, logout } = useAuth()
+
+// `People` is user-scoped (private attendees), so we only show it to logged-in users.
+const libraryLinks = computed(() => {
+  const base = [
+    { icon: 'pi-star', path: '/artists', label: 'Artists', color: 'pink' },
+    { icon: 'pi-building', path: '/venues', label: 'Venues', color: 'cyan' },
+    { icon: 'pi-map-marker', path: '/cities', label: 'Cities', color: 'green' },
+    { icon: 'pi-globe', path: '/countries', label: 'Countries', color: 'orange' },
+  ]
+  if (user.value) base.push({ icon: 'pi-users', path: '/attendees', label: 'People', color: 'yellow' })
+  base.push(
+    { icon: 'pi-ticket', path: '/festivals', label: 'Festivals', color: 'red' },
+    { icon: 'pi-chart-bar', path: '/stats', label: 'Stats', color: 'comment' },
+  )
+  return base
+})
 
 const menuOpen = ref(false)
 
@@ -74,7 +81,24 @@ onMounted(() => {
 
       <!-- Desktop nav -->
       <div class="hidden sm:flex items-center gap-2">
-        <Button v-if="user" label="New Event" icon="pi pi-plus" size="small" @click="navigate('/event/new')" />
+        <!-- < lg: icon-only rounded to fit among the other icons; lg+: full label -->
+        <Button
+          v-if="user"
+          icon="pi pi-plus"
+          size="small"
+          class="lg:!hidden"
+          rounded
+          aria-label="New Event"
+          @click="navigate('/event/new')"
+        />
+        <Button
+          v-if="user"
+          label="New Event"
+          icon="pi pi-plus"
+          size="small"
+          class="hidden lg:!inline-flex"
+          @click="navigate('/event/new')"
+        />
 
         <Button icon="pi pi-calendar" size="small" rounded :text="route.path !== '/'"
           :severity="route.path === '/' ? undefined : 'secondary'" @click="navigate('/')" aria-label="Shows" />
@@ -96,6 +120,8 @@ onMounted(() => {
 
         <Button v-if="user" icon="pi pi-sign-out" size="small" rounded text severity="secondary" @click="confirmLogout"
           aria-label="Sign out" />
+        <Button v-else icon="pi pi-sign-in" label="Sign in" size="small" outlined severity="secondary"
+          @click="navigate('/login')" />
 
         <Button :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'" size="small" rounded text @click="toggleTheme"
           :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'" />
@@ -113,7 +139,7 @@ onMounted(() => {
     <!-- Mobile dropdown menu -->
     <div v-if="menuOpen"
       class="sm:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 flex flex-col gap-1">
-      <button
+      <button v-if="user"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full text-left transition-colors"
         :class="route.path === '/event/new'
           ? 'badge-d-purple'
@@ -168,6 +194,12 @@ onMounted(() => {
           @click="confirmLogout">
           <i class="pi pi-sign-out" />
           Sign out
+        </button>
+        <button v-else
+          class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ml-auto"
+          @click="navigate('/login')">
+          <i class="pi pi-sign-in" />
+          Sign in
         </button>
       </div>
     </div>
