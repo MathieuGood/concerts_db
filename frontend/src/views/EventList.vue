@@ -74,6 +74,14 @@ watch(() => route.path, (to, from) => {
   if (from && from !== '/' && to === '/') fetchEvents()
 })
 
+// Reset expansion state when navigating to '/' without expanded param (e.g. navbar click).
+watch(() => route.query.expanded, (expanded) => {
+  if (!expanded) {
+    expandedRows.value = {}
+    expandedCards.value = new Set()
+  }
+})
+
 watch([search, expandedRows, expandedCards], () => {
   const tableIds = Object.entries(expandedRows.value).filter(([, v]) => v).map(([k]) => Number(k))
   const ids = [...new Set([...tableIds, ...expandedCards.value])]
