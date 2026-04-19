@@ -20,7 +20,9 @@ jobs:
                           git clone https://github.com/MathieuGood/concerts_db ~/apps/concerts_db
                       fi
                       cd ~/apps/concerts_db
-                      git pull origin main
+                      git fetch origin
+                      git checkout main
+                      git reset --hard origin/main
                       if [ ! -f backend/.env ]; then
                           echo 'DATABASE_URI=sqlite+pysqlite:////data/concerts_db.sqlite' > backend/.env
                           echo 'TEST_DATABASE_URI=sqlite:///:memory:' >> backend/.env
