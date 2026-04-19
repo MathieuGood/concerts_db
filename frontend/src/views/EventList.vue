@@ -156,29 +156,6 @@ async function fetchEvents() {
   events.value = list
 }
 
-// ── Infinite scroll ───────────────────────────────────────────────────────────
-const PAGE_SIZE = 30
-const displayCount = ref(PAGE_SIZE)
-const sentinelRef  = ref<HTMLElement | null>(null)
-
-const displayedEvents = computed(() => filtered.value.slice(0, displayCount.value))
-
-// Reset au changement de filtre
-watch(filtered, () => { displayCount.value = PAGE_SIZE }, { flush: 'sync' })
-
-let _scrollObserver: IntersectionObserver | null = null
-
-watch(sentinelRef, (el) => {
-  _scrollObserver?.disconnect()
-  if (!el) return
-  _scrollObserver = new IntersectionObserver(([entry]) => {
-    if (entry?.isIntersecting) displayCount.value += PAGE_SIZE
-  }, { rootMargin: '300px' })
-  _scrollObserver.observe(el)
-})
-
-onUnmounted(() => _scrollObserver?.disconnect())
-// ─────────────────────────────────────────────────────────────────────────────
 
 onMounted(async () => {
   try {
@@ -281,6 +258,26 @@ const filtered = computed(() => {
 
   return result.sort((a, b) => a.event_date.localeCompare(b.event_date))
 })
+
+// ── Infinite scroll ───────────────────────────────────────────────────────────
+const PAGE_SIZE = 30
+const displayCount  = ref(PAGE_SIZE)
+const sentinelRef   = ref<HTMLElement | null>(null)
+const displayedEvents = computed(() => filtered.value.slice(0, displayCount.value))
+
+watch(filtered, () => { displayCount.value = PAGE_SIZE }, { flush: 'sync' })
+
+let _scrollObserver: IntersectionObserver | null = null
+watch(sentinelRef, (el) => {
+  _scrollObserver?.disconnect()
+  if (!el) return
+  _scrollObserver = new IntersectionObserver(([entry]) => {
+    if (entry?.isIntersecting) displayCount.value += PAGE_SIZE
+  }, { rootMargin: '300px' })
+  _scrollObserver.observe(el)
+})
+onUnmounted(() => _scrollObserver?.disconnect())
+// ─────────────────────────────────────────────────────────────────────────────
 
 function toggleCard(id: number) {
   if (expandedCards.value.has(id)) expandedCards.value.delete(id)
