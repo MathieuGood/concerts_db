@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import DatePicker from 'primevue/datepicker'
 import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import VenueSelectOrCreate from '@/components/VenueSelectOrCreate.vue'
@@ -347,7 +346,7 @@ defineExpose({ isEditMode })
           </div>
           <div>
             <label class="form-label">Comments</label>
-            <Textarea v-model="form.comments" class="w-full" style="height:5rem;max-height:5rem;overflow-y:auto;resize:none" />
+            <textarea v-model="form.comments" rows="3" class="p-textarea p-component w-full" style="overflow-y:auto;resize:none" />
           </div>
         </section>
 
