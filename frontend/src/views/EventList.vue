@@ -9,6 +9,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 import DataTable, { type DataTableRowClickEvent } from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dialog from 'primevue/dialog'
+import SelectButton from 'primevue/selectbutton'
 import EventForm from '@/views/EventForm.vue'
 import { eventService } from '@/services/eventService'
 import { useAuth } from '@/composables/useAuth'
@@ -27,7 +28,13 @@ const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
 const events = ref<Event[]>([])
 const loading = ref(true)
 const search = ref(initialSearch)
-const onlyIPlayed = ref(false)
+type PlayedFilter = 'all' | 'played' | 'not_played'
+const playedFilter = ref<PlayedFilter>('all')
+const playedOptions: { label: string; value: PlayedFilter }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'I played', value: 'played' },
+  { label: 'Not played', value: 'not_played' },
+]
 const expandedRows = ref<any[]>([])
 const expandedCards = ref<Set<number>>(new Set(initialExpandedIds))
 
@@ -103,8 +110,9 @@ function fuzzyMatch(q: string, e: Event): boolean {
 const filtered = computed(() => {
   const q = search.value.trim().toLowerCase()
   let result = q ? events.value.filter((e) => fuzzyMatch(q, e)) : [...events.value]
-  // Keep full event (all concerts) even if only one concert has i_played — just gate inclusion.
-  if (onlyIPlayed.value) result = result.filter((e) => e.concerts.some((c) => c.i_played))
+  // Keep full event (all concerts) — just gate inclusion based on presence of any played concert.
+  if (playedFilter.value === 'played') result = result.filter((e) => e.concerts.some((c) => c.i_played))
+  else if (playedFilter.value === 'not_played') result = result.filter((e) => !e.concerts.some((c) => c.i_played))
   return result.sort((a, b) => a.event_date.localeCompare(b.event_date))
 })
 
@@ -138,16 +146,6 @@ function onRowClick(ev: DataTableRowClickEvent) {
           class="w-full"
         />
       </IconField>
-      <Button
-        icon="pi pi-microphone"
-        :severity="onlyIPlayed ? undefined : 'secondary'"
-        :outlined="!onlyIPlayed"
-        size="small"
-        rounded
-        aria-label="Only shows where I played"
-        v-tooltip.bottom="'Only shows I played'"
-        @click="onlyIPlayed = !onlyIPlayed"
-      />
       <span v-if="!loading" class="text-xs text-gray-400 shrink-0 whitespace-nowrap">
         {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
       </span>
@@ -157,6 +155,18 @@ function onRowClick(ev: DataTableRowClickEvent) {
         size="small"
         class="shrink-0"
         @click="router.push('/event/new')"
+      />
+    </div>
+
+    <!-- Played filter -->
+    <div class="flex">
+      <SelectButton
+        v-model="playedFilter"
+        :options="playedOptions"
+        optionLabel="label"
+        optionValue="value"
+        :allowEmpty="false"
+        size="small"
       />
     </div>
 
