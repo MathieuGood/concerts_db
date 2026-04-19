@@ -63,7 +63,7 @@ const modalOpen = computed({
   set: (v: boolean) => {
     if (!v) {
       // Block dismiss when EventForm is in edit mode (avoid losing unsaved changes)
-      if (eventFormRef.value?.isEditMode.value) return
+      if (eventFormRef.value?.isEditMode) return
       router.push('/')
     }
   },
