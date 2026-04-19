@@ -203,7 +203,7 @@ defineExpose({ isEditMode })
 </script>
 
 <template>
-  <div class="space-y-6 pt-2">
+  <div class="space-y-6 pt-4">
 
     <div v-if="loading" class="flex justify-center py-16">
       <ProgressSpinner style="width: 40px; height: 40px" />
@@ -347,7 +347,7 @@ defineExpose({ isEditMode })
           </div>
           <div>
             <label class="form-label">Comments</label>
-            <Textarea v-model="form.comments" rows="4" class="w-full resize-none overflow-y-auto" />
+            <Textarea v-model="form.comments" rows="3" class="w-full resize-none overflow-y-auto" />
           </div>
         </section>
 

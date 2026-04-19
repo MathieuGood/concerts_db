@@ -563,11 +563,11 @@ function onRowClick(ev: DataTableRowClickEvent) {
       dismissable-mask
       :draggable="false"
       :show-header="false"
-      :style="{ width: '900px' }"
+      :style="{ width: '900px', maxHeight: '90vh' }"
       :breakpoints="{ '960px': '100vw' }"
       :pt="{
         root: { class: 'event-dialog' },
-        content: { class: 'p-4 md:p-6' },
+        content: { class: 'p-4 md:p-6 overflow-y-auto' },
       }"
     >
       <EventForm ref="eventFormRef" :key="route.fullPath" />
