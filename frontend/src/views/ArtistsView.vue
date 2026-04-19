@@ -181,7 +181,9 @@ async function createArtist() {
     const country_id = await resolveCountry(newArtist.value.countryInput)
     const created = await artistService.create(newArtist.value.name.trim(), country_id)
     const country = countries.value.find(c => c.id === created.country_id) ?? null
-    artistRows.value.push({ id: created.id, name: created.name, countryName: country?.name ?? '', country_id: created.country_id ?? null, country, concerts: 0, venues: 0, cities: 0, countries: 0, firstSeen: null, lastSeen: null, events: [], _editing: false })
+    const cid = created.country_id ?? null
+    const countryArtists = artistRows.value.filter(r => r.country_id === cid).length + 1
+    artistRows.value.push({ id: created.id, name: created.name, countryName: country?.name ?? '', country_id: cid, country, concerts: 0, venues: 0, cities: 0, countries: 0, countryArtists, firstSeen: null, lastSeen: null, events: [], _editing: false })
     newArtist.value = { name: '', countryInput: null }
     addingArtist.value = false
   } catch (e) {
