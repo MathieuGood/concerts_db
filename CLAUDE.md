@@ -179,3 +179,49 @@ event_date,venue,city,country,artists,attendees,festival,comments
 - `models/address.py` unused.
 - World map / city heatmap: planned (add lat/lng, geocode Nominatim, Leaflet).
 - Automated backups: VPS cron exists; email/NAS delivery not implemented.
+
+---
+
+## Traitement des billets de concert (ticket processing)
+
+Workflow pour matcher des billets JPEG scannés contre la DB prod et organiser les fichiers.
+
+### Dossiers
+- **Billets source :** `~/SynologyDrive/Concerts/concert_tickets/` — fichiers JPEG (`UUID_…_c.jpeg` / `…_a.jpeg`, format iOS Photos) **ou PDF**
+- **Matchés prod :** sous-dossier `prod_ok/` — fichiers renommés `YYYY-MM-DD_Artiste1-Artiste2_Salle-Ville.jpeg`
+- **Rapport :** `concert_tickets/RAPPORT_BILLETS.md` — état complet de chaque fichier
+
+### Convention de renommage
+`YYYY-MM-DD_Artiste1-Artiste2_Salle-Ville.jpeg` — sans accents, espaces → tirets, caractères spéciaux supprimés.
+Doublon (2 billets même event) : suffixe `_b` sur le second.
+
+### Méthode de vérification prod
+**Référence fiable : exporter le CSV complet depuis le VPS, pas l'API.**
+```bash
+# Sur le VPS
+docker exec concerts_db-backend-1 uv run python src/scripts/export_csv.py
+# Récupérer localement
+scp ubuntu@51.91.98.35:~/apps/concerts_db/backups/<fichier>.csv ~/SynologyDrive/Concerts/
+```
+Format CSV : `event_date,event_name,venue,city,country,festival,artists,concert_comments,setlist,attendees,event_comments`  
+Artistes séparés par `;`. Dates en ISO `YYYY-MM-DD`.
+
+> ⚠️ **Ne pas utiliser `GET /api/event/` via WebFetch** — liste tronquée par la limite de tokens, rate les events les plus anciens (tri par date desc, les pre-2012 coupés).
+
+### Catégories du rapport
+- ✅ **Trouvé en prod** → renommer + déplacer dans `prod_ok/`
+- 🆕 **À créer en prod** → event réel non encore dans la DB
+- ⚠️ **Données incomplètes** → event identifié mais infos manquantes (artistes, date)
+- ❌ **Exclus** → non-concerts (sport, musée, clubbing, tourisme)
+
+### Pièges connus
+- **Format date sur billets US** : `02/05/2009` en France = 2 mai, mais si billet américain = February 5. Vérifier contre le CSV.
+- **Billets de festivals multi-jours** : le pass global ≠ les entrées journalières en prod. Vérifier chaque jour séparément.
+- **Gap IDs en prod** : des events avec des IDs non-séquentiels (entrées supprimées puis recréées) peuvent exister — le CSV export les inclut tous.
+
+### Rapport précédent (session 2026-04-19)
+`~/SynologyDrive/Concerts/concert_tickets/` — 144 fichiers traités :
+- ✅ 107 matchés en prod (dans `prod_ok/`)
+- 🆕 7 à créer
+- ⚠️ 8 données incomplètes
+- ❌ 22 exclus (sport Boston, clubbing, tourisme)
