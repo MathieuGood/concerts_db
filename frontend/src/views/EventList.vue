@@ -314,7 +314,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
       <!-- Row 2: played filter + active filter chip + count + new -->
       <div class="flex items-center gap-2">
         <SelectButton v-model="playedFilter" :options="playedOptions" optionLabel="label" optionValue="value"
-          :allowEmpty="false" size="small" class="shrink-0" :pt="{ pcToggleButton: { root: { class: '!px-1.5' } } }">
+          :allowEmpty="false" size="small" class="shrink-0" :pt="{ pcToggleButton: { root: { class: '!px-1' } } }">
           <template #option="{ option }">
             <i :class="option.icon" v-tooltip.bottom="option.label" />
           </template>
