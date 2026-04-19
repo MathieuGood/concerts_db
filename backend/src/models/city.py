@@ -11,7 +11,7 @@ class City(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
 
-    country_id: Mapped[int] = mapped_column(ForeignKey("countries.id"))
+    country_id: Mapped[int] = mapped_column(ForeignKey("countries.id"), index=True)
     country: Mapped["Country"] = relationship(back_populates="cities")
 
     venues: Mapped[List["Venue"]] = relationship("Venue", back_populates="city")

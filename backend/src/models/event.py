@@ -14,9 +14,9 @@ class Event(Base):
     event_date: Mapped[date] = mapped_column(nullable=False)
     comments: Mapped[str] = mapped_column(default="", nullable=False)
 
-    venue_id: Mapped[int] = mapped_column(ForeignKey("venues.id"), nullable=False)
-    festival_id: Mapped[int] = mapped_column(ForeignKey("festivals.id"), nullable=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    venue_id: Mapped[int] = mapped_column(ForeignKey("venues.id"), nullable=False, index=True)
+    festival_id: Mapped[int] = mapped_column(ForeignKey("festivals.id"), nullable=True, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
 
     venue: Mapped["Venue"] = relationship("Venue", back_populates="events")
     festival: Mapped["Festival"] = relationship("Festival", back_populates="events")

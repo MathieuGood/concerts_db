@@ -11,19 +11,19 @@ from models.video import Video
 from schemas.event import EventCreate
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 
 def _base_query(db: Session):
+    # joinedload pour les many-to-one (pas de duplication de lignes)
+    # selectinload pour les one-to-many (évite le produit cartésien concerts × photos × videos)
     return db.query(Event).options(
         joinedload(Event.venue).joinedload(Venue.city).joinedload(City.country),
-        joinedload(Event.attendees),
         joinedload(Event.festival),
-        joinedload(Event.concerts)
-        .joinedload(Concert.artist)
-        .joinedload(Artist.country),
-        joinedload(Event.concerts).joinedload(Concert.photos),
-        joinedload(Event.concerts).joinedload(Concert.videos),
+        selectinload(Event.attendees),
+        selectinload(Event.concerts).joinedload(Concert.artist).joinedload(Artist.country),
+        selectinload(Event.concerts).selectinload(Concert.photos),
+        selectinload(Event.concerts).selectinload(Concert.videos),
     )
 
 
@@ -148,18 +148,18 @@ def update(db: Session, event_id: int, event: EventCreate, user_id: int) -> Even
         updated_event.festival_id = event.festival_id
 
         updated_event.attendees.clear()
-        for attendee_id in event.attendees_ids:
-            attendee = (
+        if event.attendees_ids:
+            attendees = (
                 db.query(Attendee)
-                .filter(Attendee.id == attendee_id, Attendee.user_id == user_id)
-                .first()
+                .filter(Attendee.id.in_(event.attendees_ids), Attendee.user_id == user_id)
+                .all()
             )
-            if not attendee:
+            if len(attendees) != len(event.attendees_ids):
                 raise HTTPException(
                     status_code=403,
-                    detail=f"Attendee with ID {attendee_id} not found or does not belong to you.",
+                    detail="One or more attendees not found or do not belong to you.",
                 )
-            updated_event.attendees.append(attendee)
+            updated_event.attendees.extend(attendees)
 
         updated_event.concerts.clear()
         updated_concerts = []

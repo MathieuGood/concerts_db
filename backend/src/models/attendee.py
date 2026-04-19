@@ -12,7 +12,7 @@ class Attendee(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     firstname: Mapped[str] = mapped_column(nullable=False)
     lastname: Mapped[str] = mapped_column(nullable=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
 
     events: Mapped[List["Event"]] = relationship(
         "Event", secondary="event_attendees", back_populates="attendees"
