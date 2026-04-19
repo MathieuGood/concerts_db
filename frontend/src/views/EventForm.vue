@@ -217,7 +217,7 @@ defineExpose({ isEditMode })
       <template v-if="!isEditMode && eventData">
 
         <!-- Header -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 pt-2">
           <Button icon="pi pi-arrow-left" text size="small" aria-label="Back" @click="goBack()" />
           <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100 flex-1 truncate">
             {{ viewTitle }}
