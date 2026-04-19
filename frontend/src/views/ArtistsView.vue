@@ -103,7 +103,8 @@ function formatDate(d: string | null) {
 
 const filtered = computed(() => {
   const q = normalize(search.value)
-  return q ? artistRows.value.filter(a => normalize(a.name).includes(q) || normalize(a.countryName).includes(q)) : artistRows.value
+  const rows = q ? artistRows.value.filter(a => normalize(a.name).includes(q) || normalize(a.countryName).includes(q)) : [...artistRows.value]
+  return rows.sort((a, b) => b.concerts - a.concerts)
 })
 
 // ── Infinite scroll ───────────────────────────────────────────────────────────
