@@ -77,7 +77,9 @@ function formatDate(d: string | null) {
 
 const filtered = computed(() => {
   const q = search.value.toLowerCase()
-  return q ? attendeeRows.value.filter(a => a.fullName.toLowerCase().includes(q)) : attendeeRows.value
+  const rows = q ? attendeeRows.value.filter(a => a.fullName.toLowerCase().includes(q)) : [...attendeeRows.value]
+  // Mobile consumes this list as-is; desktop DataTable re-sorts per column clicks but honours this as initial order.
+  return rows.sort((a, b) => b.events - a.events)
 })
 
 function startEdit(row: AttendeeRow) {
