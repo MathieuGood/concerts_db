@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, shallowRef, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
@@ -94,7 +94,9 @@ function onSearchBlur() {
 
 const eventFormRef = ref<InstanceType<typeof EventForm> | null>(null)
 
-const events = ref<Event[]>([])
+// shallowRef : Vue ne proxy pas les objets imbriqués (event→concerts→artist…)
+// On ne mutate jamais les events individuellement, on remplace toujours le tableau entier.
+const events = shallowRef<Event[]>([])
 const loading = ref(true)
 const search = ref(initialSearch)
 type PlayedFilter = 'all' | 'played' | 'not_played'
