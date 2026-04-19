@@ -343,7 +343,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
 
         <!-- Active filter chip -->
         <span v-if="activeFilter"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-xs font-medium shrink-0 max-w-[180px]">
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-xs font-medium min-w-0 max-w-[180px]">
           <i :class="FILTER_CONFIG[activeFilter.type].icon" class="text-xs shrink-0" />
           <span class="truncate">{{ activeFilter.label }}</span>
           <button class="shrink-0 hover:opacity-70" @click="activeFilter = null">
