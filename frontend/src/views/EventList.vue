@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, shallowRef, computed, onMounted, watch } from 'vue'
+import { ref, shallowRef, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
@@ -155,6 +155,30 @@ async function fetchEvents() {
   const list = await eventService.getAll()
   events.value = list
 }
+
+// ── Infinite scroll ───────────────────────────────────────────────────────────
+const PAGE_SIZE = 30
+const displayCount = ref(PAGE_SIZE)
+const sentinelRef  = ref<HTMLElement | null>(null)
+
+const displayedEvents = computed(() => filtered.value.slice(0, displayCount.value))
+
+// Reset au changement de filtre
+watch(filtered, () => { displayCount.value = PAGE_SIZE }, { flush: 'sync' })
+
+let _scrollObserver: IntersectionObserver | null = null
+
+watch(sentinelRef, (el) => {
+  _scrollObserver?.disconnect()
+  if (!el) return
+  _scrollObserver = new IntersectionObserver(([entry]) => {
+    if (entry?.isIntersecting) displayCount.value += PAGE_SIZE
+  }, { rootMargin: '300px' })
+  _scrollObserver.observe(el)
+})
+
+onUnmounted(() => _scrollObserver?.disconnect())
+// ─────────────────────────────────────────────────────────────────────────────
 
 onMounted(async () => {
   try {
@@ -351,7 +375,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
     <template v-else>
       <!-- Mobile cards (< md) -->
       <div class="md:hidden space-y-2">
-        <div v-for="event in filtered" :key="event.id"
+        <div v-for="event in displayedEvents" :key="event.id"
           class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <!-- Card header row -->
           <div class="flex items-start gap-2 p-4">
@@ -422,7 +446,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
 
       <!-- Desktop table (>= md) -->
       <div class="hidden md:block">
-        <DataTable :value="filtered" v-model:expandedRows="expandedRows" row-hover size="small" sortField="event_date"
+        <DataTable :value="displayedEvents" v-model:expandedRows="expandedRows" row-hover size="small" sortField="event_date"
           :sortOrder="1" class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer"
           dataKey="id" @row-click="onRowClick">
           <Column expander style="width: 2.5rem">
@@ -516,6 +540,8 @@ function onRowClick(ev: DataTableRowClickEvent) {
           </template>
         </DataTable>
       </div>
+      <!-- Sentinel infinite scroll -->
+      <div ref="sentinelRef" class="h-1" />
     </template>
 
     <!-- Event view/edit/create modal -->
