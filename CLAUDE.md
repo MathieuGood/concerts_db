@@ -28,17 +28,17 @@ cd frontend && npm run dev                                      # :5173, proxies
 
 ### Dev seed automatique (`dataset/`)
 
-Placer un CSV d'export dans `dataset/` à la racine du projet (gitignored).  
-À chaque démarrage du backend, si ce répertoire existe : **reset complet de la DB** + import du CSV le plus récent.  
+Activer avec `DEV=true` dans `backend/.env` (déjà présent en local).  
+Placer un CSV d'export dans `dataset/` à la racine (gitignored).  
+À chaque démarrage du backend : **reset complet de la DB** + import du CSV le plus récent.  
 Compte admin créé automatiquement : `dev@dev.com` / `dev`
 
 ```bash
 # Exporter depuis la prod puis déposer dans dataset/
-docker exec concerts_db-backend-1 uv run python src/scripts/export_csv.py
 scp ubuntu@51.91.98.35:~/apps/concerts_db/backups/<fichier>.csv dataset/
 ```
 
-Sans `dataset/` → comportement normal, aucun impact sur la prod.
+`DEV` absent ou `DEV=false` → no-op. Le `.env` prod sur le VPS ne contient pas `DEV=true`.
 
 ## Tech stack
 

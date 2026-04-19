@@ -1,12 +1,13 @@
 """
-Dev seed: si un répertoire `dataset/` existe à la racine du projet,
-réinitialise la DB et importe le CSV le plus récent de ce répertoire.
+Dev seed: si DEV=true dans backend/.env, réinitialise la DB au démarrage
+et importe le CSV le plus récent depuis dataset/ à la racine du projet.
 
 Déclenché à chaque démarrage du backend (lifespan FastAPI).
-Sans `dataset/` → no-op, comportement prod inchangé.
+DEV non défini ou DEV=false → no-op, comportement prod inchangé.
 
 Compte admin créé automatiquement : dev@dev.com / dev
 """
+import os
 from pathlib import Path
 
 from auth.password import hash_password
@@ -27,12 +28,16 @@ def _latest_csv(directory: Path) -> Path | None:
 
 
 def seed_if_requested() -> None:
+    if os.getenv("DEV", "").lower() != "true":
+        return
+
     if not DATASET_DIR.is_dir():
+        print(f"[dev_seed] DEV=true mais dataset/ introuvable ({DATASET_DIR}) — skip")
         return
 
     csv_path = _latest_csv(DATASET_DIR)
     if csv_path is None:
-        print(f"[dev_seed] dataset/ trouvé mais aucun CSV dedans — skip")
+        print(f"[dev_seed] DEV=true mais aucun CSV dans dataset/ — skip")
         return
 
     print(f"[dev_seed] dataset/ détecté → réinitialisation DB depuis {csv_path.name}")
