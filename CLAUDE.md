@@ -3,7 +3,7 @@
 ## Deploy
 
 - **URL:** `https://concerts.mathieubon.com` · **VPS port:** 8082 (nginx → Docker Compose)
-- **Deploy:** push `main` → GH Actions → SSH VPS → `git pull` + `docker compose -f docker-compose.prod.yml up -d --build`
+- **Deploy:** push `main` → GH Actions → SSH VPS → `git fetch origin && git checkout main && git reset --hard origin/main` + `docker compose -f docker-compose.prod.yml up -d --build`
 - **VPS dir:** `~/apps/concerts_db/` · **DB:** `/data/concerts_db.sqlite` (volume `./data:/data`)
 - **GH secrets:** `VPS_SSH_KEY`, `VPS_HOST=51.91.98.35`, `VPS_USER=ubuntu`, `SECRET_KEY` (JWT signing, `openssl rand -hex 32`)
 - **Infra docs:** `/Users/mathieugood/guru_code/vps/CLAUDE.md`
@@ -162,6 +162,8 @@ User ── Event ── Festival (optional, shared)
 - **Row editing on entity pages:** `editMode="row"` + manual `editingRows` mgmt, merged action column with pencil/save/cancel/delete.
 - **Entity pages:** search + count + Add + inline add form + small DataTable + expandable rows (stat pills + events list).
 - **Mobile event card:** date inline with artist name (row 1); venue — city on row 2 spanning full width; festival badge on row 3.
+- **Accent-insensitive search:** `frontend/src/utils/search.ts` exports `normalize(s)` (NFD decompose + strip diacritics + lowercase). Used in `VenueSelectOrCreate`, `ArtistSelectOrCreate`, and `EventList` search.
+- **Infinite scroll (EventList):** all events loaded from API once, rendered 30 at a time via `displayedEvents = filtered.slice(0, displayCount)`. `IntersectionObserver` on a sentinel `<div>` increments `displayCount` by 30. `watch(filtered, ..., { flush: 'sync' })` resets count on filter change.
 
 ## CSV import
 
@@ -173,7 +175,7 @@ event_date,venue,city,country,artists,attendees,festival,comments
 
 ## Known gaps
 
-- No pagination.
+- No pagination on entity pages (ArtistsView, VenuesView, etc.) — EventList uses infinite scroll.
 - `models/address.py` unused.
 - World map / city heatmap: planned (add lat/lng, geocode Nominatim, Leaflet).
 - Automated backups: VPS cron exists; email/NAS delivery not implemented.
