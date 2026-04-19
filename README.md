@@ -42,13 +42,16 @@ SECRET_KEY=<openssl rand -hex 32>
 
 ### Seeding dev with a prod CSV snapshot
 
-Drop exported CSVs into any directory and point the backend at it:
+Set `DEV=true` in `backend/.env`, then drop a CSV export into `dataset/` at the project root (gitignored):
 
-```
-DEV_SEED_CSV_DIR=/absolute/path/to/csv_directory
+```bash
+# Export from prod then place in dataset/
+scp ubuntu@<vps>:~/apps/concerts_db/backups/<file>.csv dataset/
 ```
 
-On startup, if the `events` table is empty, the backend imports the **most recent** `*.csv` (by mtime) from that directory. Once seeded, the hook is a no-op — delete the SQLite file to re-seed.
+On every backend start: full DB reset + import of the most recent `*.csv` in `dataset/`. Admin account created automatically: `dev@dev.com` / `dev`.
+
+`DEV` absent or `DEV=false` → no-op.
 
 ## What's in it
 
