@@ -251,7 +251,9 @@ defineExpose({ isEditMode })
           </div>
           <div v-if="eventData.festival" class="flex items-center gap-3 px-4 py-3">
             <i class="pi pi-ticket text-gray-400 text-sm w-4 shrink-0" />
-            <span class="text-sm badge-d-red px-2 py-0.5 rounded-full">{{ eventData.festival.name }}</span>
+            <span class="text-sm badge-d-red px-2 py-0.5 rounded-full">
+              {{ eventData.festival.name }}{{ eventData.festival.year ? ` ${eventData.festival.year}` : '' }}
+            </span>
           </div>
           <div v-if="eventData.comments" class="flex items-start gap-3 px-4 py-3">
             <i class="pi pi-comment text-gray-400 text-sm w-4 shrink-0 mt-0.5" />
