@@ -41,7 +41,7 @@ const activeFilter   = ref<ActiveFilter | null>(null)
 const showSuggestions = ref(false)
 
 const suggestions = computed(() => {
-  const q = search.value.trim().toLowerCase()
+  const q = normalize(search.value.trim())
   if (q.length < 2) return []
 
   const festivals = new Map<number, string>()
@@ -52,18 +52,18 @@ const suggestions = computed(() => {
   for (const event of events.value) {
     if (event.festival) {
       const label = event.festival.name + (event.festival.year ? ` ${event.festival.year}` : '')
-      if (label.toLowerCase().includes(q)) festivals.set(event.festival.id, label)
+      if (normalize(label).includes(q)) festivals.set(event.festival.id, label)
     }
     for (const concert of event.concerts) {
-      if (concert.artist?.name?.toLowerCase().includes(q))
+      if (concert.artist?.name && normalize(concert.artist.name).includes(q))
         artists.set(concert.artist.id, concert.artist.name)
     }
-    if (event.venue?.city?.name?.toLowerCase().includes(q))
+    if (event.venue?.city?.name && normalize(event.venue.city.name).includes(q))
       cities.set(event.venue.city.id, event.venue.city.name)
     if (user.value) {
       for (const a of event.attendees ?? []) {
         const label = `${a.firstname} ${a.lastname}`.trim()
-        if (label.toLowerCase().includes(q)) attendees.set(a.id, label)
+        if (normalize(label).includes(q)) attendees.set(a.id, label)
       }
     }
   }
@@ -87,6 +87,11 @@ function applyFilter(type: FilterType, id: number, label: string) {
 
 function onSearchBlur() {
   setTimeout(() => { showSuggestions.value = false }, 150)
+}
+
+// Normalise accents + casse : "Zénith" → "zenith", "anti-flag" → "anti-flag"
+function normalize(s: string): string {
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -175,21 +180,21 @@ function matchesTerm(term: string, e: Event): boolean {
   const artists = e.concerts.map((c) => c.artist?.name ?? '').join(' ')
   const fields = [
     e.name ?? '',
-    e.event_date,                  // "2011-04-15"
-    formatDate(e.event_date),      // "15 Apr 2011" — recherche "apr 2011", "15 apr", etc.
-    toCompactDate(e.event_date),   // "15042011" — recherche "150411", "15042011"
+    e.event_date,
+    formatDate(e.event_date),
+    toCompactDate(e.event_date),
     e.venue?.name ?? '',
     e.venue?.city?.name ?? '',
     e.venue?.city?.country?.name ?? '',
     e.festival?.name ?? '',
     artists,
   ]
-  return fields.some((f) => f.toLowerCase().includes(term))
+  return fields.some((f) => normalize(f).includes(term))
 }
 
 // Chaque mot doit être une sous-chaîne d'au moins un champ (ET logique entre mots)
 function fuzzyMatch(q: string, e: Event): boolean {
-  const terms = q.split(/\s+/).filter(Boolean)
+  const terms = normalize(q).split(/\s+/).filter(Boolean)
   return terms.every((term) => matchesTerm(term, e))
 }
 
@@ -239,16 +244,14 @@ function onRowClick(ev: DataTableRowClickEvent) {
     <!-- Header -->
     <div class="flex flex-col gap-2">
       <!-- Row 1: search + suggestions dropdown -->
-      <div class="relative">
+      <!-- @focusin/@focusout sur le div : plus fiable que @focus/@blur sur le composant PrimeVue -->
+      <div class="relative" @focusin="showSuggestions = true" @focusout="onSearchBlur" @keydown.escape="showSuggestions = false">
         <IconField>
           <InputIcon class="pi pi-search" />
           <InputText
             v-model="search"
             :placeholder="activeFilter ? 'Affiner la recherche…' : 'Rechercher artiste, festival, ville, date…'"
             class="w-full"
-            @focus="showSuggestions = true"
-            @blur="onSearchBlur"
-            @keydown.escape="showSuggestions = false"
           />
         </IconField>
 
