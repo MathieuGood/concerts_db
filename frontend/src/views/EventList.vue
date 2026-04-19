@@ -29,17 +29,17 @@ const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
 // ── Smart search ──────────────────────────────────────────────────────────────
 type FilterType = 'festival' | 'artist' | 'city' | 'attendee'
 interface ActiveFilter { type: FilterType; id: number; label: string }
-interface Suggestion   { id: number; label: string }
+interface Suggestion { id: number; label: string }
 
 const FILTER_CONFIG: Record<FilterType, { icon: string; label: string }> = {
-  festival: { icon: 'pi pi-ticket',      label: 'Festival' },
-  artist:   { icon: 'pi pi-music',       label: 'Artiste'  },
-  city:     { icon: 'pi pi-map-marker',  label: 'Ville'    },
-  attendee: { icon: 'pi pi-user',        label: 'Personne' },
+  festival: { icon: 'pi pi-ticket', label: 'Festival' },
+  artist: { icon: 'pi pi-music', label: 'Artiste' },
+  city: { icon: 'pi pi-map-marker', label: 'Ville' },
+  attendee: { icon: 'pi pi-user', label: 'Personne' },
 }
 
-const activeFilter    = ref<ActiveFilter | null>(null)
-const showSuggestions  = ref(false)
+const activeFilter = ref<ActiveFilter | null>(null)
+const showSuggestions = ref(false)
 const highlightedIndex = ref(-1)
 
 const suggestions = computed(() => {
@@ -47,8 +47,8 @@ const suggestions = computed(() => {
   if (q.length < 2) return []
 
   const festivals = new Map<number, string>()
-  const artists   = new Map<number, string>()
-  const cities    = new Map<number, string>()
+  const artists = new Map<number, string>()
+  const cities = new Map<number, string>()
   const attendees = new Map<number, string>()
 
   for (const event of events.value) {
@@ -75,8 +75,8 @@ const suggestions = computed(() => {
 
   return ([
     { type: 'festival' as FilterType, items: toItems(festivals) },
-    { type: 'artist'   as FilterType, items: toItems(artists)   },
-    { type: 'city'     as FilterType, items: toItems(cities)    },
+    { type: 'artist' as FilterType, items: toItems(artists) },
+    { type: 'city' as FilterType, items: toItems(cities) },
     { type: 'attendee' as FilterType, items: toItems(attendees) },
   ] as { type: FilterType; items: Suggestion[] }[]).filter(g => g.items.length > 0)
 })
@@ -142,7 +142,7 @@ type PlayedFilter = 'all' | 'played' | 'not_played'
 const playedFilter = ref<PlayedFilter>('all')
 const playedOptions: { icon: string; label: string; value: PlayedFilter }[] = [
   { icon: 'pi pi-bars', label: 'All shows', value: 'all' },
-  { icon: 'pi pi-microphone', label: 'I played', value: 'played' },
+  { icon: 'pi pi-microphone', label: 'Played', value: 'played' },
   { icon: 'pi pi-eye', label: 'Watched', value: 'not_played' },
 ]
 // PrimeVue v4: expandedRows is Record<string, boolean>, not an array of objects
@@ -242,9 +242,9 @@ const filtered = computed(() => {
   // Filtre entité exact (festival, artiste, ville, personne)
   if (activeFilter.value) {
     const f = activeFilter.value
-    if      (f.type === 'festival') result = result.filter(e => e.festival?.id === f.id)
-    else if (f.type === 'artist')   result = result.filter(e => e.concerts.some(c => c.artist?.id === f.id))
-    else if (f.type === 'city')     result = result.filter(e => e.venue?.city?.id === f.id)
+    if (f.type === 'festival') result = result.filter(e => e.festival?.id === f.id)
+    else if (f.type === 'artist') result = result.filter(e => e.concerts.some(c => c.artist?.id === f.id))
+    else if (f.type === 'city') result = result.filter(e => e.venue?.city?.id === f.id)
     else if (f.type === 'attendee') result = result.filter(e => e.attendees?.some(a => a.id === f.id))
   }
 
@@ -252,7 +252,7 @@ const filtered = computed(() => {
   const q = searchDebounced.value.trim().toLowerCase()
   if (q) result = result.filter(e => fuzzyMatch(q, e))
 
-  if (playedFilter.value === 'played')     result = result.filter(e => e.concerts.some(c => c.i_played))
+  if (playedFilter.value === 'played') result = result.filter(e => e.concerts.some(c => c.i_played))
   else if (playedFilter.value === 'not_played') result = result.filter(e => !e.concerts.some(c => c.i_played))
 
   return result.sort((a, b) => a.event_date.localeCompare(b.event_date))
@@ -286,34 +286,25 @@ function onRowClick(ev: DataTableRowClickEvent) {
       <div class="relative" @focusin="showSuggestions = true" @focusout="onSearchBlur" @keydown="onSearchKeydown">
         <IconField>
           <InputIcon class="pi pi-search" />
-          <InputText
-            v-model="search"
+          <InputText v-model="search"
             :placeholder="activeFilter ? 'Affiner la recherche…' : 'Rechercher artiste, festival, ville, date…'"
-            class="w-full"
-          />
+            class="w-full" />
         </IconField>
 
         <!-- Suggestions dropdown -->
-        <div
-          v-if="showSuggestions && suggestions.length"
-          class="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden"
-        >
+        <div v-if="showSuggestions && suggestions.length"
+          class="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden">
           <template v-for="group in suggestions" :key="group.type">
-            <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+            <div
+              class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
               <i :class="FILTER_CONFIG[group.type].icon" class="mr-1.5" />{{ FILTER_CONFIG[group.type].label }}
             </div>
-            <button
-              v-for="item in group.items.slice(0, 4)"
-              :key="item.id"
-              :class="[
-                'w-full flex items-center px-4 py-2 text-sm text-left text-gray-800 dark:text-gray-200 transition-colors',
-                highlightedItem?.type === group.type && highlightedItem?.id === item.id
-                  ? 'bg-gray-100 dark:bg-gray-700'
-                  : 'hover:bg-gray-50 dark:hover:bg-gray-800'
-              ]"
-              @mousedown.prevent
-              @click="applyFilter(group.type, item.id, item.label)"
-            >
+            <button v-for="item in group.items.slice(0, 4)" :key="item.id" :class="[
+              'w-full flex items-center px-4 py-2 text-sm text-left text-gray-800 dark:text-gray-200 transition-colors',
+              highlightedItem?.type === group.type && highlightedItem?.id === item.id
+                ? 'bg-gray-100 dark:bg-gray-700'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+            ]" @mousedown.prevent @click="applyFilter(group.type, item.id, item.label)">
               {{ item.label }}
             </button>
           </template>
@@ -322,26 +313,16 @@ function onRowClick(ev: DataTableRowClickEvent) {
 
       <!-- Row 2: played filter + active filter chip + count + new -->
       <div class="flex items-center gap-2">
-        <SelectButton
-          v-model="playedFilter"
-          :options="playedOptions"
-          optionLabel="label"
-          optionValue="value"
-          :allowEmpty="false"
-          size="small"
-          class="shrink-0"
-          :pt="{ pcToggleButton: { root: { class: '!px-2.5' } } }"
-        >
+        <SelectButton v-model="playedFilter" :options="playedOptions" optionLabel="label" optionValue="value"
+          :allowEmpty="false" size="small" class="shrink-0" :pt="{ pcToggleButton: { root: { class: '!px-1.5' } } }">
           <template #option="{ option }">
             <i :class="option.icon" v-tooltip.bottom="option.label" />
           </template>
         </SelectButton>
 
         <!-- Active filter chip -->
-        <span
-          v-if="activeFilter"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-xs font-medium shrink-0 max-w-[180px]"
-        >
+        <span v-if="activeFilter"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-xs font-medium shrink-0 max-w-[180px]">
           <i :class="FILTER_CONFIG[activeFilter.type].icon" class="text-xs shrink-0" />
           <span class="truncate">{{ activeFilter.label }}</span>
           <button class="shrink-0 hover:opacity-70" @click="activeFilter = null">
@@ -352,13 +333,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
         <span v-if="!loading" class="flex-1 text-xs text-gray-400 whitespace-nowrap">
           {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
         </span>
-        <Button
-          icon="pi pi-plus"
-          label="New"
-          size="small"
-          class="shrink-0"
-          @click="router.push('/event/new')"
-        />
+        <Button icon="pi pi-plus" label="New" size="small" class="shrink-0" @click="router.push('/event/new')" />
       </div>
     </div>
 
@@ -376,17 +351,11 @@ function onRowClick(ev: DataTableRowClickEvent) {
     <template v-else>
       <!-- Mobile cards (< md) -->
       <div class="md:hidden space-y-2">
-        <div
-          v-for="event in filtered"
-          :key="event.id"
-          class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
-        >
+        <div v-for="event in filtered" :key="event.id"
+          class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <!-- Card header row -->
           <div class="flex items-start gap-2 p-4">
-            <button
-              class="flex-1 min-w-0 text-left"
-              @click="toggleCard(event.id)"
-            >
+            <button class="flex-1 min-w-0 text-left" @click="toggleCard(event.id)">
               <div class="min-w-0">
                 <div class="flex items-start justify-between gap-2">
                   <p class="font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0">
@@ -396,52 +365,40 @@ function onRowClick(ev: DataTableRowClickEvent) {
                     <span class="text-xs text-gray-400 dark:text-gray-500">
                       {{ formatDate(event.event_date) }}
                     </span>
-                    <i :class="['pi text-gray-400 text-xs ml-1', expandedCards.has(event.id) ? 'pi-chevron-up' : 'pi-chevron-down']" />
+                    <i
+                      :class="['pi text-gray-400 text-xs ml-1', expandedCards.has(event.id) ? 'pi-chevron-up' : 'pi-chevron-down']" />
                   </div>
                 </div>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate">
                   {{ event.venue?.name }}<span v-if="event.venue?.city?.name"> — {{ event.venue.city.name }}</span>
                 </p>
-                <span
-                  v-if="event.festival"
-                  class="inline-block mt-1 text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full"
-                >
+                <span v-if="event.festival"
+                  class="inline-block mt-1 text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full">
                   {{ event.festival.name }}{{ event.festival.year ? ` ${event.festival.year}` : '' }}
                 </span>
               </div>
             </button>
             <div class="flex shrink-0 -mr-1 -mt-1">
-              <Button
-                icon="pi pi-eye"
-                text
-                rounded
-                size="small"
-                severity="secondary"
-                aria-label="View"
-                @click="router.push(`/event/${event.id}`)"
-              />
+              <Button icon="pi pi-eye" text rounded size="small" severity="secondary" aria-label="View"
+                @click="router.push(`/event/${event.id}`)" />
             </div>
           </div>
 
           <!-- Card expansion -->
-          <div
-            v-if="expandedCards.has(event.id)"
-            class="border-t border-gray-100 dark:border-gray-800 px-4 py-3 space-y-3"
-          >
+          <div v-if="expandedCards.has(event.id)"
+            class="border-t border-gray-100 dark:border-gray-800 px-4 py-3 space-y-3">
             <!-- Concerts -->
             <div v-if="event.concerts.length" class="space-y-2">
-              <div
-                v-for="concert in event.concerts"
-                :key="concert.id"
-                class="space-y-1"
-              >
+              <div v-for="concert in event.concerts" :key="concert.id" class="space-y-1">
                 <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
                   {{ concert.artist?.name ?? '—' }}
                 </p>
                 <p v-if="concert.comments" class="text-xs text-gray-500 dark:text-gray-400 italic">
                   {{ concert.comments }}
                 </p>
-                <div v-if="concert.setlist" class="text-xs text-gray-500 dark:text-gray-400 font-mono whitespace-pre-line bg-gray-50 dark:bg-gray-800 rounded px-2 py-1">{{ concert.setlist }}</div>
+                <div v-if="concert.setlist"
+                  class="text-xs text-gray-500 dark:text-gray-400 font-mono whitespace-pre-line bg-gray-50 dark:bg-gray-800 rounded px-2 py-1">
+                  {{ concert.setlist }}</div>
               </div>
             </div>
             <!-- Venue full -->
@@ -454,11 +411,8 @@ function onRowClick(ev: DataTableRowClickEvent) {
             <p v-if="event.comments" class="text-xs text-gray-500 dark:text-gray-400 italic">{{ event.comments }}</p>
             <!-- Attendees -->
             <div v-if="event.attendees?.length" class="flex flex-wrap gap-1">
-              <span
-                v-for="a in event.attendees"
-                :key="a.id"
-                class="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2 py-0.5 rounded-full"
-              >
+              <span v-for="a in event.attendees" :key="a.id"
+                class="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2 py-0.5 rounded-full">
                 {{ a.firstname }} {{ a.lastname }}
               </span>
             </div>
@@ -468,22 +422,13 @@ function onRowClick(ev: DataTableRowClickEvent) {
 
       <!-- Desktop table (>= md) -->
       <div class="hidden md:block">
-        <DataTable
-          :value="filtered"
-          v-model:expandedRows="expandedRows"
-          row-hover
-          size="small"
-          sortField="event_date"
-          :sortOrder="1"
-          class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer"
-          dataKey="id"
-          @row-click="onRowClick"
-        >
+        <DataTable :value="filtered" v-model:expandedRows="expandedRows" row-hover size="small" sortField="event_date"
+          :sortOrder="1" class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer"
+          dataKey="id" @row-click="onRowClick">
           <Column expander style="width: 2.5rem">
             <template #body="{ data }">
               <i
-                :class="['pi text-gray-400 text-xs', expandedRows[String(data.id)] ? 'pi-chevron-down' : 'pi-chevron-right']"
-              />
+                :class="['pi text-gray-400 text-xs', expandedRows[String(data.id)] ? 'pi-chevron-down' : 'pi-chevron-right']" />
             </template>
           </Column>
 
@@ -513,10 +458,8 @@ function onRowClick(ev: DataTableRowClickEvent) {
 
           <Column header="Festival">
             <template #body="{ data }">
-              <span
-                v-if="data.festival"
-                class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full"
-              >
+              <span v-if="data.festival"
+                class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full">
                 {{ data.festival.name }}{{ data.festival.year ? ` ${data.festival.year}` : '' }}
               </span>
             </template>
@@ -525,25 +468,10 @@ function onRowClick(ev: DataTableRowClickEvent) {
           <Column style="width: 5rem">
             <template #body="{ data }">
               <div class="flex">
-                <Button
-                  icon="pi pi-eye"
-                  text
-                  rounded
-                  size="small"
-                  severity="secondary"
-                  aria-label="View"
-                  @click="router.push(`/event/${data.id}`)"
-                />
-                <Button
-                  v-if="canEdit(data)"
-                  icon="pi pi-pencil"
-                  text
-                  rounded
-                  size="small"
-                  severity="secondary"
-                  aria-label="Edit"
-                  @click="router.push(`/event/${data.id}?edit=true`)"
-                />
+                <Button icon="pi pi-eye" text rounded size="small" severity="secondary" aria-label="View"
+                  @click="router.push(`/event/${data.id}`)" />
+                <Button v-if="canEdit(data)" icon="pi pi-pencil" text rounded size="small" severity="secondary"
+                  aria-label="Edit" @click="router.push(`/event/${data.id}?edit=true`)" />
               </div>
             </template>
           </Column>
@@ -552,15 +480,15 @@ function onRowClick(ev: DataTableRowClickEvent) {
             <div class="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 space-y-3">
               <!-- Concerts -->
               <div v-if="data.concerts.length" class="space-y-2">
-                <div
-                  v-for="concert in data.concerts"
-                  :key="concert.id"
-                >
+                <div v-for="concert in data.concerts" :key="concert.id">
                   <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
                     {{ concert.artist?.name ?? '—' }}
                   </span>
-                  <span v-if="concert.comments" class="ml-2 text-xs text-gray-500 dark:text-gray-400 italic">{{ concert.comments }}</span>
-                  <div v-if="concert.setlist" class="mt-1 text-xs text-gray-500 dark:text-gray-400 font-mono whitespace-pre-line bg-white dark:bg-gray-900 rounded px-2 py-1 border border-gray-100 dark:border-gray-700">{{ concert.setlist }}</div>
+                  <span v-if="concert.comments" class="ml-2 text-xs text-gray-500 dark:text-gray-400 italic">{{
+                    concert.comments }}</span>
+                  <div v-if="concert.setlist"
+                    class="mt-1 text-xs text-gray-500 dark:text-gray-400 font-mono whitespace-pre-line bg-white dark:bg-gray-900 rounded px-2 py-1 border border-gray-100 dark:border-gray-700">
+                    {{ concert.setlist }}</div>
                 </div>
               </div>
 
@@ -579,11 +507,8 @@ function onRowClick(ev: DataTableRowClickEvent) {
 
               <!-- Attendees -->
               <div v-if="data.attendees?.length" class="flex flex-wrap gap-1">
-                <span
-                  v-for="a in data.attendees"
-                  :key="a.id"
-                  class="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2 py-0.5 rounded-full"
-                >
+                <span v-for="a in data.attendees" :key="a.id"
+                  class="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2 py-0.5 rounded-full">
                   {{ a.firstname }} {{ a.lastname }}
                 </span>
               </div>
@@ -594,19 +519,11 @@ function onRowClick(ev: DataTableRowClickEvent) {
     </template>
 
     <!-- Event view/edit/create modal -->
-    <Dialog
-      v-model:visible="modalOpen"
-      modal
-      dismissable-mask
-      :draggable="false"
-      :show-header="false"
-      :style="{ width: '900px', maxHeight: '90vh' }"
-      :breakpoints="{ '960px': '100vw' }"
-      :pt="{
+    <Dialog v-model:visible="modalOpen" modal dismissable-mask :draggable="false" :show-header="false"
+      :style="{ width: '900px', maxHeight: '90vh' }" :breakpoints="{ '960px': '100vw' }" :pt="{
         root: { class: 'event-dialog' },
         content: { class: 'p-4 md:p-6' },
-      }"
-    >
+      }">
       <EventForm ref="eventFormRef" :key="route.fullPath" />
     </Dialog>
   </div>
