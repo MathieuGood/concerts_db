@@ -100,28 +100,32 @@ function formatDate(dateStr: string): string {
   })
 }
 
-function fuzzy(query: string, target: string): boolean {
-  let ti = 0
-  for (let qi = 0; qi < query.length; qi++) {
-    while (ti < target.length && target[ti] !== query[qi]) ti++
-    if (ti === target.length) return false
-    ti++
-  }
-  return true
+// "2011-04-15" → "15042011" pour la recherche par date compacte (ddmmyyyy ou ddmmyy)
+function toCompactDate(dateStr: string): string {
+  const [y, m, d] = dateStr.split('-')
+  return `${d}${m}${y}`
 }
 
-function fuzzyMatch(q: string, e: Event): boolean {
+function matchesTerm(term: string, e: Event): boolean {
   const artists = e.concerts.map((c) => c.artist?.name ?? '').join(' ')
   const fields = [
     e.name ?? '',
-    e.event_date,
+    e.event_date,                  // "2011-04-15"
+    formatDate(e.event_date),      // "15 Apr 2011" — recherche "apr 2011", "15 apr", etc.
+    toCompactDate(e.event_date),   // "15042011" — recherche "150411", "15042011"
     e.venue?.name ?? '',
     e.venue?.city?.name ?? '',
     e.venue?.city?.country?.name ?? '',
     e.festival?.name ?? '',
     artists,
   ]
-  return fields.some((f) => fuzzy(q, f.toLowerCase()))
+  return fields.some((f) => f.toLowerCase().includes(term))
+}
+
+// Chaque mot doit être une sous-chaîne d'au moins un champ (ET logique entre mots)
+function fuzzyMatch(q: string, e: Event): boolean {
+  const terms = q.split(/\s+/).filter(Boolean)
+  return terms.every((term) => matchesTerm(term, e))
 }
 
 const filtered = computed(() => {
