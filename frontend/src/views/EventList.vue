@@ -273,7 +273,7 @@ watch(sentinelRef, (el) => {
   if (!el) return
   _scrollObserver = new IntersectionObserver(([entry]) => {
     if (entry?.isIntersecting) displayCount.value += PAGE_SIZE
-  }, { rootMargin: '300px' })
+  }, { rootMargin: '600px' })
   _scrollObserver.observe(el)
 })
 onUnmounted(() => _scrollObserver?.disconnect())

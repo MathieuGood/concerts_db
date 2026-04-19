@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { normalize } from '@/utils/search'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
@@ -102,6 +102,23 @@ const filtered = computed(() => {
   const q = normalize(search.value)
   return q ? venueRows.value.filter(v => normalize(v.name).includes(q) || normalize(v.cityName).includes(q) || normalize(v.countryName).includes(q)) : venueRows.value
 })
+
+// ── Infinite scroll ───────────────────────────────────────────────────────────
+const PAGE_SIZE = 30
+const displayCount = ref(PAGE_SIZE)
+const sentinelRef  = ref<HTMLElement | null>(null)
+const displayedRows = computed(() => filtered.value.slice(0, displayCount.value))
+watch(filtered, () => { displayCount.value = PAGE_SIZE }, { flush: 'sync' })
+let _scrollObserver: IntersectionObserver | null = null
+watch(sentinelRef, (el) => {
+  _scrollObserver?.disconnect()
+  if (!el) return
+  _scrollObserver = new IntersectionObserver(([entry]) => {
+    if (entry?.isIntersecting) displayCount.value += PAGE_SIZE
+  }, { rootMargin: '600px' })
+  _scrollObserver.observe(el)
+})
+onUnmounted(() => _scrollObserver?.disconnect())
 
 function startEdit(row: VenueRow) {
   editData.value[row.id] = { name: row.name, city_id: row.city_id }
@@ -291,7 +308,7 @@ function deleteFromCard(row: VenueRow) {
 
       <!-- Mobile card list -->
       <div class="sm:hidden space-y-2">
-        <div v-for="row in filtered" :key="row.id"
+        <div v-for="row in displayedRows" :key="row.id"
              class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
 
           <!-- Edit mode -->
@@ -349,9 +366,12 @@ function deleteFromCard(row: VenueRow) {
         </div>
       </div>
 
+      <!-- Sentinel infinite scroll -->
+      <div ref="sentinelRef" class="h-1" />
+
       <!-- Desktop table -->
       <div class="hidden sm:block">
-        <DataTable :value="filtered" dataKey="id" sortField="events" :sortOrder="-1" size="small"
+        <DataTable :value="displayedRows" dataKey="id" sortField="events" :sortOrder="-1" size="small"
           v-model:expandedRows="expandedRows"
           class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
           <Column expander style="width:3rem" />

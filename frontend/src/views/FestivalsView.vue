@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { normalize } from '@/utils/search'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
@@ -133,6 +133,23 @@ const filtered = computed(() => {
   return q ? series.value.filter(s => normalize(s.name).includes(q)) : series.value
 })
 
+// ── Infinite scroll ───────────────────────────────────────────────────────────
+const PAGE_SIZE = 30
+const displayCount = ref(PAGE_SIZE)
+const sentinelRef  = ref<HTMLElement | null>(null)
+const displayedRows = computed(() => filtered.value.slice(0, displayCount.value))
+watch(filtered, () => { displayCount.value = PAGE_SIZE }, { flush: 'sync' })
+let _scrollObserver: IntersectionObserver | null = null
+watch(sentinelRef, (el) => {
+  _scrollObserver?.disconnect()
+  if (!el) return
+  _scrollObserver = new IntersectionObserver(([entry]) => {
+    if (entry?.isIntersecting) displayCount.value += PAGE_SIZE
+  }, { rootMargin: '600px' })
+  _scrollObserver.observe(el)
+})
+onUnmounted(() => _scrollObserver?.disconnect())
+
 // ── Edit ─────────────────────────────────────────────────────
 function startEdit(edition: FestivalEdition) {
   editData.value[edition.id] = { name: findSeriesName(edition.id), year: edition.year }
@@ -255,7 +272,7 @@ function toggleExpand(id: number) {
 
       <!-- Mobile card list -->
       <div class="sm:hidden space-y-2">
-        <div v-for="s in filtered" :key="s.name"
+        <div v-for="s in displayedRows" :key="s.name"
              class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
           <div class="flex items-start p-3 gap-2 cursor-pointer" @click="toggleExpand(s.editions[0]?.id ?? -1)">
             <div class="flex-1 min-w-0">
@@ -313,9 +330,12 @@ function toggleExpand(id: number) {
         </div>
       </div>
 
+      <!-- Sentinel infinite scroll -->
+      <div ref="sentinelRef" class="h-1" />
+
       <!-- Desktop table -->
       <div class="hidden sm:block">
-        <DataTable :value="filtered" dataKey="name" size="small"
+        <DataTable :value="displayedRows" dataKey="name" size="small"
           v-model:expandedRows="expandedRows"
           class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700" rowHover>
           <Column expander style="width:3rem" />
