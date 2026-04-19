@@ -191,6 +191,16 @@ watch(() => route.query.expanded, (expanded) => {
   }
 })
 
+// Reset all filters when navigating to '/' with empty query (e.g. clicking ConcertsDB logo).
+watch(() => route.query, (q) => {
+  if (route.path === '/' && !q.q && !q.filter) {
+    search.value = ''
+    searchDebounced.value = ''
+    activeFilter.value = null
+    playedFilter.value = 'all'
+  }
+}, { deep: true })
+
 watch([search, expandedRows, expandedCards], () => {
   const tableIds = Object.entries(expandedRows.value).filter(([, v]) => v).map(([k]) => Number(k))
   const ids = [...new Set([...tableIds, ...expandedCards.value])]
@@ -310,6 +320,8 @@ function onRowClick(ev: DataTableRowClickEvent) {
           <InputText v-model="search"
             :placeholder="activeFilter ? 'Affiner la recherche…' : 'Rechercher artiste, festival, ville, date…'"
             class="w-full" />
+          <InputIcon v-if="search || activeFilter" class="pi pi-times cursor-pointer" style="pointer-events:auto"
+            @click.stop="search = ''; activeFilter = null" />
         </IconField>
 
         <!-- Suggestions dropdown -->

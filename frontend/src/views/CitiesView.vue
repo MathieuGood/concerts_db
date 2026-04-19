@@ -215,7 +215,7 @@ function deleteFromCard(row: CityRow) {
     <div v-if="loading" class="flex justify-center py-16"><ProgressSpinner style="width:40px;height:40px" /></div>
     <template v-else>
       <div class="flex gap-2">
-        <IconField class="flex-1"><InputIcon class="pi pi-search" /><InputText v-model="search" placeholder="Search cities…" class="w-full" /></IconField>
+        <IconField class="flex-1"><InputIcon class="pi pi-search" /><InputText v-model="search" placeholder="Search cities…" class="w-full" /><InputIcon v-if="search" class="pi pi-times cursor-pointer" style="pointer-events:auto" @click="search = ''" /></IconField>
         <span class="text-xs text-gray-400 self-center whitespace-nowrap">{{ filtered.length }} cit{{ filtered.length !== 1 ? 'ies' : 'y' }}</span>
         <Button icon="pi pi-plus" label="Add" size="small" class="ml-3" @click="addingCity = !addingCity" />
       </div>

@@ -31,7 +31,11 @@ const menuOpen = ref(false)
 
 function navigate(path: string) {
   menuOpen.value = false
-  router.push(path)
+  if (path === '/' && route.path === '/') {
+    router.push({ path: '/', query: {} })
+  } else {
+    router.push(path)
+  }
 }
 
 function confirmLogout() {
