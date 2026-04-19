@@ -203,7 +203,7 @@ defineExpose({ isEditMode })
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 pt-2">
 
     <div v-if="loading" class="flex justify-center py-16">
       <ProgressSpinner style="width: 40px; height: 40px" />
@@ -255,7 +255,7 @@ defineExpose({ isEditMode })
           </div>
           <div v-if="eventData.comments" class="flex items-start gap-3 px-4 py-3">
             <i class="pi pi-comment text-gray-400 text-sm w-4 shrink-0 mt-0.5" />
-            <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line break-all max-h-40 overflow-y-auto">{{ eventData.comments }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line break-words">{{ eventData.comments }}</p>
           </div>
         </section>
 
@@ -345,7 +345,7 @@ defineExpose({ isEditMode })
           </div>
           <div>
             <label class="form-label">Comments</label>
-            <Textarea v-model="form.comments" rows="2" auto-resize class="w-full max-h-40 overflow-y-auto" />
+            <Textarea v-model="form.comments" rows="2" auto-resize class="w-full" />
           </div>
         </section>
 
