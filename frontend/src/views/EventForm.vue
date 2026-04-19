@@ -257,7 +257,7 @@ defineExpose({ isEditMode })
           </div>
           <div v-if="eventData.comments" class="flex items-start gap-3 px-4 py-3">
             <i class="pi pi-comment text-gray-400 text-sm w-4 shrink-0 mt-0.5" />
-            <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line break-words">{{ eventData.comments }}</p>
+            <p class="flex-1 min-w-0 text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line break-words">{{ eventData.comments }}</p>
           </div>
         </section>
 
@@ -347,7 +347,7 @@ defineExpose({ isEditMode })
           </div>
           <div>
             <label class="form-label">Comments</label>
-            <Textarea v-model="form.comments" class="w-full" :pt="{ root: { style: 'height:5rem;max-height:5rem;overflow-y:auto;resize:none' } }" />
+            <Textarea v-model="form.comments" class="w-full" style="height:5rem;max-height:5rem;overflow-y:auto;resize:none" />
           </div>
         </section>
 

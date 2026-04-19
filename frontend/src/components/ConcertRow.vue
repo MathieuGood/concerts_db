@@ -82,7 +82,7 @@ function update(field: keyof ConcertFormData, value: unknown) {
         :model-value="modelValue.comments"
         placeholder="Comments"
         class="w-full text-sm"
-        :pt="{ root: { style: 'height:4rem;max-height:4rem;overflow-y:auto;resize:none' } }"
+        style="height:4rem;max-height:4rem;overflow-y:auto;resize:none"
         @update:model-value="update('comments', $event)"
       />
     </div>
@@ -93,7 +93,7 @@ function update(field: keyof ConcertFormData, value: unknown) {
         :model-value="modelValue.setlist"
         placeholder="Setlist (one song per line)"
         class="w-full text-sm"
-        :pt="{ root: { style: 'height:8rem;max-height:8rem;overflow-y:auto;resize:none' } }"
+        style="height:8rem;max-height:8rem;overflow-y:auto;resize:none"
         @update:model-value="update('setlist', $event)"
       />
     </div>

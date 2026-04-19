@@ -567,7 +567,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
       :breakpoints="{ '960px': '100vw' }"
       :pt="{
         root: { class: 'event-dialog' },
-        content: { class: 'p-4 md:p-6 overflow-y-auto' },
+        content: { class: 'p-4 md:p-6' },
       }"
     >
       <EventForm ref="eventFormRef" :key="route.fullPath" />
