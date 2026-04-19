@@ -27,6 +27,7 @@ const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
 const events = ref<Event[]>([])
 const loading = ref(true)
 const search = ref(initialSearch)
+const onlyIPlayed = ref(false)
 const expandedRows = ref<any[]>([])
 const expandedCards = ref<Set<number>>(new Set(initialExpandedIds))
 
@@ -101,7 +102,9 @@ function fuzzyMatch(q: string, e: Event): boolean {
 
 const filtered = computed(() => {
   const q = search.value.trim().toLowerCase()
-  const result = q ? events.value.filter((e) => fuzzyMatch(q, e)) : [...events.value]
+  let result = q ? events.value.filter((e) => fuzzyMatch(q, e)) : [...events.value]
+  // Keep full event (all concerts) even if only one concert has i_played — just gate inclusion.
+  if (onlyIPlayed.value) result = result.filter((e) => e.concerts.some((c) => c.i_played))
   return result.sort((a, b) => a.event_date.localeCompare(b.event_date))
 })
 
@@ -135,6 +138,16 @@ function onRowClick(ev: DataTableRowClickEvent) {
           class="w-full"
         />
       </IconField>
+      <Button
+        icon="pi pi-microphone"
+        :severity="onlyIPlayed ? undefined : 'secondary'"
+        :outlined="!onlyIPlayed"
+        size="small"
+        rounded
+        aria-label="Only shows where I played"
+        v-tooltip.bottom="'Only shows I played'"
+        @click="onlyIPlayed = !onlyIPlayed"
+      />
       <span v-if="!loading" class="text-xs text-gray-400 shrink-0 whitespace-nowrap">
         {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
       </span>
