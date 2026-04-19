@@ -25,6 +25,8 @@ function canEdit(event: Event): boolean {
 }
 const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
 
+const eventFormRef = ref<InstanceType<typeof EventForm> | null>(null)
+
 const events = ref<Event[]>([])
 const loading = ref(true)
 const search = ref(initialSearch)
@@ -35,15 +37,15 @@ const playedOptions: { icon: string; label: string; value: PlayedFilter }[] = [
   { icon: 'pi pi-microphone', label: 'I played', value: 'played' },
   { icon: 'pi pi-eye', label: 'Watched', value: 'not_played' },
 ]
-const expandedRows = ref<any[]>([])
+// PrimeVue v4: expandedRows is Record<string, boolean>, not an array of objects
+const expandedRows = ref<Record<string, boolean>>(
+  Object.fromEntries(initialExpandedIds.map(id => [String(id), true]))
+)
 const expandedCards = ref<Set<number>>(new Set(initialExpandedIds))
 
 async function fetchEvents() {
   const list = await eventService.getAll()
   events.value = list
-  // Reconcile expansion state with the freshly fetched list (IDs may have been added/removed).
-  expandedRows.value = list.filter(e => expandedRows.value.some((r: any) => r.id === e.id)
-    || initialExpandedIds.includes(e.id))
 }
 
 onMounted(async () => {
@@ -58,7 +60,13 @@ onMounted(async () => {
 // Modal open when route targets an event (/event/new or /event/:id).
 const modalOpen = computed({
   get: () => route.path === '/event/new' || !!route.params.id,
-  set: (v: boolean) => { if (!v) router.push('/') },
+  set: (v: boolean) => {
+    if (!v) {
+      // Block dismiss when EventForm is in edit mode (avoid losing unsaved changes)
+      if (eventFormRef.value?.isEditMode.value) return
+      router.push('/')
+    }
+  },
 })
 
 // When closing the modal (returning to '/'), refetch to pick up any create/update/delete.
@@ -67,7 +75,8 @@ watch(() => route.path, (to, from) => {
 })
 
 watch([search, expandedRows, expandedCards], () => {
-  const ids = [...new Set([...expandedRows.value.map((r: any) => r.id), ...expandedCards.value])]
+  const tableIds = Object.entries(expandedRows.value).filter(([, v]) => v).map(([k]) => Number(k))
+  const ids = [...new Set([...tableIds, ...expandedCards.value])]
   syncToUrl(search.value, ids)
 }, { deep: true })
 
@@ -127,18 +136,17 @@ function onRowClick(ev: DataTableRowClickEvent) {
   // Ignore clicks originating from buttons (view/edit action column)
   const target = ev.originalEvent.target as HTMLElement | null
   if (target?.closest('button')) return
-  const id = ev.data.id
-  const idx = expandedRows.value.findIndex((r: any) => r.id === id)
-  if (idx >= 0) expandedRows.value = expandedRows.value.filter((r: any) => r.id !== id)
-  else expandedRows.value = [...expandedRows.value, ev.data]
+  const id = String(ev.data.id)
+  expandedRows.value = { ...expandedRows.value, [id]: !expandedRows.value[id] }
 }
 </script>
 
 <template>
   <div class="space-y-4">
-    <!-- Header row -->
-    <div class="flex items-center gap-2">
-      <IconField class="flex-1">
+    <!-- Header -->
+    <div class="flex flex-col gap-2">
+      <!-- Row 1: search -->
+      <IconField>
         <InputIcon class="pi pi-search" />
         <InputText
           v-model="search"
@@ -146,30 +154,33 @@ function onRowClick(ev: DataTableRowClickEvent) {
           class="w-full"
         />
       </IconField>
-      <SelectButton
-        v-model="playedFilter"
-        :options="playedOptions"
-        optionLabel="label"
-        optionValue="value"
-        :allowEmpty="false"
-        size="small"
-        class="shrink-0"
-        :pt="{ pcToggleButton: { root: { class: '!px-2.5' } } }"
-      >
-        <template #option="{ option }">
-          <i :class="option.icon" v-tooltip.bottom="option.label" />
-        </template>
-      </SelectButton>
-      <span v-if="!loading" class="hidden sm:inline text-xs text-gray-400 shrink-0 whitespace-nowrap">
-        {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
-      </span>
-      <Button
-        icon="pi pi-plus"
-        label="New"
-        size="small"
-        class="shrink-0"
-        @click="router.push('/event/new')"
-      />
+      <!-- Row 2: filter + count + new -->
+      <div class="flex items-center gap-2">
+        <SelectButton
+          v-model="playedFilter"
+          :options="playedOptions"
+          optionLabel="label"
+          optionValue="value"
+          :allowEmpty="false"
+          size="small"
+          class="shrink-0"
+          :pt="{ pcToggleButton: { root: { class: '!px-2.5' } } }"
+        >
+          <template #option="{ option }">
+            <i :class="option.icon" v-tooltip.bottom="option.label" />
+          </template>
+        </SelectButton>
+        <span v-if="!loading" class="flex-1 text-xs text-gray-400 whitespace-nowrap">
+          {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
+        </span>
+        <Button
+          icon="pi pi-plus"
+          label="New"
+          size="small"
+          class="shrink-0"
+          @click="router.push('/event/new')"
+        />
+      </div>
     </div>
 
     <!-- Loading -->
@@ -289,10 +300,10 @@ function onRowClick(ev: DataTableRowClickEvent) {
           dataKey="id"
           @row-click="onRowClick"
         >
-          <Column style="width: 2.5rem">
+          <Column expander style="width: 2.5rem">
             <template #body="{ data }">
               <i
-                :class="['pi text-gray-400 text-xs', expandedRows.some((r: any) => r.id === data.id) ? 'pi-chevron-down' : 'pi-chevron-right']"
+                :class="['pi text-gray-400 text-xs', expandedRows[String(data.id)] ? 'pi-chevron-down' : 'pi-chevron-right']"
               />
             </template>
           </Column>
@@ -417,7 +428,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
         content: { class: 'p-4 md:p-6' },
       }"
     >
-      <EventForm :key="route.fullPath" />
+      <EventForm ref="eventFormRef" :key="route.fullPath" />
     </Dialog>
   </div>
 </template>

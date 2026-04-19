@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner'
+import SelectButton from 'primevue/selectbutton'
 import { eventService } from '@/services/eventService'
 import type { Event } from '@/models/Event'
 
@@ -9,6 +10,20 @@ const router = useRouter()
 const events = ref<Event[]>([])
 const loading = ref(true)
 const selectedYear = ref<number | null>(null)
+
+type PlayedFilter = 'all' | 'played' | 'not_played'
+const playedFilter = ref<PlayedFilter>('all')
+const playedOptions: { icon: string; label: string; value: PlayedFilter }[] = [
+  { icon: 'pi pi-bars', label: 'All shows', value: 'all' },
+  { icon: 'pi pi-microphone', label: 'I played', value: 'played' },
+  { icon: 'pi pi-eye', label: 'Not played', value: 'not_played' },
+]
+
+const filteredEvents = computed(() => {
+  if (playedFilter.value === 'played') return events.value.filter(e => e.concerts.some(c => c.i_played))
+  if (playedFilter.value === 'not_played') return events.value.filter(e => !e.concerts.some(c => c.i_played))
+  return events.value
+})
 
 onMounted(async () => {
   try {
@@ -28,7 +43,7 @@ const BAND_PALETTE = ['#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#ec4899']
 
 const allBandNames = computed(() => {
   const names = new Set<string>()
-  for (const e of events.value) {
+  for (const e of filteredEvents.value) {
     for (const c of e.concerts) {
       if (c.i_played && c.artist?.name) names.add(c.artist.name)
     }
@@ -45,7 +60,7 @@ function bandColor(name: string): string {
 
 const yearStats = computed(() => {
   const map = new Map<number, Map<string, number>>()
-  for (const e of events.value) {
+  for (const e of filteredEvents.value) {
     const y = parseInt(e.event_date.slice(0, 4))
     if (!map.has(y)) map.set(y, new Map())
     const bandMap = map.get(y)!
@@ -78,7 +93,7 @@ const monthBoxes = computed(() => {
   if (!selectedYear.value) return []
   return MONTHS.map((name, idx) => {
     const prefix = `${selectedYear.value}-${String(idx + 1).padStart(2, '0')}`
-    const monthEvents = events.value
+    const monthEvents = filteredEvents.value
       .filter(e => e.event_date.startsWith(prefix))
       .sort((a, b) => a.event_date.localeCompare(b.event_date))
     return { name, monthIdx: idx, events: monthEvents }
@@ -114,7 +129,23 @@ function playedBand(event: Event): string | null {
       <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
         <div class="flex items-center justify-between mb-4">
           <h2 class="font-semibold text-gray-800 dark:text-gray-100">Shows per year</h2>
-          <span class="text-xs text-gray-400">{{ events.length }} total</span>
+          <div class="flex items-center gap-2">
+            <SelectButton
+              v-model="playedFilter"
+              :options="playedOptions"
+              optionLabel="label"
+              optionValue="value"
+              :allowEmpty="false"
+              size="small"
+              class="shrink-0"
+              :pt="{ pcToggleButton: { root: { class: '!px-2.5' } } }"
+            >
+              <template #option="{ option }">
+                <i :class="option.icon" v-tooltip.bottom="option.label" />
+              </template>
+            </SelectButton>
+            <span class="text-xs text-gray-400">{{ filteredEvents.length }} total</span>
+          </div>
         </div>
 
         <!-- Bars -->

@@ -23,6 +23,7 @@ from models.venue import Venue
 from models.artist import Artist
 from models.attendee import Attendee
 from models.festival import Festival
+from models.user import User  # noqa: F401 — needed for SQLAlchemy FK resolution
 from sqlalchemy.orm import Session
 from crud import country as country_crud
 from crud import city as city_crud

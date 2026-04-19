@@ -198,6 +198,8 @@ onMounted(async () => {
     })
   }
 })
+
+defineExpose({ isEditMode })
 </script>
 
 <template>
@@ -253,7 +255,7 @@ onMounted(async () => {
           </div>
           <div v-if="eventData.comments" class="flex items-start gap-3 px-4 py-3">
             <i class="pi pi-comment text-gray-400 text-sm w-4 shrink-0 mt-0.5" />
-            <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line break-all">{{ eventData.comments }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line break-all max-h-40 overflow-y-auto">{{ eventData.comments }}</p>
           </div>
         </section>
 
@@ -343,7 +345,7 @@ onMounted(async () => {
           </div>
           <div>
             <label class="form-label">Comments</label>
-            <Textarea v-model="form.comments" rows="2" auto-resize class="w-full" />
+            <Textarea v-model="form.comments" rows="2" auto-resize class="w-full max-h-40 overflow-y-auto" />
           </div>
         </section>
 
