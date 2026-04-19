@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { normalize } from '@/utils/search'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
@@ -128,8 +129,8 @@ function formatDate(d: string | null) {
 }
 
 const filtered = computed(() => {
-  const q = search.value.toLowerCase()
-  return q ? series.value.filter(s => s.name.toLowerCase().includes(q)) : series.value
+  const q = normalize(search.value)
+  return q ? series.value.filter(s => normalize(s.name).includes(q)) : series.value
 })
 
 // ── Edit ─────────────────────────────────────────────────────

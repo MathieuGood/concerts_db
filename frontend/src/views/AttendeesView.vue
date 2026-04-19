@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { normalize } from '@/utils/search'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
@@ -76,8 +77,8 @@ function formatDate(d: string | null) {
 }
 
 const filtered = computed(() => {
-  const q = search.value.toLowerCase()
-  const rows = q ? attendeeRows.value.filter(a => a.fullName.toLowerCase().includes(q)) : [...attendeeRows.value]
+  const q = normalize(search.value)
+  const rows = q ? attendeeRows.value.filter(a => normalize(a.fullName).includes(q)) : [...attendeeRows.value]
   // Mobile consumes this list as-is; desktop DataTable re-sorts per column clicks but honours this as initial order.
   return rows.sort((a, b) => b.events - a.events)
 })

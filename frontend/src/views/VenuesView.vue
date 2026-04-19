@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { normalize } from '@/utils/search'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
@@ -98,8 +99,8 @@ function formatDate(d: string | null) {
 }
 
 const filtered = computed(() => {
-  const q = search.value.toLowerCase()
-  return q ? venueRows.value.filter(v => v.name.toLowerCase().includes(q) || v.cityName.toLowerCase().includes(q) || v.countryName.toLowerCase().includes(q)) : venueRows.value
+  const q = normalize(search.value)
+  return q ? venueRows.value.filter(v => normalize(v.name).includes(q) || normalize(v.cityName).includes(q) || normalize(v.countryName).includes(q)) : venueRows.value
 })
 
 function startEdit(row: VenueRow) {
@@ -174,14 +175,14 @@ watch(() => newVenue.value.countryInput, async (val) => {
 })
 
 function searchNewVenueCountry(event: { query: string }) {
-  const q = event.query.toLowerCase()
-  newVenueCountrySuggestions.value = countries.value.filter(c => c.name.toLowerCase().includes(q))
+  const q = normalize(event.query)
+  newVenueCountrySuggestions.value = countries.value.filter(c => normalize(c.name).includes(q))
 }
 
 function searchNewVenueCity(event: { query: string }) {
-  const q = event.query.toLowerCase()
+  const q = normalize(event.query)
   const pool = newVenueCities.value.length ? newVenueCities.value : cities.value
-  newVenueCitySuggestions.value = pool.filter(c => c.name.toLowerCase().includes(q))
+  newVenueCitySuggestions.value = pool.filter(c => normalize(c.name).includes(q))
 }
 
 async function createVenue() {
@@ -216,13 +217,13 @@ watch(() => activeCardEdit.value?.countryInput, async (val) => {
 })
 
 function searchCardCountry(event: { query: string }) {
-  const q = event.query.toLowerCase()
-  cardCountrySuggestions.value = countries.value.filter(c => c.name.toLowerCase().includes(q))
+  const q = normalize(event.query)
+  cardCountrySuggestions.value = countries.value.filter(c => normalize(c.name).includes(q))
 }
 function searchCardCity(event: { query: string }) {
   if (!activeCardEdit.value) return
-  const q = event.query.toLowerCase()
-  cardCitySuggestions.value = activeCardEdit.value.cities.filter(c => c.name.toLowerCase().includes(q))
+  const q = normalize(event.query)
+  cardCitySuggestions.value = activeCardEdit.value.cities.filter(c => normalize(c.name).includes(q))
 }
 
 function isExpanded(id: number) { return expandedCards.value.includes(id) }

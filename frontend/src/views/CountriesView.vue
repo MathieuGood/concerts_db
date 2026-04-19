@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { normalize } from '@/utils/search'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
@@ -78,8 +79,8 @@ function formatDate(d: string | null) {
 }
 
 const filtered = computed(() => {
-  const q = search.value.toLowerCase()
-  return q ? countryRows.value.filter(c => c.name.toLowerCase().includes(q)) : countryRows.value
+  const q = normalize(search.value)
+  return q ? countryRows.value.filter(c => normalize(c.name).includes(q)) : countryRows.value
 })
 
 function startEdit(row: CountryRow) {

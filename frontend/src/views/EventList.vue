@@ -15,6 +15,7 @@ import { eventService } from '@/services/eventService'
 import { useAuth } from '@/composables/useAuth'
 import type { Event } from '@/models/Event'
 import { useListState } from '@/composables/useListState'
+import { normalize } from '@/utils/search'
 
 const route = useRoute()
 const router = useRouter()
@@ -89,10 +90,6 @@ function onSearchBlur() {
   setTimeout(() => { showSuggestions.value = false }, 150)
 }
 
-// Normalise accents + casse : "Zénith" → "zenith", "anti-flag" → "anti-flag"
-function normalize(s: string): string {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-}
 // ─────────────────────────────────────────────────────────────────────────────
 
 const eventFormRef = ref<InstanceType<typeof EventForm> | null>(null)

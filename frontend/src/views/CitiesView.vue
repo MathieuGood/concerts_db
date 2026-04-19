@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { normalize } from '@/utils/search'
 import { useRouter } from 'vue-router'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
@@ -83,8 +84,8 @@ function formatDate(d: string | null) {
 }
 
 const filtered = computed(() => {
-  const q = search.value.toLowerCase()
-  return q ? cityRows.value.filter(c => c.name.toLowerCase().includes(q) || c.countryName.toLowerCase().includes(q)) : cityRows.value
+  const q = normalize(search.value)
+  return q ? cityRows.value.filter(c => normalize(c.name).includes(q) || normalize(c.countryName).includes(q)) : cityRows.value
 })
 
 function startEdit(row: CityRow) {
@@ -151,14 +152,14 @@ async function createCity() {
 // AutoComplete suggestions
 const newCityCountrySuggestions = ref<Country[]>([])
 function searchNewCityCountry(event: { query: string }) {
-  const q = event.query.toLowerCase()
-  newCityCountrySuggestions.value = countries.value.filter(c => c.name.toLowerCase().includes(q))
+  const q = normalize(event.query)
+  newCityCountrySuggestions.value = countries.value.filter(c => normalize(c.name).includes(q))
 }
 
 const cardCountrySuggestions = ref<Country[]>([])
 function searchCardCountry(event: { query: string }) {
-  const q = event.query.toLowerCase()
-  cardCountrySuggestions.value = countries.value.filter(c => c.name.toLowerCase().includes(q))
+  const q = normalize(event.query)
+  cardCountrySuggestions.value = countries.value.filter(c => normalize(c.name).includes(q))
 }
 
 // Mobile card helpers
