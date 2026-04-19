@@ -17,3 +17,11 @@ class ArtistResponse(ArtistBase):
     country: Optional[CountryResponse] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ArtistListResponse(BaseModel):
+    """Lightweight artist for event list — omits country."""
+    id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)

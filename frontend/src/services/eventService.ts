@@ -13,8 +13,7 @@ export interface EventPayload {
     artist_id: number
     comments: string
     setlist: string
-    photos_ids: number[]
-    videos_ids: number[]
+    i_played: boolean
   }[]
 }
 
@@ -49,8 +48,6 @@ export function buildPayload(
       comments: c.comments,
       setlist: c.setlist,
       i_played: c.i_played,
-      photos_ids: [],
-      videos_ids: [],
     })),
   }
 }

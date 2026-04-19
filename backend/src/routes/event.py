@@ -7,7 +7,7 @@ from auth.dependencies import get_current_user, get_optional_user
 from crud.event import create, delete, get, get_all, update
 from database.database import get_db
 from models.user import User
-from schemas.event import EventCreate, EventResponse
+from schemas.event import EventCreate, EventResponse, EventListResponse
 from schemas.response import ApiResponse
 
 router = APIRouter()
@@ -22,7 +22,7 @@ def _strip_private_fields(events: list) -> None:
             c.comments = ""
 
 
-@router.get("/event/", response_model=ApiResponse[List[EventResponse]])
+@router.get("/event/", response_model=ApiResponse[List[EventListResponse]])
 async def get_all_events(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_optional_user),

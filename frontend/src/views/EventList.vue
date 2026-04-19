@@ -25,6 +25,71 @@ function canEdit(event: Event): boolean {
 }
 const { initialSearch, initialExpandedIds, syncToUrl } = useListState()
 
+// ── Smart search ──────────────────────────────────────────────────────────────
+type FilterType = 'festival' | 'artist' | 'city' | 'attendee'
+interface ActiveFilter { type: FilterType; id: number; label: string }
+interface Suggestion   { id: number; label: string }
+
+const FILTER_CONFIG: Record<FilterType, { icon: string; label: string }> = {
+  festival: { icon: 'pi pi-ticket',      label: 'Festival' },
+  artist:   { icon: 'pi pi-music',       label: 'Artiste'  },
+  city:     { icon: 'pi pi-map-marker',  label: 'Ville'    },
+  attendee: { icon: 'pi pi-user',        label: 'Personne' },
+}
+
+const activeFilter   = ref<ActiveFilter | null>(null)
+const showSuggestions = ref(false)
+
+const suggestions = computed(() => {
+  const q = search.value.trim().toLowerCase()
+  if (q.length < 2) return []
+
+  const festivals = new Map<number, string>()
+  const artists   = new Map<number, string>()
+  const cities    = new Map<number, string>()
+  const attendees = new Map<number, string>()
+
+  for (const event of events.value) {
+    if (event.festival) {
+      const label = event.festival.name + (event.festival.year ? ` ${event.festival.year}` : '')
+      if (label.toLowerCase().includes(q)) festivals.set(event.festival.id, label)
+    }
+    for (const concert of event.concerts) {
+      if (concert.artist?.name?.toLowerCase().includes(q))
+        artists.set(concert.artist.id, concert.artist.name)
+    }
+    if (event.venue?.city?.name?.toLowerCase().includes(q))
+      cities.set(event.venue.city.id, event.venue.city.name)
+    if (user.value) {
+      for (const a of event.attendees ?? []) {
+        const label = `${a.firstname} ${a.lastname}`.trim()
+        if (label.toLowerCase().includes(q)) attendees.set(a.id, label)
+      }
+    }
+  }
+
+  const toItems = (m: Map<number, string>): Suggestion[] =>
+    [...m.entries()].map(([id, label]) => ({ id, label }))
+
+  return ([
+    { type: 'festival' as FilterType, items: toItems(festivals) },
+    { type: 'artist'   as FilterType, items: toItems(artists)   },
+    { type: 'city'     as FilterType, items: toItems(cities)    },
+    { type: 'attendee' as FilterType, items: toItems(attendees) },
+  ] as { type: FilterType; items: Suggestion[] }[]).filter(g => g.items.length > 0)
+})
+
+function applyFilter(type: FilterType, id: number, label: string) {
+  activeFilter.value = { type, id, label }
+  search.value = ''
+  showSuggestions.value = false
+}
+
+function onSearchBlur() {
+  setTimeout(() => { showSuggestions.value = false }, 150)
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 const eventFormRef = ref<InstanceType<typeof EventForm> | null>(null)
 
 const events = ref<Event[]>([])
@@ -129,11 +194,24 @@ function fuzzyMatch(q: string, e: Event): boolean {
 }
 
 const filtered = computed(() => {
+  let result = [...events.value]
+
+  // Filtre entité exact (festival, artiste, ville, personne)
+  if (activeFilter.value) {
+    const f = activeFilter.value
+    if      (f.type === 'festival') result = result.filter(e => e.festival?.id === f.id)
+    else if (f.type === 'artist')   result = result.filter(e => e.concerts.some(c => c.artist?.id === f.id))
+    else if (f.type === 'city')     result = result.filter(e => e.venue?.city?.id === f.id)
+    else if (f.type === 'attendee') result = result.filter(e => e.attendees?.some(a => a.id === f.id))
+  }
+
+  // Recherche texte libre (en plus du filtre actif)
   const q = search.value.trim().toLowerCase()
-  let result = q ? events.value.filter((e) => fuzzyMatch(q, e)) : [...events.value]
-  // Keep full event (all concerts) — just gate inclusion based on presence of any played concert.
-  if (playedFilter.value === 'played') result = result.filter((e) => e.concerts.some((c) => c.i_played))
-  else if (playedFilter.value === 'not_played') result = result.filter((e) => !e.concerts.some((c) => c.i_played))
+  if (q) result = result.filter(e => fuzzyMatch(q, e))
+
+  if (playedFilter.value === 'played')     result = result.filter(e => e.concerts.some(c => c.i_played))
+  else if (playedFilter.value === 'not_played') result = result.filter(e => !e.concerts.some(c => c.i_played))
+
   return result.sort((a, b) => a.event_date.localeCompare(b.event_date))
 })
 
@@ -160,16 +238,43 @@ function onRowClick(ev: DataTableRowClickEvent) {
   <div class="space-y-4">
     <!-- Header -->
     <div class="flex flex-col gap-2">
-      <!-- Row 1: search -->
-      <IconField>
-        <InputIcon class="pi pi-search" />
-        <InputText
-          v-model="search"
-          placeholder="Search by artist, venue, festival, date…"
-          class="w-full"
-        />
-      </IconField>
-      <!-- Row 2: filter + count + new -->
+      <!-- Row 1: search + suggestions dropdown -->
+      <div class="relative">
+        <IconField>
+          <InputIcon class="pi pi-search" />
+          <InputText
+            v-model="search"
+            :placeholder="activeFilter ? 'Affiner la recherche…' : 'Rechercher artiste, festival, ville, date…'"
+            class="w-full"
+            @focus="showSuggestions = true"
+            @blur="onSearchBlur"
+            @keydown.escape="showSuggestions = false"
+          />
+        </IconField>
+
+        <!-- Suggestions dropdown -->
+        <div
+          v-if="showSuggestions && suggestions.length"
+          class="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden"
+        >
+          <template v-for="group in suggestions" :key="group.type">
+            <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+              <i :class="FILTER_CONFIG[group.type].icon" class="mr-1.5" />{{ FILTER_CONFIG[group.type].label }}
+            </div>
+            <button
+              v-for="item in group.items.slice(0, 4)"
+              :key="item.id"
+              class="w-full flex items-center px-4 py-2 text-sm text-left hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 transition-colors"
+              @mousedown.prevent
+              @click="applyFilter(group.type, item.id, item.label)"
+            >
+              {{ item.label }}
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <!-- Row 2: played filter + active filter chip + count + new -->
       <div class="flex items-center gap-2">
         <SelectButton
           v-model="playedFilter"
@@ -185,6 +290,19 @@ function onRowClick(ev: DataTableRowClickEvent) {
             <i :class="option.icon" v-tooltip.bottom="option.label" />
           </template>
         </SelectButton>
+
+        <!-- Active filter chip -->
+        <span
+          v-if="activeFilter"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-xs font-medium shrink-0 max-w-[180px]"
+        >
+          <i :class="FILTER_CONFIG[activeFilter.type].icon" class="text-xs shrink-0" />
+          <span class="truncate">{{ activeFilter.label }}</span>
+          <button class="shrink-0 hover:opacity-70" @click="activeFilter = null">
+            <i class="pi pi-times text-xs" />
+          </button>
+        </span>
+
         <span v-if="!loading" class="flex-1 text-xs text-gray-400 whitespace-nowrap">
           {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
         </span>
