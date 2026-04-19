@@ -191,15 +191,15 @@ watch(() => route.query.expanded, (expanded) => {
   }
 })
 
-// Reset all filters when navigating to '/' with empty query (e.g. clicking ConcertsDB logo).
-watch(() => route.query, (q) => {
-  if (route.path === '/' && !q.q && !q.filter) {
+// Reset all filters when AppHeader explicitly navigates to '/' with a _r token.
+watch(() => route.query._r, (val) => {
+  if (val) {
     search.value = ''
     searchDebounced.value = ''
     activeFilter.value = null
     playedFilter.value = 'all'
   }
-}, { deep: true })
+})
 
 watch([search, expandedRows, expandedCards], () => {
   const tableIds = Object.entries(expandedRows.value).filter(([, v]) => v).map(([k]) => Number(k))

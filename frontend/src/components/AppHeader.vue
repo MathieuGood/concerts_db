@@ -32,7 +32,7 @@ const menuOpen = ref(false)
 function navigate(path: string) {
   menuOpen.value = false
   if (path === '/' && route.path === '/') {
-    router.push({ path: '/', query: {} })
+    router.push({ path: '/', query: { _r: Date.now().toString() } })
   } else {
     router.push(path)
   }
