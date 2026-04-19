@@ -332,7 +332,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
         </div>
       </div>
 
-      <!-- Row 2: played filter + active filter chip + count + new -->
+      <!-- Row 2: played filter + count + new -->
       <div class="flex items-center gap-2">
         <SelectButton v-model="playedFilter" :options="playedOptions" optionLabel="label" optionValue="value"
           :allowEmpty="false" size="small" class="shrink-0" :pt="{ pcToggleButton: { root: { class: '!px-1' } } }">
@@ -341,20 +341,21 @@ function onRowClick(ev: DataTableRowClickEvent) {
           </template>
         </SelectButton>
 
-        <!-- Active filter chip -->
-        <span v-if="activeFilter"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-xs font-medium min-w-0 max-w-[180px]">
+        <span v-if="!loading" class="flex-1 text-xs text-gray-400 whitespace-nowrap">
+          {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
+        </span>
+        <Button icon="pi pi-plus" label="New" size="small" class="shrink-0" @click="router.push('/event/new')" />
+      </div>
+
+      <!-- Row 3: active filter chip -->
+      <div v-if="activeFilter" class="flex items-center gap-1.5">
+        <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-xs font-medium min-w-0 max-w-full">
           <i :class="FILTER_CONFIG[activeFilter.type].icon" class="text-xs shrink-0" />
           <span class="truncate">{{ activeFilter.label }}</span>
           <button class="shrink-0 hover:opacity-70" @click="activeFilter = null">
             <i class="pi pi-times text-xs" />
           </button>
         </span>
-
-        <span v-if="!loading" class="flex-1 text-xs text-gray-400 whitespace-nowrap">
-          {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
-        </span>
-        <Button icon="pi pi-plus" label="New" size="small" class="shrink-0" @click="router.push('/event/new')" />
       </div>
     </div>
 
