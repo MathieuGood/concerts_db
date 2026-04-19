@@ -30,10 +30,10 @@ const loading = ref(true)
 const search = ref(initialSearch)
 type PlayedFilter = 'all' | 'played' | 'not_played'
 const playedFilter = ref<PlayedFilter>('all')
-const playedOptions: { label: string; value: PlayedFilter }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'I played', value: 'played' },
-  { label: 'Not played', value: 'not_played' },
+const playedOptions: { icon: string; label: string; value: PlayedFilter }[] = [
+  { icon: 'pi pi-bars', label: 'All shows', value: 'all' },
+  { icon: 'pi pi-microphone', label: 'I played', value: 'played' },
+  { icon: 'pi pi-eye', label: 'Watched', value: 'not_played' },
 ]
 const expandedRows = ref<any[]>([])
 const expandedCards = ref<Set<number>>(new Set(initialExpandedIds))
@@ -137,7 +137,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
 <template>
   <div class="space-y-4">
     <!-- Header row -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2">
       <IconField class="flex-1">
         <InputIcon class="pi pi-search" />
         <InputText
@@ -146,7 +146,21 @@ function onRowClick(ev: DataTableRowClickEvent) {
           class="w-full"
         />
       </IconField>
-      <span v-if="!loading" class="text-xs text-gray-400 shrink-0 whitespace-nowrap">
+      <SelectButton
+        v-model="playedFilter"
+        :options="playedOptions"
+        optionLabel="label"
+        optionValue="value"
+        :allowEmpty="false"
+        size="small"
+        class="shrink-0"
+        :pt="{ pcToggleButton: { root: { class: '!px-2.5' } } }"
+      >
+        <template #option="{ option }">
+          <i :class="option.icon" v-tooltip.bottom="option.label" />
+        </template>
+      </SelectButton>
+      <span v-if="!loading" class="hidden sm:inline text-xs text-gray-400 shrink-0 whitespace-nowrap">
         {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
       </span>
       <Button
@@ -155,18 +169,6 @@ function onRowClick(ev: DataTableRowClickEvent) {
         size="small"
         class="shrink-0"
         @click="router.push('/event/new')"
-      />
-    </div>
-
-    <!-- Played filter -->
-    <div class="flex">
-      <SelectButton
-        v-model="playedFilter"
-        :options="playedOptions"
-        optionLabel="label"
-        optionValue="value"
-        :allowEmpty="false"
-        size="small"
       />
     </div>
 
