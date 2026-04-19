@@ -81,8 +81,8 @@ function update(field: keyof ConcertFormData, value: unknown) {
       <Textarea
         :model-value="modelValue.comments"
         placeholder="Comments"
-        rows="2"
-        class="w-full text-sm resize-none max-h-24 !overflow-y-auto"
+        class="w-full text-sm"
+        :pt="{ root: { style: 'height:4rem;max-height:4rem;overflow-y:auto;resize:none' } }"
         @update:model-value="update('comments', $event)"
       />
     </div>
@@ -92,8 +92,8 @@ function update(field: keyof ConcertFormData, value: unknown) {
       <Textarea
         :model-value="modelValue.setlist"
         placeholder="Setlist (one song per line)"
-        rows="4"
-        class="w-full text-sm resize-none max-h-24 !overflow-y-auto"
+        class="w-full text-sm"
+        :pt="{ root: { style: 'height:8rem;max-height:8rem;overflow-y:auto;resize:none' } }"
         @update:model-value="update('setlist', $event)"
       />
     </div>
