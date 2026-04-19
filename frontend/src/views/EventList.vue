@@ -474,18 +474,18 @@ function onRowClick(ev: DataTableRowClickEvent) {
 
           <Column header="Artists">
             <template #body="{ data }">
-              {{ artistNames(data) || data.name || '—' }}
+              <div class="leading-tight">
+                <div v-if="data.festival" class="text-xs font-medium text-violet-500 dark:text-violet-400 mb-0.5">
+                  {{ data.festival.name }}{{ data.festival.year ? ` ${data.festival.year}` : '' }}
+                </div>
+                <div>{{ artistNames(data) || data.name || '—' }}</div>
+              </div>
             </template>
           </Column>
 
           <Column header="Venue">
             <template #body="{ data }">
-              <div class="leading-tight">
-                <div>{{ data.venue?.name }}</div>
-                <div v-if="data.festival" class="text-xs text-violet-500 dark:text-violet-400 mt-0.5">
-                  {{ data.festival.name }}{{ data.festival.year ? ` ${data.festival.year}` : '' }}
-                </div>
-              </div>
+              {{ data.venue?.name }}
             </template>
           </Column>
 
