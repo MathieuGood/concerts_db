@@ -332,8 +332,9 @@ function onRowClick(ev: DataTableRowClickEvent) {
         </div>
       </div>
 
-      <!-- Row 2: played filter + count + new -->
+      <!-- Row 2: new + played filter + count -->
       <div class="flex items-center gap-2">
+        <Button icon="pi pi-plus" label="New" size="small" class="shrink-0" @click="router.push('/event/new')" />
         <SelectButton v-model="playedFilter" :options="playedOptions" optionLabel="label" optionValue="value"
           :allowEmpty="false" size="small" class="shrink-0" :pt="{ pcToggleButton: { root: { class: '!px-1' } } }">
           <template #option="{ option }">
@@ -344,7 +345,6 @@ function onRowClick(ev: DataTableRowClickEvent) {
         <span v-if="!loading" class="flex-1 text-xs text-gray-400 whitespace-nowrap">
           {{ filtered.length }} event{{ filtered.length !== 1 ? 's' : '' }}
         </span>
-        <Button icon="pi pi-plus" label="New" size="small" class="shrink-0" @click="router.push('/event/new')" />
       </div>
 
       <!-- Row 3: active filter chip -->
