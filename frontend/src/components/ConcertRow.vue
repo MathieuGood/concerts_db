@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import Textarea from 'primevue/textarea'
 import ArtistSelectOrCreate from './ArtistSelectOrCreate.vue'
 import type { ConcertFormData } from '@/models/Event'
 import type { Artist } from '@/models/Artist'
@@ -77,25 +78,25 @@ function update(field: keyof ConcertFormData, value: unknown) {
 
     <!-- Comments (collapsible) -->
     <div v-if="showComments" class="px-3 pb-2 pl-9">
-      <textarea
-        :value="modelValue.comments"
+      <Textarea
+        :model-value="modelValue.comments"
         placeholder="Comments"
         rows="2"
-        class="p-textarea p-component w-full text-sm"
-        style="overflow-y:auto;resize:none"
-        @input="update('comments', ($event.target as HTMLTextAreaElement).value)"
+        auto-resize
+        class="w-full text-sm"
+        @update:model-value="update('comments', $event)"
       />
     </div>
 
     <!-- Setlist (collapsible) -->
     <div v-if="showSetlist" class="px-3 pb-2 pl-9">
-      <textarea
-        :value="modelValue.setlist"
+      <Textarea
+        :model-value="modelValue.setlist"
         placeholder="Setlist (one song per line)"
         rows="5"
-        class="p-textarea p-component w-full text-sm font-mono"
-        style="overflow-y:auto;resize:none"
-        @input="update('setlist', ($event.target as HTMLTextAreaElement).value)"
+        auto-resize
+        class="w-full text-sm font-mono"
+        @update:model-value="update('setlist', $event)"
       />
     </div>
   </div>
