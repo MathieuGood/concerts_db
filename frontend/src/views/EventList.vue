@@ -38,8 +38,9 @@ const FILTER_CONFIG: Record<FilterType, { icon: string; label: string }> = {
   attendee: { icon: 'pi pi-user',        label: 'Personne' },
 }
 
-const activeFilter   = ref<ActiveFilter | null>(null)
-const showSuggestions = ref(false)
+const activeFilter    = ref<ActiveFilter | null>(null)
+const showSuggestions  = ref(false)
+const highlightedIndex = ref(-1)
 
 const suggestions = computed(() => {
   const q = normalize(searchDebounced.value.trim())
@@ -80,14 +81,45 @@ const suggestions = computed(() => {
   ] as { type: FilterType; items: Suggestion[] }[]).filter(g => g.items.length > 0)
 })
 
+const flatSuggestions = computed(() => {
+  const items: Array<{ type: FilterType; id: number; label: string }> = []
+  for (const g of suggestions.value)
+    for (const item of g.items.slice(0, 4))
+      items.push({ type: g.type, id: item.id, label: item.label })
+  return items
+})
+
+const highlightedItem = computed(() => flatSuggestions.value[highlightedIndex.value] ?? null)
+
 function applyFilter(type: FilterType, id: number, label: string) {
   activeFilter.value = { type, id, label }
   search.value = ''
   showSuggestions.value = false
+  highlightedIndex.value = -1
 }
 
 function onSearchBlur() {
-  setTimeout(() => { showSuggestions.value = false }, 150)
+  setTimeout(() => { showSuggestions.value = false; highlightedIndex.value = -1 }, 150)
+}
+
+function onSearchKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    showSuggestions.value = false
+    highlightedIndex.value = -1
+    return
+  }
+  if (!showSuggestions.value || !flatSuggestions.value.length) return
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    highlightedIndex.value = Math.min(highlightedIndex.value + 1, flatSuggestions.value.length - 1)
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    highlightedIndex.value = Math.max(highlightedIndex.value - 1, -1)
+  } else if (e.key === 'Enter' && highlightedIndex.value >= 0) {
+    e.preventDefault()
+    const item = flatSuggestions.value[highlightedIndex.value]
+    if (item) applyFilter(item.type, item.id, item.label)
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,7 +136,7 @@ const searchDebounced = ref(initialSearch)
 let _debounceTimer: ReturnType<typeof setTimeout> | null = null
 watch(search, (val) => {
   if (_debounceTimer) clearTimeout(_debounceTimer)
-  _debounceTimer = setTimeout(() => { searchDebounced.value = val }, 200)
+  _debounceTimer = setTimeout(() => { searchDebounced.value = val; highlightedIndex.value = -1 }, 200)
 })
 type PlayedFilter = 'all' | 'played' | 'not_played'
 const playedFilter = ref<PlayedFilter>('all')
@@ -251,7 +283,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
     <div class="flex flex-col gap-2">
       <!-- Row 1: search + suggestions dropdown -->
       <!-- @focusin/@focusout sur le div : plus fiable que @focus/@blur sur le composant PrimeVue -->
-      <div class="relative" @focusin="showSuggestions = true" @focusout="onSearchBlur" @keydown.escape="showSuggestions = false">
+      <div class="relative" @focusin="showSuggestions = true" @focusout="onSearchBlur" @keydown="onSearchKeydown">
         <IconField>
           <InputIcon class="pi pi-search" />
           <InputText
@@ -273,7 +305,12 @@ function onRowClick(ev: DataTableRowClickEvent) {
             <button
               v-for="item in group.items.slice(0, 4)"
               :key="item.id"
-              class="w-full flex items-center px-4 py-2 text-sm text-left hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 transition-colors"
+              :class="[
+                'w-full flex items-center px-4 py-2 text-sm text-left text-gray-800 dark:text-gray-200 transition-colors',
+                highlightedItem?.type === group.type && highlightedItem?.id === item.id
+                  ? 'bg-gray-100 dark:bg-gray-700'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+              ]"
               @mousedown.prevent
               @click="applyFilter(group.type, item.id, item.label)"
             >

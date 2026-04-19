@@ -84,6 +84,11 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
 }
 
+/* Textarea: aligner le background sur InputText (tokens différents dans Aura) */
+.p-textarea {
+  background: var(--p-inputtext-background);
+}
+
 /* Denser DataTable: smaller font + tighter cell padding (vertical & horizontal) */
 .p-datatable-sm td,
 .p-datatable-sm th {
