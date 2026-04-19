@@ -35,3 +35,6 @@ Thumbs.db
 
 # Test cache
 .pytest_cache/
+
+# Local dev dataset (CSV exports à importer au démarrage — non versionné)
+dataset/

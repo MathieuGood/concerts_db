@@ -86,7 +86,7 @@ def find_or_create_attendee(db: Session, full_name: str) -> Attendee:
     return attendee
 
 
-def import_csv(csv_path: Path = DEFAULT_CSV_PATH):
+def import_csv(csv_path: Path = DEFAULT_CSV_PATH, user_id: int | None = None):
     if not csv_path.exists():
         print(f"ERROR: CSV not found at {csv_path}")
         sys.exit(1)
@@ -139,6 +139,7 @@ def import_csv(csv_path: Path = DEFAULT_CSV_PATH):
                         comments=comments,
                         venue_id=venue.id,
                         festival_id=festival_id,
+                        user_id=user_id,
                     )
                     db.add(event)
                     db.commit()

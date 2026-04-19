@@ -26,6 +26,20 @@ cd frontend && npm run dev                                      # :5173, proxies
 
 `backend/.env`: `DATABASE_URI=sqlite+pysqlite:////tmp/concerts_db.sqlite`, `SECRET_KEY=...` required.
 
+### Dev seed automatique (`dataset/`)
+
+Placer un CSV d'export dans `dataset/` à la racine du projet (gitignored).  
+À chaque démarrage du backend, si ce répertoire existe : **reset complet de la DB** + import du CSV le plus récent.  
+Compte admin créé automatiquement : `dev@dev.com` / `dev`
+
+```bash
+# Exporter depuis la prod puis déposer dans dataset/
+docker exec concerts_db-backend-1 uv run python src/scripts/export_csv.py
+scp ubuntu@51.91.98.35:~/apps/concerts_db/backups/<fichier>.csv dataset/
+```
+
+Sans `dataset/` → comportement normal, aucun impact sur la prod.
+
 ## Tech stack
 
 - **Backend:** Python 3.12, FastAPI (`root_path="/api"` for Swagger behind nginx), SQLAlchemy 2.0, Pydantic v2, SQLite, uv

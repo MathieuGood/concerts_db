@@ -137,7 +137,10 @@ function onRowClick(ev: DataTableRowClickEvent) {
   const target = ev.originalEvent.target as HTMLElement | null
   if (target?.closest('button')) return
   const id = String(ev.data.id)
-  expandedRows.value = { ...expandedRows.value, [id]: !expandedRows.value[id] }
+  const next = { ...expandedRows.value }
+  if (next[id]) delete next[id]
+  else next[id] = true
+  expandedRows.value = next
 }
 </script>
 
