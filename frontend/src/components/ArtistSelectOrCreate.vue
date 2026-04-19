@@ -4,6 +4,7 @@ import Select from 'primevue/select'
 import AutoComplete from 'primevue/autocomplete'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import { normalize } from '@/utils/search'
 import { artistService } from '@/services/artistService'
 import { countryService } from '@/services/countryService'
 import type { Artist } from '@/models/Artist'
@@ -43,9 +44,9 @@ async function onShowCreate() {
 }
 
 function searchCountry(event: { query: string }) {
-  const q = event.query.toLowerCase()
+  const q = normalize(event.query)
   countrySuggestions.value = allCountries.value.filter((c) =>
-    c.name.toLowerCase().includes(q),
+    normalize(c.name).includes(q),
   )
 }
 
@@ -97,9 +98,9 @@ const selectedArtist = computed(() =>
 )
 
 function searchEditCountry(event: { query: string }) {
-  const q = event.query.toLowerCase()
+  const q = normalize(event.query)
   editCountrySuggestions.value = allCountries.value.filter((c) =>
-    c.name.toLowerCase().includes(q),
+    normalize(c.name).includes(q),
   )
 }
 

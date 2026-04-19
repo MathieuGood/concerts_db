@@ -347,7 +347,7 @@ defineExpose({ isEditMode })
           </div>
           <div>
             <label class="form-label">Comments</label>
-            <Textarea v-model="form.comments" rows="2" auto-resize class="w-full" />
+            <Textarea v-model="form.comments" rows="4" class="w-full resize-none overflow-y-auto" />
           </div>
         </section>
 

@@ -42,7 +42,7 @@ const activeFilter   = ref<ActiveFilter | null>(null)
 const showSuggestions = ref(false)
 
 const suggestions = computed(() => {
-  const q = normalize(search.value.trim())
+  const q = normalize(searchDebounced.value.trim())
   if (q.length < 2) return []
 
   const festivals = new Map<number, string>()
@@ -99,6 +99,13 @@ const eventFormRef = ref<InstanceType<typeof EventForm> | null>(null)
 const events = shallowRef<Event[]>([])
 const loading = ref(true)
 const search = ref(initialSearch)
+const searchDebounced = ref(initialSearch)
+
+let _debounceTimer: ReturnType<typeof setTimeout> | null = null
+watch(search, (val) => {
+  if (_debounceTimer) clearTimeout(_debounceTimer)
+  _debounceTimer = setTimeout(() => { searchDebounced.value = val }, 200)
+})
 type PlayedFilter = 'all' | 'played' | 'not_played'
 const playedFilter = ref<PlayedFilter>('all')
 const playedOptions: { icon: string; label: string; value: PlayedFilter }[] = [
@@ -210,7 +217,7 @@ const filtered = computed(() => {
   }
 
   // Recherche texte libre (en plus du filtre actif)
-  const q = search.value.trim().toLowerCase()
+  const q = searchDebounced.value.trim().toLowerCase()
   if (q) result = result.filter(e => fuzzyMatch(q, e))
 
   if (playedFilter.value === 'played')     result = result.filter(e => e.concerts.some(c => c.i_played))
@@ -362,7 +369,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
                   v-if="event.festival"
                   class="inline-block mt-1 text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full"
                 >
-                  {{ event.festival.name }}
+                  {{ event.festival.name }}{{ event.festival.year ? ` ${event.festival.year}` : '' }}
                 </span>
               </div>
             </button>
@@ -473,7 +480,7 @@ function onRowClick(ev: DataTableRowClickEvent) {
                 v-if="data.festival"
                 class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full"
               >
-                {{ data.festival.name }}
+                {{ data.festival.name }}{{ data.festival.year ? ` ${data.festival.year}` : '' }}
               </span>
             </template>
           </Column>

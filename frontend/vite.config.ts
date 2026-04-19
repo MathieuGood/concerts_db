@@ -14,7 +14,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('primevue') || id.includes('@primevue')) return 'primevue'
           if (id.includes('node_modules')) return 'vendor'
         },
       },

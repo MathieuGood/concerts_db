@@ -4,6 +4,7 @@ import Select from 'primevue/select'
 import AutoComplete from 'primevue/autocomplete'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import { normalize } from '@/utils/search'
 import { venueService } from '@/services/venueService'
 import { countryService } from '@/services/countryService'
 import { cityService } from '@/services/cityService'
@@ -50,9 +51,9 @@ async function onShowCreate() {
 }
 
 function searchCountry(event: { query: string }) {
-  const q = event.query.toLowerCase()
+  const q = normalize(event.query)
   countrySuggestions.value = allCountries.value.filter((c) =>
-    c.name.toLowerCase().includes(q),
+    normalize(c.name).includes(q),
   )
 }
 
@@ -66,9 +67,9 @@ watch(selectedCountry, async (country) => {
 })
 
 function searchCity(event: { query: string }) {
-  const q = event.query.toLowerCase()
+  const q = normalize(event.query)
   citySuggestions.value = allCities.value.filter((c) =>
-    c.name.toLowerCase().includes(q),
+    normalize(c.name).includes(q),
   )
 }
 
@@ -133,9 +134,9 @@ const selectedVenue = computed(() =>
 )
 
 function searchEditCountry(event: { query: string }) {
-  const q = event.query.toLowerCase()
+  const q = normalize(event.query)
   editCountrySuggestions.value = allCountries.value.filter((c) =>
-    c.name.toLowerCase().includes(q),
+    normalize(c.name).includes(q),
   )
 }
 
@@ -145,9 +146,9 @@ async function onEditCountrySelect(event: { value: Country }) {
 }
 
 function searchEditCity(event: { query: string }) {
-  const q = event.query.toLowerCase()
+  const q = normalize(event.query)
   editCitySuggestions.value = editAllCities.value.filter((c) =>
-    c.name.toLowerCase().includes(q),
+    normalize(c.name).includes(q),
   )
 }
 
