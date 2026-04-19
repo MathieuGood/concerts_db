@@ -29,7 +29,7 @@ interface EventEntry {
 }
 interface ArtistRow {
   id: number; name: string; countryName: string; country_id: number | null; country: Country | null
-  concerts: number; venues: number; cities: number; countries: number
+  concerts: number; venues: number; cities: number; countries: number; countryArtists: number
   firstSeen: string | null; lastSeen: string | null
   events: EventEntry[]; _editing: boolean
 }
@@ -76,16 +76,21 @@ onMounted(async () => {
       }
     }
 
-    artistRows.value = artists.map(a => {
+    const rows = artists.map(a => {
       const s = statsMap.get(a.id)
       return {
         id: a.id, name: a.name, countryName: a.country?.name ?? '', country_id: a.country_id ?? null, country: a.country ?? null,
         concerts: s?.concerts ?? 0, venues: s?.venueIds.size ?? 0, cities: s?.cityIds.size ?? 0, countries: s?.countryIds.size ?? 0,
+        countryArtists: 0,
         firstSeen: s?.firstSeen ?? null, lastSeen: s?.lastSeen ?? null,
         events: s?.events.sort((a, b) => b.date.localeCompare(a.date)) ?? [],
         _editing: false,
       }
     })
+    const countryCount = new Map<number | null, number>()
+    for (const r of rows) countryCount.set(r.country_id, (countryCount.get(r.country_id) ?? 0) + 1)
+    for (const r of rows) r.countryArtists = countryCount.get(r.country_id) ?? 0
+    artistRows.value = rows
     expandedRows.value = artistRows.value.filter(r => initialExpandedIds.includes(r.id))
     expandedCards.value = initialExpandedIds.filter(id => artistRows.value.some(r => r.id === id))
   } finally { loading.value = false }
@@ -325,6 +330,11 @@ function deleteFromCard(row: ArtistRow) {
             <template #body="{ data }">
               <Select v-if="data._editing" v-model="editData[data.id].country_id" :options="countries" optionLabel="name" optionValue="id" showClear placeholder="None" class="w-full" />
               <span v-else>{{ data.country?.name ?? '—' }}</span>
+            </template>
+          </Column>
+          <Column field="countryArtists" header="From country" sortable style="width:110px">
+            <template #body="{ data }">
+              <span class="font-semibold text-d-comment">{{ data.countryArtists || '—' }}</span>
             </template>
           </Column>
           <Column field="concerts" header="Concerts" sortable style="width:90px">
