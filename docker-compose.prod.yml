@@ -7,6 +7,7 @@ services:
       - "127.0.0.1:8082:80"
     depends_on:
       - backend
+    restart: unless-stopped
 
   backend:
     build:
@@ -18,3 +19,4 @@ services:
       - backend/.env
     volumes:
       - ./data:/data
+    restart: unless-stopped
